@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -46,4 +47,7 @@ public class Article {
 
     @Column(name = "likes")
     private Long likes;
+
+    @OneToMany(mappedBy = "article")
+    private Set<Comment> comments;
 }

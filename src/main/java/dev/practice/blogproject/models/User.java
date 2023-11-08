@@ -71,4 +71,7 @@ public class User {
 
     @OneToMany(mappedBy = "author")
     private Set<Article> articles;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Comment> comments;
 }
