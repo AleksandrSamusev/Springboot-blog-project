@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -61,4 +62,10 @@ public class User {
     @Column(name = "is_banned")
     @NotNull
     private Boolean isBanned = false;
+
+    @OneToMany(mappedBy = "sender")
+    private Set<Message> sentMessages;
+
+    @OneToMany(mappedBy = "recipient")
+    private Set<Message> receivedMessages;
 }
