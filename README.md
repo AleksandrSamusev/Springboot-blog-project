@@ -41,3 +41,6 @@ The main features of the service are as follows:
 4. Confirm/reject the publication of the article (in case of rejection the author sees admins comments);
 5. Block the user from leaving comments on articles; 
 
+## DB ER-diagramm
+
+![er-diagramm](src/main/resources/static/images/blog.png)
