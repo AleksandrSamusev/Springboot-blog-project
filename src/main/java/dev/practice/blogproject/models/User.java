@@ -68,4 +68,7 @@ public class User {
 
     @OneToMany(mappedBy = "recipient")
     private Set<Message> receivedMessages;
+
+    @OneToMany(mappedBy = "author")
+    private Set<Article> articles;
 }
