@@ -18,6 +18,7 @@ public class UserMapper {
         dto.setEmail(user.getEmail());
         dto.setUsername(user.getUsername());
         dto.setBirthdate(user.getBirthdate());
+        dto.setRole(user.getRole());
         dto.setIsBanned(user.getIsBanned());
         dto.setComments(user.getComments());
         dto.setSentMessages(user.getSentMessages());
@@ -35,6 +36,7 @@ public class UserMapper {
         user.setEmail(dto.getEmail());
         user.setUsername(dto.getUsername());
         user.setBirthdate(dto.getBirthdate());
+        user.setRole(dto.getRole());
         user.setIsBanned(dto.getIsBanned());
         user.setComments(dto.getComments());
         user.setSentMessages(dto.getSentMessages());

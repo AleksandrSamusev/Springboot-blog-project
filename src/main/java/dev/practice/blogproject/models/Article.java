@@ -43,7 +43,7 @@ public class Article {
     private LocalDateTime published;
 
     @Enumerated(EnumType.STRING)
-    private ArticleStatuses status = ArticleStatuses.CREATED;
+    private ArticleStatus status = ArticleStatus.CREATED;
 
     @Column(name = "likes")
     private Long likes;

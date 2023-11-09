@@ -1,6 +1,6 @@
 package dev.practice.blogproject.models;
 
-public enum ArticleStatuses {
+public enum ArticleStatus {
     PUBLISHED,
     MODERATING,
     CREATED,
