@@ -1,0 +1,672 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Blog API",
+    "version": "1.0.0",
+    "description": "This is a sample Blog server based on the OpenAPI 3.0 specification.",
+    "contact": {
+      "email": "alex.samusev.81@gmail.com",
+      "name": "Aleksandr Samusev"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1",
+      "variables": {},
+      "description": "localhost"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 16
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "username": {
+            "type": "string",
+            "example": "JohnDoe123"
+          },
+          "email": {
+            "type": "string",
+            "example": "johnDoe@john.doe"
+          },
+          "birthdate": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-05-17"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ],
+            "example": "ADMIN"
+          },
+          "about": {
+            "type": "string",
+            "maxLength": 1000,
+            "example": "Hi! My name is John Doe and i'm an active user of this service"
+          },
+          "isBanned": {
+            "type": "boolean",
+            "default": false,
+            "example": false
+          },
+          "sentMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "uniqueItems": true
+          },
+          "recievedMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "uniqueItems": true
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            },
+            "uniqueItems": true
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "username",
+          "email",
+          "birthdate",
+          "role",
+          "isBanned"
+        ]
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 3
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is a simple message 500 characters max length"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/User"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/User"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          }
+        },
+        "required": [
+          "message",
+          "sender",
+          "recipient",
+          "created"
+        ]
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "commentId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 43
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is an example comment"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "article": {
+            "$ref": "#/components/schemas/Article"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "comment",
+          "created",
+          "article",
+          "user"
+        ]
+      },
+      "Article": {
+        "type": "object",
+        "properties": {
+          "articleId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 34
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "This is an example of the articles title"
+          },
+          "content": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
+          },
+          "author": {
+            "$ref": "#/components/schemas/User"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PUBLISHED",
+              "MODERATING",
+              "CREATED",
+              "REJECTED"
+            ],
+            "example": "PUBLISHED"
+          },
+          "likes": {
+            "type": "integer",
+            "format": "int64",
+            "example": 5567
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            },
+            "uniqueItems": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "title",
+          "content",
+          "author",
+          "created",
+          "status"
+        ]
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 53
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Example tag"
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UserFullDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 16
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "username": {
+            "type": "string",
+            "example": "JohnDoe123"
+          },
+          "email": {
+            "type": "string",
+            "example": "johnDoe@john.doe"
+          },
+          "birthdate": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-05-17"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ],
+            "example": "ADMIN"
+          },
+          "about": {
+            "type": "string",
+            "maxLength": 1000,
+            "example": "Hi! My name is John Doe and i'm an active user of this service"
+          },
+          "isBanned": {
+            "type": "boolean",
+            "default": false,
+            "example": false
+          },
+          "sentMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageFullDto"
+            },
+            "uniqueItems": true
+          },
+          "recievedMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageFullDto"
+            },
+            "uniqueItems": true
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArticleFullDto"
+            },
+            "uniqueItems": true
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentFullDto"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "username",
+          "email",
+          "birthdate",
+          "role",
+          "isBanned"
+        ]
+      },
+      "MessageFullDto": {
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 3
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is a simple message 500 characters max length"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/UserFullDto"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/UserFullDto"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          }
+        },
+        "required": [
+          "message",
+          "sender",
+          "recipient",
+          "created"
+        ]
+      },
+      "CommentFullDto": {
+        "type": "object",
+        "properties": {
+          "commentId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 43
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is an example comment"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "article": {
+            "$ref": "#/components/schemas/ArticleFullDto"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserFullDto"
+          }
+        },
+        "required": [
+          "comment",
+          "created",
+          "article",
+          "user"
+        ]
+      },
+      "ArticleFullDto": {
+        "type": "object",
+        "properties": {
+          "articleId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 34
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "This is an example of the articles title"
+          },
+          "content": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
+          },
+          "author": {
+            "$ref": "#/components/schemas/User"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PUBLISHED",
+              "MODERATING",
+              "CREATED",
+              "REJECTED"
+            ],
+            "example": "PUBLISHED"
+          },
+          "likes": {
+            "type": "integer",
+            "format": "int64",
+            "example": 5567
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentFullDto"
+            },
+            "uniqueItems": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagFullDto"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "title",
+          "content",
+          "author",
+          "created",
+          "status"
+        ]
+      },
+      "TagFullDto": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 53
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Example tag"
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArticleFullDto"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UserShortDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 16
+          },
+          "username": {
+            "type": "string",
+            "example": "JohnDoe123"
+          }
+        },
+        "required": [
+          "userId",
+          "username"
+        ]
+      },
+      "ArticleShortDto": {
+        "type": "object",
+        "properties": {
+          "articleId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 34
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "This is an example of the articles title"
+          },
+          "content": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserShortDto"
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "likes": {
+            "type": "integer",
+            "format": "int64",
+            "example": 5567
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentShortDto"
+            },
+            "uniqueItems": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagShortDto"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "articleId",
+          "title",
+          "content",
+          "author",
+          "created",
+          "status"
+        ]
+      },
+      "TagShortDto": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 53
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Example tag"
+          }
+        },
+        "required": [
+          "tagId",
+          "name"
+        ]
+      },
+      "CommentShortDto": {
+        "type": "object",
+        "properties": {
+          "commentId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 43
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is an example comment"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "articleId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 34
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 21
+          }
+        },
+        "required": [
+          "comment",
+          "created",
+          "articleId",
+          "userId"
+        ]
+      },
+      "MessageShortDto": {
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 3
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is a simple message 500 characters max length"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/UserShortDto"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/UserShortDto"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          }
+        },
+        "required": [
+          "message",
+          "sender",
+          "recipient",
+          "created"
+        ]
+      }
+    }
+  }
+}
