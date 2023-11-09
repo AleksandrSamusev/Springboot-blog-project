@@ -1,5 +1,5 @@
 package dev.practice.blogproject.dtos;
-import dev.practice.blogproject.models.ArticleStatuses;
+import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.models.Comment;
 import dev.practice.blogproject.models.Tag;
 import dev.practice.blogproject.models.User;
@@ -21,7 +21,7 @@ public class ArticleDto {
     private User author;
     private LocalDateTime created = LocalDateTime.now();
     private LocalDateTime published;
-    private ArticleStatuses status = ArticleStatuses.CREATED;
+    private ArticleStatus status = ArticleStatus.CREATED;
     private Long likes;
     private Set<Comment> comments;
     private Set<Tag> tags;

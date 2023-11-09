@@ -3,6 +3,7 @@ package dev.practice.blogproject.dtos;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.Comment;
 import dev.practice.blogproject.models.Message;
+import dev.practice.blogproject.models.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class UserDto {
     private String username;
     private String email;
     private LocalDate birthdate;
+    private Role role;
     private String about;
     private Boolean isBanned;
     private Set<Message> sentMessages;

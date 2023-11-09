@@ -54,6 +54,11 @@ public class User {
     @Past
     private LocalDate birthdate;
 
+    @Column(name = "role")
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Column(name = "about")
     @NotNull
     @Length(max = 1000)
