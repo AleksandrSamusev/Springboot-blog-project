@@ -24,5 +24,5 @@ public class ArticleDto {
     private ArticleStatuses status = ArticleStatuses.CREATED;
     private Long likes;
     private Set<Comment> comments;
-    private Set<Tag> tags;
+    private Set<Tag> tags; //
 }
