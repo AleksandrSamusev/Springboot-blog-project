@@ -1,6 +1,6 @@
 package dev.practice.blogproject.dtos;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewCommentDto {
+public class TagNewDto {
 
-    @NotNull
-    private String comment;
+    @NotBlank
+    private String name;
 
 }

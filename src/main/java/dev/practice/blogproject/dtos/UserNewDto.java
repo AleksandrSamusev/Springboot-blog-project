@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewUserDto {
+public class UserNewDto {
 
     @NotBlank
     private String firstName;

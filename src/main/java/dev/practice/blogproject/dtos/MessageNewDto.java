@@ -1,5 +1,6 @@
 package dev.practice.blogproject.dtos;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateArticleDto {
+public class MessageNewDto {
 
-    private String title;
-    private String content;
+    @NotBlank
+    private String message;
 
 }

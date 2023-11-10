@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateUserDto {
+public class UserUpdateDto {
 
     String firstName;
     String lastName;

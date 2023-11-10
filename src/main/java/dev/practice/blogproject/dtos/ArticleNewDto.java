@@ -6,13 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewMessageDto {
+public class ArticleNewDto {
 
     @NotBlank
-    private String message;
+    private String title;
+
+    @NotBlank
+    private String content;
+    private Set<TagNewDto> tags;
 
 }
