@@ -863,6 +863,68 @@
           }
         }
       }
+    },
+    "/private/messages/users/{userId}": {
+      "post": {
+        "tags": [
+          "Private Message Controller"
+        ],
+        "summary": "Create message",
+        "description": "Create message\n",
+        "operationId": "createMessage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageShortDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -976,13 +1038,18 @@
             "type": "string",
             "format": "date-time",
             "example": "2017-07-21T17:32:28Z"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "default": false
           }
         },
         "required": [
           "message",
           "sender",
           "recipient",
-          "created"
+          "created",
+          "isDeleted"
         ]
       },
       "Comment": {
@@ -1006,7 +1073,7 @@
           "article": {
             "$ref": "#/components/schemas/Article"
           },
-          "user": {
+          "commentAuthor": {
             "$ref": "#/components/schemas/User"
           }
         },
@@ -1014,7 +1081,7 @@
           "comment",
           "created",
           "article",
-          "user"
+          "commentAuthor"
         ]
       },
       "Article": {
@@ -1160,28 +1227,28 @@
           "sentMessages": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MessageFullDto"
+              "$ref": "#/components/schemas/MessageShortDto"
             },
             "uniqueItems": true
           },
           "recievedMessages": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MessageFullDto"
+              "$ref": "#/components/schemas/MessageShortDto"
             },
             "uniqueItems": true
           },
           "articles": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ArticleFullDto"
+              "$ref": "#/components/schemas/ArticleShortDto"
             },
             "uniqueItems": true
           },
           "comments": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CommentFullDto"
+              "$ref": "#/components/schemas/CommentShortDto"
             },
             "uniqueItems": true
           }
@@ -1210,22 +1277,27 @@
             "example": "This is a simple message 500 characters max length"
           },
           "sender": {
-            "$ref": "#/components/schemas/UserFullDto"
+            "$ref": "#/components/schemas/UserShortDto"
           },
           "recipient": {
-            "$ref": "#/components/schemas/UserFullDto"
+            "$ref": "#/components/schemas/UserShortDto"
           },
           "created": {
             "type": "string",
             "format": "date-time",
             "example": "2017-07-21T17:32:28Z"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "default": false
           }
         },
         "required": [
           "message",
           "sender",
           "recipient",
-          "created"
+          "created",
+          "isDeleted"
         ]
       },
       "CommentFullDto": {
@@ -1246,17 +1318,19 @@
             "format": "date-time",
             "example": "2017-07-21T17:32:28Z"
           },
-          "article": {
-            "$ref": "#/components/schemas/ArticleFullDto"
+          "articleId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 33
           },
-          "user": {
-            "$ref": "#/components/schemas/UserFullDto"
+          "commentAuthor": {
+            "$ref": "#/components/schemas/UserShortDto"
           }
         },
         "required": [
           "comment",
           "created",
-          "article",
+          "articleId",
           "user"
         ]
       },
@@ -1278,7 +1352,7 @@
             "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
           },
           "author": {
-            "$ref": "#/components/schemas/User"
+            "$ref": "#/components/schemas/UserShortDto"
           },
           "created": {
             "type": "string",
@@ -1315,7 +1389,7 @@
           "tags": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TagFullDto"
+              "$ref": "#/components/schemas/TagShortDto"
             },
             "uniqueItems": true
           }
@@ -1343,8 +1417,10 @@
           },
           "articles": {
             "type": "array",
+            "description": "Set of unique article Ids",
             "items": {
-              "$ref": "#/components/schemas/ArticleFullDto"
+              "type": "integer",
+              "format": "int64"
             },
             "uniqueItems": true
           }
@@ -1503,13 +1579,18 @@
             "type": "string",
             "format": "date-time",
             "example": "2017-07-21T17:32:28Z"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "default": false
           }
         },
         "required": [
           "message",
           "sender",
           "recipient",
-          "created"
+          "created",
+          "isDeleted"
         ]
       },
       "NewUserDto": {
@@ -1517,18 +1598,22 @@
         "properties": {
           "firstName": {
             "type": "string",
+            "maxLength": 50,
             "example": "John"
           },
           "lastName": {
             "type": "string",
+            "maxLength": 50,
             "example": "Doe"
           },
           "username": {
             "type": "string",
+            "maxLength": 50,
             "example": "JohnDoe123"
           },
           "email": {
             "type": "string",
+            "maxLength": 50,
             "example": "johnDoe@john.doe"
           },
           "birthdate": {
@@ -1555,18 +1640,22 @@
         "properties": {
           "firstName": {
             "type": "string",
+            "maxLength": 50,
             "example": "John"
           },
           "lastName": {
             "type": "string",
+            "maxLength": 50,
             "example": "Doe"
           },
           "username": {
             "type": "string",
+            "maxLength": 50,
             "example": "JohnDoe123"
           },
           "email": {
             "type": "string",
+            "maxLength": 50,
             "example": "johnDoe@john.doe"
           },
           "birthdate": {
@@ -1618,6 +1707,13 @@
           "content": {
             "type": "string",
             "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NewTagDto"
+            },
+            "uniqueItems": true
           }
         },
         "required": [
@@ -1638,6 +1734,19 @@
             "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
           }
         }
+      },
+      "NewMessageDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is a simple message 500 characters max length"
+          }
+        },
+        "required": [
+          "message"
+        ]
       }
     }
   }
