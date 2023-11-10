@@ -20,6 +20,277 @@
       "description": "localhost"
     }
   ],
+  "paths": {
+    "/public/users": {
+      "get": {
+        "tags": [
+          "Public User Controller"
+        ],
+        "summary": "Get a list of users.",
+        "description": "Returns a list of all users from DB\n",
+        "operationId": "getUsers",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserShortDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Public User Controller"
+        ],
+        "summary": "Create new user.",
+        "description": "Create new user\n",
+        "operationId": "add user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserFullDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/public/users/{userId}": {
+      "get": {
+        "tags": [
+          "Public User Controller"
+        ],
+        "summary": "Get user by ID",
+        "description": "Get user by ID\n",
+        "operationId": "getUserByIdPublic",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserShortDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/users/{userId}": {
+      "get": {
+        "tags": [
+          "Private User Controller"
+        ],
+        "summary": "Get user by ID",
+        "description": "Get user by ID\n",
+        "operationId": "getUserByIdPrivate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserShortDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserFullDto"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Private User Controller"
+        ],
+        "summary": "Update user by Id",
+        "description": "Update user by ID\n",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserFullDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Private User Controller"
+        ],
+        "summary": "Delete user by Id",
+        "description": "Delete user by ID\n",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
   "components": {
     "schemas": {
       "User": {
@@ -666,6 +937,75 @@
           "recipient",
           "created"
         ]
+      },
+      "NewUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "username": {
+            "type": "string",
+            "example": "JohnDoe123"
+          },
+          "email": {
+            "type": "string",
+            "example": "johnDoe@john.doe"
+          },
+          "birthdate": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-05-17"
+          },
+          "about": {
+            "type": "string",
+            "maxLength": 1000,
+            "example": "Hi! My name is John Doe and i'm an active user of this service"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "username",
+          "email",
+          "birthdate"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "username": {
+            "type": "string",
+            "example": "JohnDoe123"
+          },
+          "email": {
+            "type": "string",
+            "example": "johnDoe@john.doe"
+          },
+          "birthdate": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-05-17"
+          },
+          "about": {
+            "type": "string",
+            "maxLength": 1000,
+            "example": "Hi! My name is John Doe and i'm an active user of this service"
+          }
+        }
       }
     }
   }
