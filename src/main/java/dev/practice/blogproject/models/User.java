@@ -3,6 +3,7 @@ package dev.practice.blogproject.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
@@ -29,30 +30,30 @@ public class User {
 
     @Column(name = "first_name")
     @Length(max = 50)
-    @NotNull
+    @NotBlank
     private String firstName;
 
     @Column(name = "last_name")
     @Length(max = 50)
-    @NotNull
+    @NotBlank
     private String lastName;
 
     @Column(name = "username")
     @Length(max = 50)
-    @NotNull
+    @NotBlank
     private String username;
 
     @Column(name = "email")
     @Length(max = 50)
     @Email
-    @NotNull
+    @NotBlank
     private String email;
 
     @Column(name = "birthdate")
     @JsonFormat(pattern = "dd/MM/yyyy")
     @NotNull
     @Past
-    private LocalDate birthdate;
+    private LocalDate birthDate;
 
     @Column(name = "role")
     @NotNull
@@ -60,13 +61,12 @@ public class User {
     private Role role;
 
     @Column(name = "about")
-    @NotNull
     @Length(max = 1000)
     private String about;
 
     @Column(name = "is_banned")
     @NotNull
-    private Boolean isBanned = false;
+    private Boolean isBanned;
 
     @OneToMany(mappedBy = "sender")
     private Set<Message> sentMessages;

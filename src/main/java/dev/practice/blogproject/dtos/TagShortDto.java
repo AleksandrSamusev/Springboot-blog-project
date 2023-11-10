@@ -1,19 +1,22 @@
 package dev.practice.blogproject.dtos;
 
-import dev.practice.blogproject.models.Article;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class TagDto {
+@AllArgsConstructor
+public class TagShortDto {
+
+    @NotNull
     private Long tagId;
-    private String name;
-    private Set<Article> articles;
+
+    @NotBlank
+    String name;
+
 }

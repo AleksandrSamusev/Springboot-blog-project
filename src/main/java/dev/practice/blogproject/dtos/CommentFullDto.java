@@ -1,6 +1,7 @@
 package dev.practice.blogproject.dtos;
 
-import dev.practice.blogproject.models.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,11 +13,17 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageDto {
-    private Long messageId;
-    private String message;
-    private User sender;
-    private User recipient;
+public class CommentFullDto {
+
+    private Long commentId;
+
+    @NotBlank
+    private String comment;
     private LocalDateTime created = LocalDateTime.now();
 
+    @NotNull
+    private Long articleId;
+
+    @NotNull
+    private UserShortDto commentAuthor;
 }

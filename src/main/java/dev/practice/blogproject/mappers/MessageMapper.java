@@ -1,6 +1,6 @@
 package dev.practice.blogproject.mappers;
 
-import dev.practice.blogproject.dtos.MessageDto;
+import dev.practice.blogproject.dtos.MessageFullDto;
 import dev.practice.blogproject.models.Message;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class MessageMapper {
 
-    public static Message toMessage(MessageDto dto) {
+    public static Message toMessage(MessageFullDto dto) {
         return new Message(
                 dto.getMessageId(),
                 dto.getMessage(),
@@ -18,8 +18,8 @@ public class MessageMapper {
         );
     }
 
-    public static MessageDto toMessageDto(Message message) {
-        return new MessageDto(
+    public static MessageFullDto toMessageDto(Message message) {
+        return new MessageFullDto(
                 message.getMessageId(),
                 message.getMessage(),
                 message.getSender(),
@@ -28,11 +28,11 @@ public class MessageMapper {
         );
     }
 
-    public static List<Message> toMessages(List<MessageDto> dtos) {
+    public static List<Message> toMessages(List<MessageFullDto> dtos) {
         return dtos.stream().map(MessageMapper::toMessage).collect(Collectors.toList());
     }
 
-    public static List<MessageDto> toMessageDtos(List<Message> messages) {
+    public static List<MessageFullDto> toMessageDtos(List<Message> messages) {
         return messages.stream().map(MessageMapper::toMessageDto).collect(Collectors.toList());
     }
 }

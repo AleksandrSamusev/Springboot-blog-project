@@ -1,6 +1,6 @@
 package dev.practice.blogproject.mappers;
 
-import dev.practice.blogproject.dtos.TagDto;
+import dev.practice.blogproject.dtos.TagFullDto;
 import dev.practice.blogproject.models.Tag;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class TagMapper {
 
-    public static Tag toTag(TagDto dto) {
+    public static Tag toTag(TagFullDto dto) {
         return new Tag(
                 dto.getTagId(),
                 dto.getName(),
@@ -16,19 +16,19 @@ public class TagMapper {
         );
     }
 
-    public static TagDto toTagDto(Tag tag) {
-        return new TagDto(
+    public static TagFullDto toTagDto(Tag tag) {
+        return new TagFullDto(
                 tag.getTagId(),
                 tag.getName(),
                 tag.getArticles()
         );
     }
 
-    public static List<Tag> toTags(List<TagDto> dtos) {
+    public static List<Tag> toTags(List<TagFullDto> dtos) {
         return dtos.stream().map(TagMapper::toTag).collect(Collectors.toList());
     }
 
-    public static List<TagDto> toTagDtos(List<Tag> tags) {
+    public static List<TagFullDto> toTagDtos(List<Tag> tags) {
         return tags.stream().map(TagMapper::toTagDto).collect(Collectors.toList());
     }
 }

@@ -1,7 +1,7 @@
 package dev.practice.blogproject.mappers;
 
 
-import dev.practice.blogproject.dtos.UserDto;
+import dev.practice.blogproject.dtos.UserFullDto;
 import dev.practice.blogproject.models.User;
 
 import java.util.List;
@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 public class UserMapper {
 
-    public static UserDto toUserDto(User user) {
-        UserDto dto = new UserDto();
+    public static UserFullDto toUserDto(User user) {
+        UserFullDto dto = new UserFullDto();
         dto.setUserId(user.getUserId());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
@@ -27,7 +27,7 @@ public class UserMapper {
         return dto;
     }
 
-    public static User toUser(UserDto dto) {
+    public static User toUser(UserFullDto dto) {
         User user = new User();
         user.setUserId(dto.getUserId());
         user.setFirstName(dto.getFirstName());
@@ -45,11 +45,11 @@ public class UserMapper {
         return user;
     }
 
-    public static List<User> toUsers(List<UserDto> dtos) {
+    public static List<User> toUsers(List<UserFullDto> dtos) {
         return dtos.stream().map(UserMapper::toUser).collect(Collectors.toList());
     }
 
-    public static List<UserDto> toDtos(List<User> users) {
+    public static List<UserFullDto> toDtos(List<User> users) {
         return users.stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 }

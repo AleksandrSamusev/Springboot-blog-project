@@ -1,12 +1,13 @@
 package dev.practice.blogproject.dtos;
+
 import dev.practice.blogproject.models.ArticleStatus;
-import dev.practice.blogproject.models.Comment;
-import dev.practice.blogproject.models.Tag;
-import dev.practice.blogproject.models.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -14,15 +15,22 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArticleDto {
+public class ArticleFullDto {
+
     private Long articleId;
+
+    @NotBlank
     private String title;
+
+    @NotBlank
     private String content;
-    private User author;
-    private LocalDateTime created = LocalDateTime.now();
+
+    @NotNull
+    private UserShortDto author;
+    private LocalDateTime created;
     private LocalDateTime published;
-    private ArticleStatus status = ArticleStatus.CREATED;
+    private ArticleStatus status;
     private Long likes;
-    private Set<Comment> comments;
-    private Set<Tag> tags;
+    private Set<CommentFullDto> comments;
+    private Set<TagShortDto> tags;
 }

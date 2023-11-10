@@ -1,6 +1,7 @@
 package dev.practice.blogproject.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,14 +25,15 @@ public class Article {
     private Long articleId;
 
     @Column(name = "title")
-    @NotNull
+    @NotBlank
     @Length(max = 200)
     private String title;
 
     @Column(name = "content")
-    @NotNull
+    @NotBlank
     private String content;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User author;
@@ -43,7 +45,7 @@ public class Article {
     private LocalDateTime published;
 
     @Enumerated(EnumType.STRING)
-    private ArticleStatus status = ArticleStatus.CREATED;
+    private ArticleStatus status  = ArticleStatus.CREATED;
 
     @Column(name = "likes")
     private Long likes;

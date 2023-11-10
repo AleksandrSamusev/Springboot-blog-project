@@ -1,6 +1,6 @@
 package dev.practice.blogproject.mappers;
 
-import dev.practice.blogproject.dtos.CommentDto;
+import dev.practice.blogproject.dtos.CommentFullDto;
 import dev.practice.blogproject.models.Comment;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class CommentMapper {
 
-    public static Comment toComment(CommentDto dto) {
+    public static Comment toComment(CommentFullDto dto) {
         return new Comment(
                 dto.getCommentId(),
                 dto.getComment(),
@@ -18,8 +18,8 @@ public class CommentMapper {
         );
     }
 
-    public static CommentDto toCommentDto(Comment comment) {
-        return new CommentDto(
+    public static CommentFullDto toCommentDto(Comment comment) {
+        return new CommentFullDto(
                 comment.getCommentId(),
                 comment.getComment(),
                 comment.getCreated(),
@@ -28,11 +28,11 @@ public class CommentMapper {
         );
     }
 
-    public static List<Comment> toComments(List<CommentDto> dtos) {
+    public static List<Comment> toComments(List<CommentFullDto> dtos) {
         return dtos.stream().map(CommentMapper::toComment).collect(Collectors.toList());
     }
 
-    public static List<CommentDto> toCommentDtos(List<Comment> comments) {
+    public static List<CommentFullDto> toCommentDtos(List<Comment> comments) {
         return comments.stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
     }
 

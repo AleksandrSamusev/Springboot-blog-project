@@ -4,6 +4,7 @@ import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.Comment;
 import dev.practice.blogproject.models.Message;
 import dev.practice.blogproject.models.Role;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,18 +17,35 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserFullDto {
+
     private Long userId;
+
+    @NotBlank
     private String firstName;
+
+    @NotBlank
     private String lastName;
+
+    @NotBlank
     private String username;
+
+    @NotBlank
+    @Email
     private String email;
-    private LocalDate birthdate;
+
+    @NotNull
+    @Past
+    private LocalDate birthDate;
+
+    @NotNull
     private Role role;
     private String about;
-    private Boolean isBanned;
-    private Set<Message> sentMessages;
-    private Set<Message> receivedMessages;
-    private Set<Article> articles;
-    private Set<Comment> comments;
+
+    @NotNull
+    private Boolean isBanned = false;
+    private Set<MessageShortDto> sentMessages;
+    private Set<MessageShortDto> receivedMessages;
+    private Set<ArticleShortDto> articles;
+    private Set<CommentShortDto> comments;
 }
