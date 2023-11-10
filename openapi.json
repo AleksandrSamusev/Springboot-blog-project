@@ -864,7 +864,7 @@
         }
       }
     },
-    "/private/messages/users/{userId}": {
+    "/private/messages/users/{recipientId}": {
       "post": {
         "tags": [
           "Private Message Controller"
@@ -875,8 +875,8 @@
         "parameters": [
           {
             "in": "path",
-            "name": "userId",
-            "description": "User ID",
+            "name": "recipientId",
+            "description": "Recipient ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -913,6 +913,194 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/messages/sent": {
+      "get": {
+        "tags": [
+          "Private Message Controller"
+        ],
+        "summary": "Get all sended messages",
+        "description": "Get all sended messages\n",
+        "operationId": "getSendedMessages",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageShortDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/messages/recieved": {
+      "get": {
+        "tags": [
+          "Private Message Controller"
+        ],
+        "summary": "Get all recieved messages",
+        "description": "Get all sended messages\n",
+        "operationId": "getRecievedMessages",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageShortDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/messages/{messageId}}": {
+      "get": {
+        "tags": [
+          "Private Message Controller"
+        ],
+        "summary": "Get message",
+        "description": "Get message by given Id\n",
+        "operationId": "getMessage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "messageId",
+            "description": "Message ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageShortDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Private Message Controller"
+        ],
+        "summary": "Delete message",
+        "description": "Delete an existing message by given Id\n",
+        "operationId": "deleteMessage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "messageId",
+            "description": "Message ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
           },
           "400": {
             "description": "Bad request"
@@ -1543,7 +1731,7 @@
             "format": "int64",
             "example": 34
           },
-          "userId": {
+          "commentAuthorId": {
             "type": "integer",
             "format": "int64",
             "example": 21
@@ -1553,7 +1741,7 @@
           "comment",
           "created",
           "articleId",
-          "userId"
+          "commentAuthorId"
         ]
       },
       "MessageShortDto": {
