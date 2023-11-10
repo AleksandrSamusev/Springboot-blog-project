@@ -1,5 +1,8 @@
-package dev.practice.blogproject.dtos;
+package dev.practice.blogproject.dtos.article;
 
+import dev.practice.blogproject.dtos.comment.CommentFullDto;
+import dev.practice.blogproject.dtos.tag.TagShortDto;
+import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.models.ArticleStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

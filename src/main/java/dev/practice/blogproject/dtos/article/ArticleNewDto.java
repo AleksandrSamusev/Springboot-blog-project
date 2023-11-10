@@ -1,5 +1,6 @@
-package dev.practice.blogproject.dtos;
+package dev.practice.blogproject.dtos.article;
 
+import dev.practice.blogproject.dtos.tag.TagNewDto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

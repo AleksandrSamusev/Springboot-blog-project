@@ -1,5 +1,6 @@
-package dev.practice.blogproject.dtos;
+package dev.practice.blogproject.dtos.message;
 
+import dev.practice.blogproject.dtos.user.UserShortDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -11,9 +12,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class MessageShortDto {
+@NoArgsConstructor
+public class MessageFullDto {
 
     private Long messageId;
 
@@ -25,10 +26,8 @@ public class MessageShortDto {
 
     @NotNull
     private UserShortDto recipient;
+    private LocalDateTime created = LocalDateTime.now();
 
-    @NotNull
-    private LocalDateTime created;
+    private boolean isDeleted;
 
-    @NotNull
-    private Boolean isDeleted;
 }

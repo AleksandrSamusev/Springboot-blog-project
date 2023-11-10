@@ -1,6 +1,6 @@
 package dev.practice.blogproject.mappers;
 
-import dev.practice.blogproject.dtos.ArticleFullDto;
+import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.models.Article;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package dev.practice.blogproject.mappers;
 
-import dev.practice.blogproject.dtos.MessageFullDto;
+import dev.practice.blogproject.dtos.message.MessageFullDto;
 import dev.practice.blogproject.models.Message;
 
 import java.util.List;

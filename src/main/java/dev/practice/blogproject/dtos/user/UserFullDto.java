@@ -1,8 +1,8 @@
-package dev.practice.blogproject.dtos;
+package dev.practice.blogproject.dtos.user;
 
-import dev.practice.blogproject.models.Article;
-import dev.practice.blogproject.models.Comment;
-import dev.practice.blogproject.models.Message;
+import dev.practice.blogproject.dtos.article.ArticleShortDto;
+import dev.practice.blogproject.dtos.comment.CommentShortDto;
+import dev.practice.blogproject.dtos.message.MessageShortDto;
 import dev.practice.blogproject.models.Role;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

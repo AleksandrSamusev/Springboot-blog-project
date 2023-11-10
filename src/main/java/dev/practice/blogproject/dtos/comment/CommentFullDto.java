@@ -1,5 +1,6 @@
-package dev.practice.blogproject.dtos;
+package dev.practice.blogproject.dtos.comment;
 
+import dev.practice.blogproject.dtos.user.UserShortDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

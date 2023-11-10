@@ -1,7 +1,7 @@
 package dev.practice.blogproject.mappers;
 
 
-import dev.practice.blogproject.dtos.UserFullDto;
+import dev.practice.blogproject.dtos.user.UserFullDto;
 import dev.practice.blogproject.models.User;
 
 import java.util.List;

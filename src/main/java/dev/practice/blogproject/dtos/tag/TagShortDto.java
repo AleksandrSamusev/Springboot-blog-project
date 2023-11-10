@@ -1,4 +1,4 @@
-package dev.practice.blogproject.dtos;
+package dev.practice.blogproject.dtos.tag;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -1,5 +1,6 @@
-package dev.practice.blogproject.dtos;
+package dev.practice.blogproject.dtos.user;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,11 +9,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class CommentNewDto {
+@AllArgsConstructor
+public class UserShortDto {
 
     @NotNull
-    private String comment;
+    private Long userId;
 
+    @NotBlank
+    private String userName;
 }

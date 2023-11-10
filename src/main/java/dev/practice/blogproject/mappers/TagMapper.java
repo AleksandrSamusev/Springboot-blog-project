@@ -1,6 +1,6 @@
 package dev.practice.blogproject.mappers;
 
-import dev.practice.blogproject.dtos.TagFullDto;
+import dev.practice.blogproject.dtos.tag.TagFullDto;
 import dev.practice.blogproject.models.Tag;
 
 import java.util.List;

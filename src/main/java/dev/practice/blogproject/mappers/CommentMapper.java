@@ -1,6 +1,6 @@
 package dev.practice.blogproject.mappers;
 
-import dev.practice.blogproject.dtos.CommentFullDto;
+import dev.practice.blogproject.dtos.comment.CommentFullDto;
 import dev.practice.blogproject.models.Comment;
 
 import java.util.List;
