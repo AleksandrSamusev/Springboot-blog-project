@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -30,7 +31,7 @@ public class UserUpdateDto {
     String email;
 
     @Past
-    LocalDateTime birthDate;
+    LocalDate birthDate;
 
     @Length(max = 1000)
     String about;
