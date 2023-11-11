@@ -17,5 +17,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler({InvalidParameterException.class})
+    public ResponseEntity<Object> handleInvalidParameterException(RuntimeException ex) {
+        ErrorResponse error = new ErrorResponse(Collections.singletonList(ex.getMessage()));
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ActionForbiddenException.class})
+    public ResponseEntity<Object> handleActionForbiddenException(RuntimeException ex) {
+        ErrorResponse error = new ErrorResponse(Collections.singletonList(ex.getMessage()));
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
 
 }
