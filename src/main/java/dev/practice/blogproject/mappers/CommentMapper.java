@@ -5,7 +5,6 @@ import dev.practice.blogproject.dtos.comment.CommentShortDto;
 import dev.practice.blogproject.models.Comment;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CommentMapper {
