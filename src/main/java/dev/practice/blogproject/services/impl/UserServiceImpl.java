@@ -4,6 +4,7 @@ import dev.practice.blogproject.dtos.user.UserFullDto;
 import dev.practice.blogproject.dtos.user.UserNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.dtos.user.UserUpdateDto;
+import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.UserMapper;
 import dev.practice.blogproject.models.User;
@@ -93,8 +94,7 @@ public class UserServiceImpl implements UserService {
                 if (role.equals("ADMIN") || userId.equals(currentUserId)) {
                     userRepository.deleteById(userId);
                 } else {
-
-                    // Todo --> throw new ActionForbidden
+                    throw new ActionForbiddenException("Action forbidden for current user");
                 }
             } else {
                 throw new ResourceNotFoundException("User with given id " + currentUserId + " not found");
