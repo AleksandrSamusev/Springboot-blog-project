@@ -2,15 +2,17 @@ package dev.practice.blogproject.mappers;
 
 
 import dev.practice.blogproject.dtos.user.UserFullDto;
+import dev.practice.blogproject.dtos.user.UserNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.models.User;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserMapper {
 
-    public static UserFullDto toUserDto(User user) {
+    public static UserFullDto toUserFullDto(User user) {
         UserFullDto dto = new UserFullDto();
         dto.setUserId(user.getUserId());
         dto.setFirstName(user.getFirstName());
@@ -30,38 +32,29 @@ public class UserMapper {
         return dto;
     }
 
-    public static User toUser(UserFullDto dto) {
-        User user = new User();
-        user.setUserId(dto.getUserId());
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setAbout(dto.getAbout());
-        user.setEmail(dto.getEmail());
-        user.setUsername(dto.getUsername());
-        user.setBirthDate(dto.getBirthDate());
-        user.setRole(dto.getRole());
-        user.setIsBanned(dto.getIsBanned());
-        dto.setComments(user.getComments().stream().map(CommentMapper::toCommentShortDto).collect(Collectors.toSet()));
-        dto.setSentMessages(user.getSentMessages().stream().map(MessageMapper::toMessageFullDto)
-                .collect(Collectors.toSet()));
-        dto.setReceivedMessages(user.getReceivedMessages().stream().map(MessageMapper::toMessageFullDto)
-                .collect(Collectors.toSet()));
-        dto.setArticles(user.getArticles().stream().map(ArticleMapper::toArticleShortDto).collect(Collectors.toSet()));
-        return user;
-    }
-
-
     public static UserShortDto toUserShortDto(User user) {
         return new UserShortDto(
                 user.getUserId(),
                 user.getUsername());
     }
 
-    public static List<User> toUsers(List<UserFullDto> dtos) {
-        return dtos.stream().map(UserMapper::toUser).collect(Collectors.toList());
+    public static User toUser(UserNewDto dto) {
+        User user = new User();
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setBirthDate(dto.getBirthDate());
+        user.setAbout(dto.getAbout());
+        user.setSentMessages(new HashSet<>());
+        user.setReceivedMessages(new HashSet<>());
+        user.setComments(new HashSet<>());
+        user.setArticles(new HashSet<>());
+        return user;
     }
 
-    public static List<UserFullDto> toDtos(List<User> users) {
-        return users.stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+
+    public static List<UserFullDto> toFullDtos(List<User> users) {
+        return users.stream().map(UserMapper::toUserFullDto).collect(Collectors.toList());
     }
 }

@@ -1,14 +1,14 @@
 package dev.practice.blogproject.controllers._public;
 
+import dev.practice.blogproject.dtos.user.UserFullDto;
+import dev.practice.blogproject.dtos.user.UserNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.services.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,12 +21,17 @@ public class PublicUserController {
 
     @GetMapping("/users")
     public ResponseEntity<List<UserShortDto>> getAllUsers() {
-        return new ResponseEntity<List<UserShortDto>>(userService.getAllUsers(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserShortDto> getUserById(@PathVariable Long userId) {
-        return new ResponseEntity<UserShortDto>(userService.getUserById(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
+    }
+
+    @PostMapping("/users")
+    public ResponseEntity<UserFullDto> createUser(@Valid @RequestBody UserNewDto dto) {
+        return new ResponseEntity<>(userService.createUser(dto), HttpStatus.CREATED);
     }
 
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -37,7 +38,7 @@ public class UserNewDto {
 
     @NotNull
     @Past
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
 
     @Length(max = 1000)
     private String about;
