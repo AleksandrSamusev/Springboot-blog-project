@@ -1,0 +1,1941 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Blog API",
+    "version": "1.0.0",
+    "description": "This is a sample Blog server based on the OpenAPI 3.0 specification.",
+    "contact": {
+      "email": "alex.samusev.81@gmail.com",
+      "name": "Aleksandr Samusev"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1",
+      "variables": {},
+      "description": "localhost"
+    }
+  ],
+  "paths": {
+    "/public/users": {
+      "get": {
+        "tags": [
+          "Public User Controller"
+        ],
+        "summary": "Get a list of users.",
+        "description": "Returns a list of all users from DB\n",
+        "operationId": "getUsers",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserShortDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Public User Controller"
+        ],
+        "summary": "Create new user.",
+        "description": "Create new user\n",
+        "operationId": "add user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserFullDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/public/users/{userId}": {
+      "get": {
+        "tags": [
+          "Public User Controller"
+        ],
+        "summary": "Get user by ID",
+        "description": "Get user by ID\n",
+        "operationId": "getUserByIdPublic",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserShortDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/users/{userId}": {
+      "get": {
+        "tags": [
+          "Private User Controller"
+        ],
+        "summary": "Get user by ID",
+        "description": "Get user by ID\n",
+        "operationId": "getUserByIdPrivate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserShortDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserFullDto"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Private User Controller"
+        ],
+        "summary": "Update user by Id",
+        "description": "Update user by ID\n",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserFullDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Private User Controller"
+        ],
+        "summary": "Delete user by Id",
+        "description": "Delete user by ID\n",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/comments/articles/{articleId}": {
+      "post": {
+        "tags": [
+          "Private Comment Controller"
+        ],
+        "summary": "Add comment",
+        "description": "Add comment to an article\n",
+        "operationId": "createComment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCommentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/comments/{commentId}": {
+      "patch": {
+        "tags": [
+          "Private Comment Controller"
+        ],
+        "summary": "Update comment",
+        "description": "Update comment by given Id\n",
+        "operationId": "updateComment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "commentId",
+            "description": "Comment ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCommentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Private Comment Controller"
+        ],
+        "summary": "Delete comment",
+        "description": "Delete comment by given Id\n",
+        "operationId": "deleteComment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "commentId",
+            "description": "Comment ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/tags/articles/{articleId}": {
+      "post": {
+        "tags": [
+          "Private Tag Controller"
+        ],
+        "summary": "Create tag",
+        "description": "Create tag for an Article\n",
+        "operationId": "createTag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/tags/{tagId}": {
+      "patch": {
+        "tags": [
+          "Private Tag Controller"
+        ],
+        "summary": "Update tag",
+        "description": "Update tag by given Id\n",
+        "operationId": "updateTag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tagId",
+            "description": "Tag ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Private Tag Controller"
+        ],
+        "summary": "Delete tag",
+        "description": "Delete tag by given Id\n",
+        "operationId": "deleteTag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tagId",
+            "description": "Tag ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/articles": {
+      "post": {
+        "tags": [
+          "Private Article Controller"
+        ],
+        "summary": "Create article",
+        "description": "Create new article\n",
+        "operationId": "createArticle",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewArticleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Public Article Controller"
+        ],
+        "summary": "Get all articles",
+        "description": "Get all articles\n",
+        "operationId": "getArticles",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleShortDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/articles/{articleId}": {
+      "patch": {
+        "tags": [
+          "Private Article Controller"
+        ],
+        "summary": "Update article",
+        "description": "Update an existing article\n",
+        "operationId": "updateArticle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateArticleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Private Article Controller"
+        ],
+        "summary": "Get article",
+        "description": "Get article by Id\n",
+        "operationId": "getArticle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ArticleShortDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ArticleFullDto"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Private Article Controller"
+        ],
+        "summary": "Delete article",
+        "description": "Delete an existing article by given Id\n",
+        "operationId": "deleteArticle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/messages/users/{recipientId}": {
+      "post": {
+        "tags": [
+          "Private Message Controller"
+        ],
+        "summary": "Create message",
+        "description": "Create message\n",
+        "operationId": "createMessage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recipientId",
+            "description": "Recipient ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageShortDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/messages/sent": {
+      "get": {
+        "tags": [
+          "Private Message Controller"
+        ],
+        "summary": "Get all sended messages",
+        "description": "Get all sended messages\n",
+        "operationId": "getSendedMessages",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageShortDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/messages/recieved": {
+      "get": {
+        "tags": [
+          "Private Message Controller"
+        ],
+        "summary": "Get all recieved messages",
+        "description": "Get all sended messages\n",
+        "operationId": "getRecievedMessages",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageShortDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/messages/{messageId}}": {
+      "get": {
+        "tags": [
+          "Private Message Controller"
+        ],
+        "summary": "Get message",
+        "description": "Get message by given Id\n",
+        "operationId": "getMessage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "messageId",
+            "description": "Message ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageShortDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Private Message Controller"
+        ],
+        "summary": "Delete message",
+        "description": "Delete an existing message by given Id\n",
+        "operationId": "deleteMessage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "messageId",
+            "description": "Message ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 16
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "username": {
+            "type": "string",
+            "example": "JohnDoe123"
+          },
+          "email": {
+            "type": "string",
+            "example": "johnDoe@john.doe"
+          },
+          "birthdate": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-05-17"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ],
+            "example": "ADMIN"
+          },
+          "about": {
+            "type": "string",
+            "maxLength": 1000,
+            "example": "Hi! My name is John Doe and i'm an active user of this service"
+          },
+          "isBanned": {
+            "type": "boolean",
+            "default": false,
+            "example": false
+          },
+          "sentMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "uniqueItems": true
+          },
+          "recievedMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "uniqueItems": true
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            },
+            "uniqueItems": true
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "username",
+          "email",
+          "birthdate",
+          "role",
+          "isBanned"
+        ]
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 3
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is a simple message 500 characters max length"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/User"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/User"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "message",
+          "sender",
+          "recipient",
+          "created",
+          "isDeleted"
+        ]
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "commentId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 43
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is an example comment"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "article": {
+            "$ref": "#/components/schemas/Article"
+          },
+          "commentAuthor": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "comment",
+          "created",
+          "article",
+          "commentAuthor"
+        ]
+      },
+      "Article": {
+        "type": "object",
+        "properties": {
+          "articleId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 34
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "This is an example of the articles title"
+          },
+          "content": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
+          },
+          "author": {
+            "$ref": "#/components/schemas/User"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PUBLISHED",
+              "MODERATING",
+              "CREATED",
+              "REJECTED"
+            ],
+            "example": "PUBLISHED"
+          },
+          "likes": {
+            "type": "integer",
+            "format": "int64",
+            "example": 5567
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            },
+            "uniqueItems": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "title",
+          "content",
+          "author",
+          "created",
+          "status"
+        ]
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 53
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Example tag"
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UserFullDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 16
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "username": {
+            "type": "string",
+            "example": "JohnDoe123"
+          },
+          "email": {
+            "type": "string",
+            "example": "johnDoe@john.doe"
+          },
+          "birthdate": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-05-17"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ],
+            "example": "ADMIN"
+          },
+          "about": {
+            "type": "string",
+            "maxLength": 1000,
+            "example": "Hi! My name is John Doe and i'm an active user of this service"
+          },
+          "isBanned": {
+            "type": "boolean",
+            "default": false,
+            "example": false
+          },
+          "sentMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageShortDto"
+            },
+            "uniqueItems": true
+          },
+          "recievedMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageShortDto"
+            },
+            "uniqueItems": true
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArticleShortDto"
+            },
+            "uniqueItems": true
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentShortDto"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "username",
+          "email",
+          "birthdate",
+          "role",
+          "isBanned"
+        ]
+      },
+      "MessageFullDto": {
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 3
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is a simple message 500 characters max length"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/UserShortDto"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/UserShortDto"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "message",
+          "sender",
+          "recipient",
+          "created",
+          "isDeleted"
+        ]
+      },
+      "CommentFullDto": {
+        "type": "object",
+        "properties": {
+          "commentId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 43
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is an example comment"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "articleId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 33
+          },
+          "commentAuthor": {
+            "$ref": "#/components/schemas/UserShortDto"
+          }
+        },
+        "required": [
+          "comment",
+          "created",
+          "articleId",
+          "user"
+        ]
+      },
+      "ArticleFullDto": {
+        "type": "object",
+        "properties": {
+          "articleId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 34
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "This is an example of the articles title"
+          },
+          "content": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserShortDto"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PUBLISHED",
+              "MODERATING",
+              "CREATED",
+              "REJECTED"
+            ],
+            "example": "PUBLISHED"
+          },
+          "likes": {
+            "type": "integer",
+            "format": "int64",
+            "example": 5567
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentFullDto"
+            },
+            "uniqueItems": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagShortDto"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "title",
+          "content",
+          "author",
+          "created",
+          "status"
+        ]
+      },
+      "TagFullDto": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 53
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Example tag"
+          },
+          "articles": {
+            "type": "array",
+            "description": "Set of unique article Ids",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UserShortDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 16
+          },
+          "username": {
+            "type": "string",
+            "example": "JohnDoe123"
+          }
+        },
+        "required": [
+          "userId",
+          "username"
+        ]
+      },
+      "ArticleShortDto": {
+        "type": "object",
+        "properties": {
+          "articleId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 34
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "This is an example of the articles title"
+          },
+          "content": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserShortDto"
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "likes": {
+            "type": "integer",
+            "format": "int64",
+            "example": 5567
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentShortDto"
+            },
+            "uniqueItems": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagShortDto"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "articleId",
+          "title",
+          "content",
+          "author",
+          "created",
+          "status"
+        ]
+      },
+      "TagShortDto": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 53
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Example tag"
+          }
+        },
+        "required": [
+          "tagId",
+          "name"
+        ]
+      },
+      "CommentShortDto": {
+        "type": "object",
+        "properties": {
+          "commentId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 43
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is an example comment"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "articleId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 34
+          },
+          "commentAuthorId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 21
+          }
+        },
+        "required": [
+          "comment",
+          "created",
+          "articleId",
+          "commentAuthorId"
+        ]
+      },
+      "MessageShortDto": {
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 3
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is a simple message 500 characters max length"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/UserShortDto"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/UserShortDto"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28Z"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "message",
+          "sender",
+          "recipient",
+          "created",
+          "isDeleted"
+        ]
+      },
+      "NewUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Doe"
+          },
+          "username": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "JohnDoe123"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "johnDoe@john.doe"
+          },
+          "birthdate": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-05-17"
+          },
+          "about": {
+            "type": "string",
+            "maxLength": 1000,
+            "example": "Hi! My name is John Doe and i'm an active user of this service"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "username",
+          "email",
+          "birthdate"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Doe"
+          },
+          "username": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "JohnDoe123"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "johnDoe@john.doe"
+          },
+          "birthdate": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-05-17"
+          },
+          "about": {
+            "type": "string",
+            "maxLength": 1000,
+            "example": "Hi! My name is John Doe and i'm an active user of this service"
+          }
+        }
+      },
+      "NewCommentDto": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is an example comment"
+          }
+        },
+        "required": [
+          "comment"
+        ]
+      },
+      "NewTagDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Example tag"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "NewArticleDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "This is an example of the articles title"
+          },
+          "content": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NewTagDto"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ]
+      },
+      "UpdateArticleDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "This is an example of the articles title"
+          },
+          "content": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
+          }
+        }
+      },
+      "NewMessageDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 500,
+            "example": "This is a simple message 500 characters max length"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      }
+    }
+  }
+}

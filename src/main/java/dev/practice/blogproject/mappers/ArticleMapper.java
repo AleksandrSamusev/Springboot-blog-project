@@ -1,6 +1,7 @@
 package dev.practice.blogproject.mappers;
 
-import dev.practice.blogproject.dtos.ArticleDto;
+import dev.practice.blogproject.dtos.article.ArticleFullDto;
+import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.models.Article;
 
 import java.util.List;
@@ -8,41 +9,33 @@ import java.util.stream.Collectors;
 
 public class ArticleMapper {
 
-    public static Article toArticle(ArticleDto dto) {
-        return new Article(
-                dto.getArticleId(),
-                dto.getTitle(),
-                dto.getContent(),
-                dto.getAuthor(),
-                dto.getCreated(),
-                dto.getPublished(),
-                dto.getStatus(),
-                dto.getLikes(),
-                dto.getComments(),
-                dto.getTags()
-        );
-    }
-
-    public static ArticleDto toArticleDto(Article article) {
-        return new ArticleDto(
+    public static ArticleFullDto toArticleDto(Article article) {
+        return new ArticleFullDto(
                 article.getArticleId(),
                 article.getTitle(),
                 article.getContent(),
-                article.getAuthor(),
+                UserMapper.toUserShortDto(article.getAuthor()),
                 article.getCreated(),
                 article.getPublished(),
                 article.getStatus(),
                 article.getLikes(),
-                article.getComments(),
-                article.getTags()
+                article.getComments().stream().map(CommentMapper::toCommentFullDto).collect(Collectors.toSet()),
+                article.getTags().stream().map(TagMapper::toTagShortDto).collect(Collectors.toSet())
         );
     }
 
-    public static List<Article> toArticles(List<ArticleDto> dtos) {
-        return dtos.stream().map(ArticleMapper::toArticle).collect(Collectors.toList());
+    public static ArticleShortDto toArticleShortDto(Article article) {
+        return new ArticleShortDto(article.getArticleId(),
+                article.getTitle(),
+                article.getContent(),
+                UserMapper.toUserShortDto(article.getAuthor()),
+                article.getPublished(),
+                article.getLikes(),
+                article.getComments().stream().map(CommentMapper::toCommentShortDto).collect(Collectors.toSet()),
+                article.getTags().stream().map(TagMapper::toTagShortDto).collect(Collectors.toSet()));
     }
 
-    public static List<ArticleDto> toArticleDtos(List<Article> articles) {
+    public static List<ArticleFullDto> toArticleDtos(List<Article> articles) {
         return articles.stream().map(ArticleMapper::toArticleDto).collect(Collectors.toList());
     }
 

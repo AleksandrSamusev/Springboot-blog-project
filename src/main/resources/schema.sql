@@ -7,10 +7,10 @@ CREATE TYPE ROLE AS ENUM ('USER', 'ADMIN');
 CREATE TABLE IF NOT EXISTS users
 (
     user_id    BIGINT PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name  VARCHAR(50) NOT NULL,
-    username   VARCHAR(50) NOT NULL UNIQUE,
-    email      VARCHAR(50) NOT NULL UNIQUE,
+    first_name VARCHAR(50) NOT NULL CHECK ( char_length(first_name) <= 50 ),
+    last_name  VARCHAR(50) NOT NULL CHECK ( char_length(first_name) <= 50 ),
+    username   VARCHAR(50) NOT NULL UNIQUE CHECK ( char_length(first_name) <= 50 ),
+    email      VARCHAR(50) NOT NULL UNIQUE CHECK ( char_length(first_name) <= 50 ),
     birthdate  DATE        NOT NULL,
     role       ROLE        NOT NULL,
     about      TEXT CHECK ( char_length(about) <= 1000 ),
@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS messages
     CHECK ( char_length(message) <= 500 ),
     sender_id    BIGINT    NOT NULL REFERENCES users (user_id),
     recipient_id BIGINT    NOT NULL REFERENCES users (user_id),
-    created      TIMESTAMP NOT NULL
+    created      TIMESTAMP NOT NULL,
+    is_deleted   BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS articles

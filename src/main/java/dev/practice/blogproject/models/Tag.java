@@ -1,12 +1,10 @@
 package dev.practice.blogproject.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 import java.util.Set;
 
@@ -17,14 +15,13 @@ import java.util.Set;
 @Table(name = "tags")
 @Entity
 public class Tag {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id")
     private Long tagId;
 
     @Column(name = "name")
-    @NotNull
-    @Length(max = 50)
     private String name;
 
     @ManyToMany
@@ -34,4 +31,5 @@ public class Tag {
             inverseJoinColumns = @JoinColumn(name = "article_id")
     )
     private Set<Article> articles;
+
 }
