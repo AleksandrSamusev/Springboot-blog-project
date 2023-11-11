@@ -1,6 +1,7 @@
 package dev.practice.blogproject.mappers;
 
 import dev.practice.blogproject.dtos.message.MessageFullDto;
+import dev.practice.blogproject.dtos.message.MessageShortDto;
 import dev.practice.blogproject.models.Message;
 
 import java.util.List;
@@ -8,28 +9,24 @@ import java.util.stream.Collectors;
 
 public class MessageMapper {
 
-    public static Message toMessage(MessageFullDto dto) {
-        return new Message(
-                dto.getMessageId(),
-                dto.getMessage(),
-                dto.getSender(),
-                dto.getRecipient(),
-                dto.getCreated()
-        );
-    }
-
     public static MessageFullDto toMessageDto(Message message) {
         return new MessageFullDto(
                 message.getMessageId(),
                 message.getMessage(),
-                message.getSender(),
-                message.getRecipient(),
-                message.getCreated()
+                UserMapper.toUserShortDto(message.getSender()),
+                UserMapper.toUserShortDto(message.getRecipient()),
+                message.getCreated(),
+                message.getIsDeleted()
         );
     }
 
-    public static List<Message> toMessages(List<MessageFullDto> dtos) {
-        return dtos.stream().map(MessageMapper::toMessage).collect(Collectors.toList());
+    public static MessageShortDto toMessageShortDto(Message message) {
+        return new MessageShortDto(message.getMessageId(),
+                message.getMessage(),
+                UserMapper.toUserShortDto(message.getSender()),
+                UserMapper.toUserShortDto(message.getRecipient()),
+                message.getCreated(),
+                message.getIsDeleted());
     }
 
     public static List<MessageFullDto> toMessageDtos(List<Message> messages) {
