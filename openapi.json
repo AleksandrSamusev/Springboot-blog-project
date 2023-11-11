@@ -491,7 +491,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewTagDto"
+                "$ref": "#/components/schemas/TagNewDto"
               }
             }
           }
@@ -550,7 +550,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewTagDto"
+                "$ref": "#/components/schemas/TagNewDto"
               }
             }
           }
@@ -645,7 +645,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewArticleDto"
+                "$ref": "#/components/schemas/ArticleNewDto"
               }
             }
           }
@@ -736,7 +736,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateArticleDto"
+                "$ref": "#/components/schemas/ArticleUpdateDto"
               }
             }
           }
@@ -898,7 +898,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewMessageDto"
+                "$ref": "#/components/schemas/MessageNewDto"
               }
             }
           }
@@ -909,7 +909,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MessageShortDto"
+                  "$ref": "#/components/schemas/MessageFullDto"
                 }
               }
             }
@@ -953,7 +953,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MessageShortDto"
+                    "$ref": "#/components/schemas/MessageFullDto"
                   }
                 }
               }
@@ -998,7 +998,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MessageShortDto"
+                    "$ref": "#/components/schemas/MessageFullDto"
                   }
                 }
               }
@@ -1053,7 +1053,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MessageShortDto"
+                    "$ref": "#/components/schemas/MessageFullDto"
                   }
                 }
               }
@@ -1282,11 +1282,12 @@
           },
           "title": {
             "type": "string",
-            "maxLength": 200,
+            "maxLength": 250,
             "example": "This is an example of the articles title"
           },
           "content": {
             "type": "string",
+            "maxLength": 30000,
             "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
           },
           "author": {
@@ -1415,14 +1416,14 @@
           "sentMessages": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MessageShortDto"
+              "$ref": "#/components/schemas/MessageFullDto"
             },
             "uniqueItems": true
           },
           "recievedMessages": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MessageShortDto"
+              "$ref": "#/components/schemas/MessageFullDto"
             },
             "uniqueItems": true
           },
@@ -1449,43 +1450,6 @@
           "birthdate",
           "role",
           "isBanned"
-        ]
-      },
-      "MessageFullDto": {
-        "type": "object",
-        "properties": {
-          "messageId": {
-            "type": "integer",
-            "format": "int64",
-            "example": 3
-          },
-          "message": {
-            "type": "string",
-            "maxLength": 500,
-            "example": "This is a simple message 500 characters max length"
-          },
-          "sender": {
-            "$ref": "#/components/schemas/UserShortDto"
-          },
-          "recipient": {
-            "$ref": "#/components/schemas/UserShortDto"
-          },
-          "created": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2017-07-21T17:32:28Z"
-          },
-          "isDeleted": {
-            "type": "boolean",
-            "default": false
-          }
-        },
-        "required": [
-          "message",
-          "sender",
-          "recipient",
-          "created",
-          "isDeleted"
         ]
       },
       "CommentFullDto": {
@@ -1532,11 +1496,12 @@
           },
           "title": {
             "type": "string",
-            "maxLength": 200,
+            "maxLength": 250,
             "example": "This is an example of the articles title"
           },
           "content": {
             "type": "string",
+            "maxLength": 30000,
             "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
           },
           "author": {
@@ -1645,11 +1610,12 @@
           },
           "title": {
             "type": "string",
-            "maxLength": 200,
+            "maxLength": 250,
             "example": "This is an example of the articles title"
           },
           "content": {
             "type": "string",
+            "maxLength": 30000,
             "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
           },
           "author": {
@@ -1744,7 +1710,7 @@
           "commentAuthorId"
         ]
       },
-      "MessageShortDto": {
+      "MessageFullDto": {
         "type": "object",
         "properties": {
           "messageId": {
@@ -1871,7 +1837,7 @@
           "comment"
         ]
       },
-      "NewTagDto": {
+      "TagNewDto": {
         "type": "object",
         "properties": {
           "name": {
@@ -1884,22 +1850,23 @@
           "name"
         ]
       },
-      "NewArticleDto": {
+      "ArticleNewDto": {
         "type": "object",
         "properties": {
           "title": {
             "type": "string",
-            "maxLength": 200,
+            "maxLength": 250,
             "example": "This is an example of the articles title"
           },
           "content": {
             "type": "string",
+            "maxLength": 30000,
             "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Faucibus in ornare quam viverra orci. Venenatis urna cursus eget nunc scelerisque viverra mauris. Lorem sed risus ultricies tristique nulla aliquet enim."
           },
           "tags": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/NewTagDto"
+              "$ref": "#/components/schemas/TagNewDto"
             },
             "uniqueItems": true
           }
@@ -1909,7 +1876,7 @@
           "content"
         ]
       },
-      "UpdateArticleDto": {
+      "ArticleUpdateDto": {
         "type": "object",
         "properties": {
           "title": {
@@ -1923,7 +1890,7 @@
           }
         }
       },
-      "NewMessageDto": {
+      "MessageNewDto": {
         "type": "object",
         "properties": {
           "message": {
