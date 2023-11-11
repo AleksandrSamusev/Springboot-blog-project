@@ -18,26 +18,24 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 @Entity
 public class Comment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
     private Long commentId;
 
     @Column(name = "comment")
-    @NotBlank
-    @Length(max = 500)
     private String comment;
 
     @Column(name = "created")
-    private LocalDateTime created;
+    private LocalDateTime created = LocalDateTime.now();
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "article_id")
     private Article article;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User commentAuthor;
+
 }

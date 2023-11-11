@@ -26,7 +26,9 @@ public class MessageFullDto {
 
     @NotNull
     private UserShortDto recipient;
-    private LocalDateTime created = LocalDateTime.now();
+
+    @NotNull
+    private LocalDateTime created;
 
     private boolean isDeleted;
 

@@ -20,7 +20,9 @@ public class CommentFullDto {
 
     @NotBlank
     private String comment;
-    private LocalDateTime created = LocalDateTime.now();
+
+    @NotNull
+    private LocalDateTime created;
 
     @NotNull
     private Long articleId;

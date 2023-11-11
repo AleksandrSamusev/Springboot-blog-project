@@ -18,14 +18,13 @@ import java.util.Set;
 @Table(name = "tags")
 @Entity
 public class Tag {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id")
     private Long tagId;
 
     @Column(name = "name")
-    @NotBlank
-    @Length(max = 50)
     private String name;
 
     @ManyToMany
@@ -35,4 +34,5 @@ public class Tag {
             inverseJoinColumns = @JoinColumn(name = "article_id")
     )
     private Set<Article> articles;
+
 }

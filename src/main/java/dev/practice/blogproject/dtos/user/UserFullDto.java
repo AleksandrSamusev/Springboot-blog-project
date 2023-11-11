@@ -31,11 +31,9 @@ public class UserFullDto {
     private String username;
 
     @NotBlank
-    @Email
     private String email;
 
     @NotNull
-    @Past
     private LocalDate birthDate;
 
     @NotNull
@@ -43,7 +41,7 @@ public class UserFullDto {
     private String about;
 
     @NotNull
-    private Boolean isBanned = false;
+    private Boolean isBanned;
     private Set<MessageShortDto> sentMessages;
     private Set<MessageShortDto> receivedMessages;
     private Set<ArticleShortDto> articles;

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.Set;
 
@@ -16,9 +17,11 @@ import java.util.Set;
 public class ArticleNewDto {
 
     @NotBlank
+    @Length(max = 250)
     private String title;
 
     @NotBlank
+    @Length(max = 30000)
     private String content;
     private Set<TagNewDto> tags;
 

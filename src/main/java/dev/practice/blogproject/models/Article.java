@@ -1,13 +1,10 @@
 package dev.practice.blogproject.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -19,21 +16,19 @@ import java.util.Set;
 @Table(name = "articles")
 @Entity
 public class Article {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "article_id")
     private Long articleId;
 
     @Column(name = "title")
-    @NotBlank
-    @Length(max = 200)
     private String title;
 
     @Column(name = "content")
-    @NotBlank
     private String content;
 
-    @NotNull
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User author;
@@ -45,7 +40,7 @@ public class Article {
     private LocalDateTime published;
 
     @Enumerated(EnumType.STRING)
-    private ArticleStatus status  = ArticleStatus.CREATED;
+    private ArticleStatus status = ArticleStatus.CREATED;
 
     @Column(name = "likes")
     private Long likes;
@@ -60,4 +55,5 @@ public class Article {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<Tag> tags;
+
 }

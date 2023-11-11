@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
@@ -15,14 +16,23 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class UserUpdateDto {
 
+    @Length(max = 50)
     String firstName;
+
+    @Length(max = 50)
     String lastName;
+
+    @Length(max = 50)
     String username;
 
     @Email
+    @Length(max = 50)
     String email;
 
     @Past
     LocalDateTime birthDate;
+
+    @Length(max = 1000)
     String about;
+
 }

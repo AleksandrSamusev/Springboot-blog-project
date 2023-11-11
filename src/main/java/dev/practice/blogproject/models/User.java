@@ -29,44 +29,30 @@ public class User {
     private Long userId;
 
     @Column(name = "first_name")
-    @Length(max = 50)
-    @NotBlank
     private String firstName;
 
     @Column(name = "last_name")
-    @Length(max = 50)
-    @NotBlank
     private String lastName;
 
     @Column(name = "username")
-    @Length(max = 50)
-    @NotBlank
     private String username;
 
     @Column(name = "email")
-    @Length(max = 50)
-    @Email
-    @NotBlank
     private String email;
 
     @Column(name = "birthdate")
     @JsonFormat(pattern = "dd/MM/yyyy")
-    @NotNull
-    @Past
     private LocalDate birthDate;
 
     @Column(name = "role")
-    @NotNull
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.USER;
 
     @Column(name = "about")
-    @Length(max = 1000)
     private String about;
 
     @Column(name = "is_banned")
-    @NotNull
-    private Boolean isBanned;
+    private Boolean isBanned = false;
 
     @OneToMany(mappedBy = "sender")
     private Set<Message> sentMessages;
@@ -79,4 +65,5 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private Set<Comment> comments;
+
 }

@@ -18,4 +18,5 @@ public class UserShortDto {
 
     @NotBlank
     private String userName;
+
 }
