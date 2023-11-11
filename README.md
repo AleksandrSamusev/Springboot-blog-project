@@ -41,6 +41,15 @@ The main features of the service are as follows:
 4. Confirm/reject the publication of the article (in case of rejection the author sees admins comments);
 5. Block the user from leaving comments on articles; 
 
-## DB ER-diagramm
+## API specification
 
-![er-diagramm](src/main/resources/static/images/blog.png)
+The specification for the project can be viewed using [Swagger Editor.](https://editor.swagger.io/)
+To do this, you need to go to the editor's website and import the contents of the file openapi.json
+
+
+![IDEA-fragment](src/main/resources/static/images/openapi.jpeg)
+
+
+## Blog Database ER-diagram
+
+![er-diagram](src/main/resources/static/images/blog.png)

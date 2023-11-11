@@ -1,16 +1,16 @@
-DROP TYPE IF EXISTS ARTICLE_STATUS CASCADE ;
+DROP TYPE IF EXISTS ARTICLE_STATUS CASCADE;
 CREATE TYPE ARTICLE_STATUS AS ENUM ('PUBLISHED', 'CREATED', 'MODERATING', 'REJECTED');
 
-DROP TYPE IF EXISTS ROLE CASCADE ;
+DROP TYPE IF EXISTS ROLE CASCADE;
 CREATE TYPE ROLE AS ENUM ('USER', 'ADMIN');
 
 CREATE TABLE IF NOT EXISTS users
 (
     user_id    BIGINT PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL CHECK ( char_length(first_name) <= 50 ),
-    last_name  VARCHAR(50) NOT NULL CHECK ( char_length(first_name) <= 50 ),
-    username   VARCHAR(50) NOT NULL UNIQUE CHECK ( char_length(first_name) <= 50 ),
-    email      VARCHAR(50) NOT NULL UNIQUE CHECK ( char_length(first_name) <= 50 ),
+    first_name VARCHAR(50) NOT NULL,
+    last_name  VARCHAR(50) NOT NULL,
+    username   VARCHAR(50) NOT NULL UNIQUE,
+    email      VARCHAR(50) NOT NULL UNIQUE,
     birthdate  DATE        NOT NULL,
     role       ROLE        NOT NULL,
     about      TEXT CHECK ( char_length(about) <= 1000 ),
@@ -20,8 +20,7 @@ CREATE TABLE IF NOT EXISTS users
 CREATE TABLE IF NOT EXISTS messages
 (
     message_id   BIGINT PRIMARY KEY,
-    message      TEXT CHECK ( char_length(message) >= 1 ),
-    CHECK ( char_length(message) <= 500 ),
+    message      TEXT      NOT NULL CHECK ( char_length(message) <= 500 ),
     sender_id    BIGINT    NOT NULL REFERENCES users (user_id),
     recipient_id BIGINT    NOT NULL REFERENCES users (user_id),
     created      TIMESTAMP NOT NULL,
@@ -32,7 +31,7 @@ CREATE TABLE IF NOT EXISTS articles
 (
     article_id BIGINT PRIMARY KEY,
     title      VARCHAR(250)   NOT NULL,
-    content    TEXT           NOT NULL,
+    content    TEXT           NOT NULL CHECK ( char_length(content) <= 30000 ),
     author_id  BIGINT         NOT NULL REFERENCES users (user_id),
     created    TIMESTAMP      NOT NULL,
     published  TIMESTAMP,
@@ -43,8 +42,7 @@ CREATE TABLE IF NOT EXISTS articles
 CREATE TABLE IF NOT EXISTS comments
 (
     comment_id BIGINT PRIMARY KEY,
-    comment    TEXT      NOT NULL CHECK ( char_length(comment) >= 1 ),
-    CHECK ( char_length(comment) <= 500 ),
+    comment    TEXT      NOT NULL CHECK ( char_length(comment) <= 500 ),
     created    TIMESTAMP NOT NULL,
     article_id BIGINT    NOT NULL REFERENCES articles (article_id) ON DELETE CASCADE,
     user_id    BIGINT    NOT NULL REFERENCES users (user_id)
