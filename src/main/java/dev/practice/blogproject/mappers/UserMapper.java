@@ -22,9 +22,9 @@ public class UserMapper {
         dto.setRole(user.getRole());
         dto.setIsBanned(user.getIsBanned());
         dto.setComments(user.getComments().stream().map(CommentMapper::toCommentShortDto).collect(Collectors.toSet()));
-        dto.setSentMessages(user.getSentMessages().stream().map(MessageMapper::toMessageShortDto)
+        dto.setSentMessages(user.getSentMessages().stream().map(MessageMapper::toMessageFullDto)
                 .collect(Collectors.toSet()));
-        dto.setReceivedMessages(user.getReceivedMessages().stream().map(MessageMapper::toMessageShortDto)
+        dto.setReceivedMessages(user.getReceivedMessages().stream().map(MessageMapper::toMessageFullDto)
                 .collect(Collectors.toSet()));
         dto.setArticles(user.getArticles().stream().map(ArticleMapper::toArticleShortDto).collect(Collectors.toSet()));
         return dto;
@@ -42,9 +42,9 @@ public class UserMapper {
         user.setRole(dto.getRole());
         user.setIsBanned(dto.getIsBanned());
         dto.setComments(user.getComments().stream().map(CommentMapper::toCommentShortDto).collect(Collectors.toSet()));
-        dto.setSentMessages(user.getSentMessages().stream().map(MessageMapper::toMessageShortDto)
+        dto.setSentMessages(user.getSentMessages().stream().map(MessageMapper::toMessageFullDto)
                 .collect(Collectors.toSet()));
-        dto.setReceivedMessages(user.getReceivedMessages().stream().map(MessageMapper::toMessageShortDto)
+        dto.setReceivedMessages(user.getReceivedMessages().stream().map(MessageMapper::toMessageFullDto)
                 .collect(Collectors.toSet()));
         dto.setArticles(user.getArticles().stream().map(ArticleMapper::toArticleShortDto).collect(Collectors.toSet()));
         return user;

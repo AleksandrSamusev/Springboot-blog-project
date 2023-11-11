@@ -30,6 +30,7 @@ public class MessageFullDto {
     @NotNull
     private LocalDateTime created;
 
+    @NotNull
     private boolean isDeleted;
 
 }

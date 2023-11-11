@@ -2,9 +2,10 @@ package dev.practice.blogproject.dtos.user;
 
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.dtos.comment.CommentShortDto;
-import dev.practice.blogproject.dtos.message.MessageShortDto;
+import dev.practice.blogproject.dtos.message.MessageFullDto;
 import dev.practice.blogproject.models.Role;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,8 +43,8 @@ public class UserFullDto {
 
     @NotNull
     private Boolean isBanned;
-    private Set<MessageShortDto> sentMessages;
-    private Set<MessageShortDto> receivedMessages;
+    private Set<MessageFullDto> sentMessages;
+    private Set<MessageFullDto> receivedMessages;
     private Set<ArticleShortDto> articles;
     private Set<CommentShortDto> comments;
 }
