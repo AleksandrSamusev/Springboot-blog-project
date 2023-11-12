@@ -37,6 +37,10 @@ public class TagServiceImpl implements TagService {
             Tag tag = TagMapper.toTag(dto);
             tag.getArticles().add(article);
             Tag savedTag = tagRepository.save(tag);
+
+            article.getTags().add(savedTag);
+            articleRepository.save(article);
+
             log.info("Tag with ID = " + savedTag.getTagId() + " created");
             return TagMapper.toTagDto(savedTag);
         }
