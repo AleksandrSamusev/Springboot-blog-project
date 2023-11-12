@@ -5,6 +5,7 @@ import dev.practice.blogproject.dtos.user.UserNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.dtos.user.UserUpdateDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
+import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.UserMapper;
 import dev.practice.blogproject.models.User;
@@ -13,6 +14,7 @@ import dev.practice.blogproject.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,6 +51,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserFullDto createUser(UserNewDto dto) {
+        if (userRepository.findByUsernameOrEmail(dto.getUsername(), dto.getEmail()) != null) {
+            if (dto.getUsername().equals(userRepository
+                    .findByUsernameOrEmail(dto.getUsername(), dto.getEmail()).getUsername())) {
+                throw new InvalidParameterException("User with given Username already exists");
+            } else {
+                throw new InvalidParameterException("User with given email already exists");
+            }
+        }
         User user = UserMapper.toUser(dto);
         User savedUser = userRepository.save(user);
         log.info("User with id = " + savedUser.getUserId() + " created");
