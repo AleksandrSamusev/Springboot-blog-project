@@ -52,4 +52,4 @@ To do this, you need to go to the editor's website and import the contents of th
 
 ## Blog Database ER-diagram
 
-![er-diagram](src/main/resources/static/images/blog.png)
+![er-diagram](src/main/resources/static/images/erDiagram.jpeg)
