@@ -58,7 +58,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     }
 
     private void checkUserExist(long userId) {
-        if (!userRepository.existsById(userId)) {
+        if (userRepository.findById(userId).isEmpty()) {
             log.error("User with id {} wasn't found", userId);
             throw new ResourceNotFoundException(String.format("User with id %d wasn't found", userId));
         }
