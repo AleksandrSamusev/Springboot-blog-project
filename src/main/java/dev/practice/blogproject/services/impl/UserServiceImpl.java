@@ -72,7 +72,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserFullDto updateUser(Long userId, Long currentUserId, UserUpdateDto dto) {
         User userFromBd = userRepository.findById(userId).orElseThrow(() ->
-                new ResourceNotFoundException("User not found with given ID " + userId));
+                new ResourceNotFoundException("User with given ID = " + userId + " not found"));
+        isUserPresent(currentUserId);
+        if (!userRepository.findById(currentUserId).get().getUserId().equals(userId)) {
+            throw new ActionForbiddenException("Action forbidden for current user");
+        }
         if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
             userFromBd.setFirstName(dto.getFirstName());
         }

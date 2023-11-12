@@ -3,6 +3,7 @@ package dev.practice.blogproject;
 import dev.practice.blogproject.dtos.user.UserFullDto;
 import dev.practice.blogproject.dtos.user.UserNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
+import dev.practice.blogproject.dtos.user.UserUpdateDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
@@ -52,6 +53,10 @@ public class UserServiceTest {
             LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
 
     private final UserNewDto newUser4 = new UserNewDto("Harry", "Potter",
+            "Kirk", "johnDoe@test.test",
+            LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
+
+    private final UserUpdateDto updateUser5 = new UserUpdateDto("Martin", "Potter",
             "Kirk", "johnDoe@test.test",
             LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
 
@@ -125,7 +130,7 @@ public class UserServiceTest {
     public void user_test_7_Given_UserExistByUsername_When_createUser_Then_InvalidParameterException() {
         when(userRepositoryMock.findByUsernameOrEmail(anyString(), anyString())).thenReturn(user1);
 
-        InvalidParameterException thrown = assertThrows(InvalidParameterException.class, ()->
+        InvalidParameterException thrown = assertThrows(InvalidParameterException.class, () ->
                 userService.createUser(newUser3));
         assertEquals("User with given Username already exists", thrown.getMessage());
     }
@@ -134,8 +139,44 @@ public class UserServiceTest {
     public void user_test_8_Given_UserExistByEmail_When_createUser_Then_InvalidParameterException() {
         when(userRepositoryMock.findByUsernameOrEmail(anyString(), anyString())).thenReturn(user1);
 
-        InvalidParameterException thrown = assertThrows(InvalidParameterException.class, ()->
+        InvalidParameterException thrown = assertThrows(InvalidParameterException.class, () ->
                 userService.createUser(newUser4));
         assertEquals("User with given email already exists", thrown.getMessage());
+    }
+
+    @Test
+    public void user_test_9_Given_ValidDtoAndIds_When_updateUser_Then_userUpdated() {
+        when(userRepositoryMock.findById(any())).thenReturn(Optional.of(user1));
+        when(userRepositoryMock.save(any())).thenReturn(user1);
+        UserFullDto dto = userService.updateUser(1L, 1L, updateUser5);
+        assertEquals(dto.getFirstName(), updateUser5.getFirstName());
+    }
+
+    @Test
+    public void user_test_10_Given_userIdNotExistsInDb_When_updateUser_Then_ResourceNotFoundException() {
+        when(userRepositoryMock.findById(8L)).thenThrow(ResourceNotFoundException.class);
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                userService.updateUser(8L, 1L, updateUser5));
+    }
+
+    @Test
+    public void user_test_11_Given_currentUserIdNotExistsInDb_When_updateUser_Then_ResourceNotFoundException() {
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
+                userService.updateUser(1L, 8L, updateUser5));
+
+        assertEquals("User with given ID = 1 not found", exception.getMessage());
+    }
+
+    @Test
+    public void user_test_12_Given_currentUserIdNotEqualUserId_When_updateUser_Then_ActionForbiddenException() {
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(user1));
+        when(userRepositoryMock.findById(3L)).thenReturn(Optional.of(user3));
+
+        ActionForbiddenException exception = assertThrows(ActionForbiddenException.class, () ->
+                userService.updateUser(1L, 3L, updateUser5));
+
+        assertEquals("Action forbidden for current user", exception.getMessage());
     }
 }
