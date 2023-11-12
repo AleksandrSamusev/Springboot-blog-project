@@ -28,7 +28,6 @@ public class Article {
     @Column(name = "content")
     private String content;
 
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User author;
