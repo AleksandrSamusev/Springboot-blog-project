@@ -12,7 +12,7 @@ public interface UserService {
 
     UserShortDto getUserById(Long id);
 
-    Object getUserById(Long userId, Long id);
+    UserFullDto getUserById(Long userId, Long id);
 
     UserFullDto createUser(UserNewDto dto);
 

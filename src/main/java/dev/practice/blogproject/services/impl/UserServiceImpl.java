@@ -40,13 +40,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Object getUserById(Long userId, Long currentUserId) {
+    public UserFullDto getUserById(Long userId, Long currentUserId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found with given id " + userId));
-        if (userId.equals(currentUserId)) {
+        isUserPresent(currentUserId);
+        String role = userRepository.findById(currentUserId).get().getRole().name();
+        if (userId.equals(currentUserId) || role.equals("ADMIN")) {
             return UserMapper.toUserFullDto(user);
+        } else {
+            throw new ActionForbiddenException("Action forbidden for current user");
         }
-        return UserMapper.toUserShortDto(user);
+
     }
 
     @Override
@@ -100,6 +104,7 @@ public class UserServiceImpl implements UserService {
         isAuthorized(userId, currentUserId);
         userRepository.deleteById(userId);
     }
+
 
     private void isUserPresent(Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
