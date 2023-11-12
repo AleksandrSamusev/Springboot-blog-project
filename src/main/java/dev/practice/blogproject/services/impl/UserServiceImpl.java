@@ -95,19 +95,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId, Long currentUserId) {
-        if (userRepository.existsById(userId)) {
-            if (userRepository.findById(currentUserId).isPresent()) {
-                String role = userRepository.findById(currentUserId).get().getRole().name();
-                if (role.equals("ADMIN") || userId.equals(currentUserId)) {
-                    userRepository.deleteById(userId);
-                } else {
-                    throw new ActionForbiddenException("Action forbidden for current user");
-                }
-            } else {
-                throw new ResourceNotFoundException("User with given id " + currentUserId + " not found");
+        isUserPresent(userId);
+        isUserPresent(currentUserId);
+        isAuthorized(userId, currentUserId);
+        userRepository.deleteById(userId);
+    }
+
+    private void isUserPresent(Long userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new ResourceNotFoundException("User with given ID = " + userId + " not found");
+        }
+    }
+
+    private void isAuthorized(Long userId, Long currentUserId) {
+        if (userRepository.findById(currentUserId).isPresent()) {
+            String role = userRepository.findById(currentUserId).get().getRole().name();
+            if (!role.equals("ADMIN") && !userId.equals(currentUserId)) {
+                throw new ActionForbiddenException("Action forbidden for current user");
             }
-        } else {
-            throw new ResourceNotFoundException("User with given id " + currentUserId + " not found");
         }
     }
 }
