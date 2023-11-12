@@ -57,7 +57,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewUserDto"
+                "$ref": "#/components/schemas/UserNewDto"
               }
             }
           }
@@ -216,7 +216,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
+                "$ref": "#/components/schemas/UserUpdateDto"
               }
             }
           }
@@ -324,7 +324,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewCommentDto"
+                "$ref": "#/components/schemas/CommentNewDto"
               }
             }
           }
@@ -386,7 +386,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewCommentDto"
+                "$ref": "#/components/schemas/CommentNewDto"
               }
             }
           }
@@ -1747,7 +1747,7 @@
           "isDeleted"
         ]
       },
-      "NewUserDto": {
+      "UserNewDto": {
         "type": "object",
         "properties": {
           "firstName": {
@@ -1789,7 +1789,7 @@
           "birthdate"
         ]
       },
-      "UpdateUserDto": {
+      "UserUpdateDto": {
         "type": "object",
         "properties": {
           "firstName": {
@@ -1824,7 +1824,7 @@
           }
         }
       },
-      "NewCommentDto": {
+      "CommentNewDto": {
         "type": "object",
         "properties": {
           "comment": {
