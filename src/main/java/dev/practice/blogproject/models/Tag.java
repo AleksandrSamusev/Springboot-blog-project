@@ -25,12 +25,7 @@ public class Tag {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany
-    @JoinTable(
-            name = "articles_tags",
-            joinColumns = @JoinColumn(name = "tag_id"),
-            inverseJoinColumns = @JoinColumn(name = "article_id")
-    )
+    @ManyToMany(mappedBy = "tags")
     private Set<Article> articles = new HashSet<>();
 
 }
