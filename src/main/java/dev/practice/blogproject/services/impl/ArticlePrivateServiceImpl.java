@@ -4,6 +4,7 @@ import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
+import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.ArticleMapper;
 import dev.practice.blogproject.models.Article;
@@ -31,6 +32,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     @Override
     public ArticleFullDto createArticle(long userId, ArticleNewDto newArticle) {
         checkUserExist(userId);
+        checkTitleExist(newArticle.getTitle());
 
         long articleId = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, userId)).getArticleId();
         if (newArticle.getTags() != null && !newArticle.getTags().isEmpty()) {
@@ -58,7 +60,14 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     private void checkUserExist(long userId) {
         if (!userRepository.existsById(userId)) {
             log.error("User with id {} wasn't found", userId);
-            throw new ResourceNotFoundException(String.format("Event with id %d wasn't found", userId));
+            throw new ResourceNotFoundException(String.format("User with id %d wasn't found", userId));
+        }
+    }
+
+    private void checkTitleExist(String title) {
+        if (articleRepository.findArticlesByTitleIgnoreCase(title) != null) {
+            log.error("Article with title {} already exist", title);
+            throw new InvalidParameterException(String.format("Article with title %s already exist", title));
         }
     }
 
