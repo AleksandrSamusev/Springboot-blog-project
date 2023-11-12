@@ -28,9 +28,8 @@ public class Article {
     @Column(name = "content")
     private String content;
 
-
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "author_id")
     private User author;
 
     @Column(name = "created")
@@ -56,4 +55,7 @@ public class Article {
     )
     private Set<Tag> tags;
 
+    public Article(long articleId) {
+        this.articleId = articleId;
+    }
 }
