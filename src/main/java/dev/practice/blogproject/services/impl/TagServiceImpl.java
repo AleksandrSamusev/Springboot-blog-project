@@ -13,6 +13,7 @@ import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.TagService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,10 @@ public class TagServiceImpl implements TagService {
             Tag tag = TagMapper.toTag(dto);
             tag.getArticles().add(article);
             Tag savedTag = tagRepository.save(tag);
+
+            article.getTags().add(savedTag);
+            articleRepository.save(article);
+
             log.info("Tag with ID = " + savedTag.getTagId() + " created");
             return TagMapper.toTagDto(savedTag);
         }

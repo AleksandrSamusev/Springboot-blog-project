@@ -5,6 +5,8 @@ import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.dtos.tag.TagShortDto;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.Tag;
+
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class TagMapper {
@@ -20,6 +22,10 @@ public class TagMapper {
     public static TagShortDto toTagShortDto(Tag tag) {
         return new TagShortDto(tag.getTagId(),
                 tag.getName());
+    }
+
+    public static Tag toTag(TagFullDto dto) {
+        return new Tag(dto.getTagId(), dto.getName(), new HashSet<>());
     }
 
     public static Tag toTag(TagNewDto dto) {
