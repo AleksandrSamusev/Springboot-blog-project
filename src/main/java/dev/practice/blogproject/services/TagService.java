@@ -6,4 +6,6 @@ import dev.practice.blogproject.dtos.tag.TagNewDto;
 public interface TagService {
     TagFullDto createTag(TagNewDto dto, Long articleId, Long userId);
 
+    void deleteTag(Long tagId, Long userId);
+
 }

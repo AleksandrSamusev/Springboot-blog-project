@@ -5,8 +5,6 @@ import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.dtos.tag.TagShortDto;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.Tag;
-
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class TagMapper {
@@ -22,10 +20,6 @@ public class TagMapper {
     public static TagShortDto toTagShortDto(Tag tag) {
         return new TagShortDto(tag.getTagId(),
                 tag.getName());
-    }
-
-    public static List<TagFullDto> toTagDtos(List<Tag> tags) {
-        return tags.stream().map(TagMapper::toTagDto).collect(Collectors.toList());
     }
 
     public static Tag toTag(TagNewDto dto) {
