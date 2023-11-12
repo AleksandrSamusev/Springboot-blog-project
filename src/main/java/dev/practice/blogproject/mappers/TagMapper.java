@@ -1,6 +1,7 @@
 package dev.practice.blogproject.mappers;
 
 import dev.practice.blogproject.dtos.tag.TagFullDto;
+import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.dtos.tag.TagShortDto;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.Tag;
