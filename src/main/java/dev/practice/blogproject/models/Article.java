@@ -55,4 +55,7 @@ public class Article {
     )
     private Set<Tag> tags;
 
+    public Article(long articleId) {
+        this.articleId = articleId;
+    }
 }

@@ -24,7 +24,7 @@ public class ArticleMapper {
         return article;
     }
 
-    public static ArticleFullDto toArticleDto(Article article) {
+    public static ArticleFullDto toArticleFullDto(Article article) {
         return new ArticleFullDto(
                 article.getArticleId(),
                 article.getTitle(),
@@ -51,7 +51,7 @@ public class ArticleMapper {
     }
 
     public static List<ArticleFullDto> toArticleDtos(List<Article> articles) {
-        return articles.stream().map(ArticleMapper::toArticleDto).collect(Collectors.toList());
+        return articles.stream().map(ArticleMapper::toArticleFullDto).collect(Collectors.toList());
     }
 
 }

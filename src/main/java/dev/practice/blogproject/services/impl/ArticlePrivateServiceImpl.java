@@ -12,6 +12,7 @@ import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.ArticlePrivateService;
+import dev.practice.blogproject.services.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,15 +26,18 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
+    private final TagService tagService;
 
     @Override
     public ArticleFullDto createArticle(long userId, ArticleNewDto newArticle) {
         checkUserExist(userId);
 
-        Long articleId = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, userId)).getArticleId();
+        long articleId = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, userId)).getArticleId();
         if (newArticle.getTags() != null && !newArticle.getTags().isEmpty()) {
-            checkTagExist(newArticle.getTags(), articleId);
+            checkTagExist(newArticle.getTags(), articleId, userId);
         }
+
+        return ArticleMapper.toArticleFullDto(articleRepository.getReferenceById(articleId));
     }
 
     @Override
@@ -58,10 +62,16 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         }
     }
 
-    private Set<Tag> checkTagExist(Set<TagNewDto> tags, long articleId) {
-        for (TagNewDto tag : tags) {
-            if (tagRepository.)
+    private void checkTagExist(Set<TagNewDto> tags, long articleId, long userId) {
+        for (TagNewDto newTag : tags) {
+            Tag tag = tagRepository.findTagByName(newTag.getName());
+            if (tag != null) {
+                tag.getArticles().add(new Article(articleId));
+                tagRepository.save(tag);
+                log.info("Tag with id {} was added to article with id {}", tag.getTagId(), articleId);
+            } else {
+                tagService.createTag(newTag, articleId, userId);
+            }
         }
-
     }
 }
