@@ -27,4 +27,10 @@ public class TagMapper {
     public static List<TagFullDto> toTagDtos(List<Tag> tags) {
         return tags.stream().map(TagMapper::toTagDto).collect(Collectors.toList());
     }
+
+    public static Tag toTag(TagNewDto dto) {
+        Tag tag = new Tag();
+        tag.setName(dto.getName());
+        return tag;
+    }
 }

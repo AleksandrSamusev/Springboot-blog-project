@@ -12,10 +12,12 @@ import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.services.TagService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
     private final ArticleRepository articleRepository;
@@ -30,10 +32,10 @@ public class TagServiceImpl implements TagService {
         if(!article.getAuthor().getUserId().equals(userId)) {
             throw new ActionForbiddenException("Action forbidden for current user");
         } else {
-            Tag tag = new Tag();
-            tag.setName(dto.getName());
+            Tag tag = TagMapper.toTag(dto);
             tag.getArticles().add(article);
             Tag savedTag = tagRepository.save(tag);
+            log.info("Tag with ID = " + savedTag.getTagId() + " created");
             return TagMapper.toTagDto(savedTag);
         }
     }
