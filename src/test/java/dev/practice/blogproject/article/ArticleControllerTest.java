@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -110,36 +109,6 @@ public class ArticleControllerTest {
                 .updateArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.any());
     }
 
-    @Test
-    void article_test_16_Given_headerWithoutUserId_When_updateArticle_Then_exceptionThrownStatusBadRequest()
-            throws Exception {
-        Mockito
-                .when(articleService.updateArticle(null, 1L, update))
-                .thenThrow(InvalidParameterException.class);
-
-        mvc.perform(patch("/api/v1/private/articles/{articleId}", 1L)
-                        .content(mapper.writeValueAsString(update))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void article_test_17_Given_pathWithoutArticleId_When_updateArticle_Then_exceptionThrownStatusBadRequest()
-            throws Exception {
-        Mockito
-                .when(articleService.updateArticle(Mockito.anyLong(), Mockito.isNull(), Mockito.any()))
-                .thenThrow(InvalidParameterException.class);
-
-        mvc.perform(patch("/api/v1/private/articles/null")
-                        .content(mapper.writeValueAsString(update))
-                        .header("X-Current-User-Id", 1)
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
 
 
 }

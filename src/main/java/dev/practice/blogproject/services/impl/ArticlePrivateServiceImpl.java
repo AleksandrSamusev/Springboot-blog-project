@@ -9,10 +9,7 @@ import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.ArticleMapper;
-import dev.practice.blogproject.models.Article;
-import dev.practice.blogproject.models.Role;
-import dev.practice.blogproject.models.Tag;
-import dev.practice.blogproject.models.User;
+import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
@@ -80,12 +77,14 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     @Override
     public Optional<?> getArticleById(Long userId, Long articleId) {
         Article article = checkArticleExist(articleId);
-        if (userId == null) {
-            return Optional.of(getArticleByIdForAny(article));
-        }
-
         User user = checkUserExist(userId);
-        if (!article.getAuthor().getUserId().equals(userId) || user.getRole().equals(Role.USER)) {
+
+        if (!article.getAuthor().getUserId().equals(userId) && user.getRole().equals(Role.USER)) {
+            if (article.getStatus() != ArticleStatus.PUBLISHED) {
+                log.error("Article with id {} is not published yet. Current status is {}", articleId,
+                        article.getStatus());
+                throw new ActionForbiddenException(String.format("Article with id %d is not published yet", articleId));
+            }
             return Optional.of(getArticleByIdForAny(article));
         }
         return Optional.of(getArticleByIdForOwnerOrAdmin(article));
@@ -106,10 +105,6 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     }
 
     private User checkUserExist(Long userId) {
-        if (userId == null) {
-            log.error("User id is NULL");
-            throw new InvalidParameterException("User id can not be NULL");
-        }
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             log.error("User with id {} wasn't found", userId);
@@ -142,10 +137,6 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     }
 
     private Article checkArticleExist(Long articleId) {
-        if (articleId == null) {
-            log.error("Article id is NULL");
-            throw new InvalidParameterException("Article id can not be NULL");
-        }
         Optional<Article> article = articleRepository.findById(articleId);
         if (article.isEmpty()) {
             log.error("Article with id {} wasn't found", article);

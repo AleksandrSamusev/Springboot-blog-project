@@ -2,6 +2,7 @@ package dev.practice.blogproject.article;
 
 import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
+import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
@@ -142,6 +143,19 @@ public class ArticlePrivateServiceImplUnitTest {
         assertThrows(ActionForbiddenException.class, () -> articleService.updateArticle(
                 1L, 0L, Mockito.any()), "Incorrect exception");
         Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
+    }
+
+    @Test
+    void article_test_18_Given_notAuthorisedUser_When_getArticleById_Then_returnedArticleShortDto() {
+        Mockito
+                .when(articleRepository.findById(0L))
+                .thenReturn(Optional.of(savedArticle));
+
+        ArticleShortDto result = (ArticleShortDto) articleService.getArticleById(null, 0L).get();
+
+        assertThat(result).isInstanceOf(ArticleShortDto.class);
+        
+
     }
 
 

@@ -30,7 +30,7 @@ public class ArticlePrivateController {
     }
 
     @GetMapping("/{articleId}")
-    public ResponseEntity<?> getArticleById(@RequestHeader("X-Current-User-Id") Long userId,
+    public ResponseEntity<?> getArticleById(@RequestHeader(value = "X-Current-User-Id") Long userId,
                                             @PathVariable("articleId") Long articleId) {
         return new ResponseEntity<>(articleService.getArticleById(userId, articleId), HttpStatus.OK);
     }
