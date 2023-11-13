@@ -40,13 +40,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Object getUserById(Long userId, Long currentUserId) {
+    public UserFullDto getUserById(Long userId, Long currentUserId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found with given id " + userId));
-        if (userId.equals(currentUserId)) {
+        isUserPresent(currentUserId);
+        String role = userRepository.findById(currentUserId).get().getRole().name();
+        if (userId.equals(currentUserId) || role.equals("ADMIN")) {
             return UserMapper.toUserFullDto(user);
+        } else {
+            throw new ActionForbiddenException("Action forbidden for current user");
         }
-        return UserMapper.toUserShortDto(user);
+
     }
 
     @Override
@@ -68,7 +72,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserFullDto updateUser(Long userId, Long currentUserId, UserUpdateDto dto) {
         User userFromBd = userRepository.findById(userId).orElseThrow(() ->
-                new ResourceNotFoundException("User not found with given ID " + userId));
+                new ResourceNotFoundException("User with given ID = " + userId + " not found"));
+        isUserPresent(currentUserId);
+        if (!userRepository.findById(currentUserId).get().getUserId().equals(userId)) {
+            throw new ActionForbiddenException("Action forbidden for current user");
+        }
         if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
             userFromBd.setFirstName(dto.getFirstName());
         }
@@ -95,19 +103,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId, Long currentUserId) {
-        if (userRepository.existsById(userId)) {
-            if (userRepository.findById(currentUserId).isPresent()) {
-                String role = userRepository.findById(currentUserId).get().getRole().name();
-                if (role.equals("ADMIN") || userId.equals(currentUserId)) {
-                    userRepository.deleteById(userId);
-                } else {
-                    throw new ActionForbiddenException("Action forbidden for current user");
-                }
-            } else {
-                throw new ResourceNotFoundException("User with given id " + currentUserId + " not found");
+        isUserPresent(userId);
+        isUserPresent(currentUserId);
+        isAuthorized(userId, currentUserId);
+        userRepository.deleteById(userId);
+    }
+
+
+    private void isUserPresent(Long userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new ResourceNotFoundException("User with given ID = " + userId + " not found");
+        }
+    }
+
+    private void isAuthorized(Long userId, Long currentUserId) {
+        if (userRepository.findById(currentUserId).isPresent()) {
+            String role = userRepository.findById(currentUserId).get().getRole().name();
+            if (!role.equals("ADMIN") && !userId.equals(currentUserId)) {
+                throw new ActionForbiddenException("Action forbidden for current user");
             }
-        } else {
-            throw new ResourceNotFoundException("User with given id " + currentUserId + " not found");
         }
     }
 }

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -43,8 +44,8 @@ public class UserFullDto {
 
     @NotNull
     private Boolean isBanned;
-    private Set<MessageFullDto> sentMessages;
-    private Set<MessageFullDto> receivedMessages;
-    private Set<ArticleShortDto> articles;
-    private Set<CommentShortDto> comments;
+    private Set<MessageFullDto> sentMessages = new HashSet<>();
+    private Set<MessageFullDto> receivedMessages = new HashSet<>();
+    private Set<ArticleShortDto> articles = new HashSet<>();
+    private Set<CommentShortDto> comments = new HashSet<>();
 }

@@ -16,7 +16,7 @@ public class PrivateUserController {
     private final UserService userService;
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable Long userId,
+    public ResponseEntity<UserFullDto> getUserById(@PathVariable Long userId,
                                          @RequestHeader("X-Current-User-Id") Long currentUserId) {
         return new ResponseEntity<>(userService.getUserById(userId, currentUserId), HttpStatus.OK);
     }

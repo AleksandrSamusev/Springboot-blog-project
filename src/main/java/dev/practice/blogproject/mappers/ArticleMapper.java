@@ -1,13 +1,10 @@
 package dev.practice.blogproject.mappers;
-
 import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.User;
-
 import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class ArticleMapper {
@@ -47,10 +44,6 @@ public class ArticleMapper {
                 article.getLikes(),
                 article.getComments().stream().map(CommentMapper::toCommentShortDto).collect(Collectors.toSet()),
                 article.getTags().stream().map(TagMapper::toTagShortDto).collect(Collectors.toSet()));
-    }
-
-    public static List<ArticleFullDto> toArticleDtos(List<Article> articles) {
-        return articles.stream().map(ArticleMapper::toArticleFullDto).collect(Collectors.toList());
     }
 
 }

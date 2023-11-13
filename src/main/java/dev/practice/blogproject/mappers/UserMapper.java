@@ -52,9 +52,4 @@ public class UserMapper {
         user.setArticles(new HashSet<>());
         return user;
     }
-
-
-    public static List<UserFullDto> toFullDtos(List<User> users) {
-        return users.stream().map(UserMapper::toUserFullDto).collect(Collectors.toList());
-    }
 }
