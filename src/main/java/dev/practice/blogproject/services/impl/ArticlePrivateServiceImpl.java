@@ -2,6 +2,7 @@ package dev.practice.blogproject.services.impl;
 
 import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
+import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
@@ -9,7 +10,7 @@ import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.ArticleMapper;
 import dev.practice.blogproject.models.Article;
-import dev.practice.blogproject.models.ArticleStatus;
+import dev.practice.blogproject.models.Role;
 import dev.practice.blogproject.models.Tag;
 import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.ArticleRepository;
@@ -63,7 +64,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     }
 
     @Override
-    public ArticleFullDto updateArticle(long userId, long articleId, ArticleUpdateDto updateArticle) {
+    public ArticleFullDto updateArticle(Long userId, Long articleId, ArticleUpdateDto updateArticle) {
         checkUserExist(userId);
         Article article = checkArticleExist(articleId);
         checkUserIsAuthor(article, userId);
@@ -77,16 +78,38 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     }
 
     @Override
-    public ArticleFullDto getArticleById(long userId, long articleId) {
-        return null;
+    public Optional<?> getArticleById(Long userId, Long articleId) {
+        Article article = checkArticleExist(articleId);
+        if (userId == null) {
+            return Optional.of(getArticleByIdForAny(article));
+        }
+
+        User user = checkUserExist(userId);
+        if (!article.getAuthor().getUserId().equals(userId) || user.getRole().equals(Role.USER)) {
+            return Optional.of(getArticleByIdForAny(article));
+        }
+        return Optional.of(getArticleByIdForOwnerOrAdmin(article));
     }
+
+    private ArticleShortDto getArticleByIdForAny(Article article) {
+        return ArticleMapper.toArticleShortDto(article);
+    }
+
+    private ArticleFullDto getArticleByIdForOwnerOrAdmin(Article article) {
+        return ArticleMapper.toArticleFullDto(article);
+    }
+
 
     @Override
     public void deleteArticle(long userId, long articleId) {
 
     }
 
-    private User checkUserExist(long userId) {
+    private User checkUserExist(Long userId) {
+        if (userId == null) {
+            log.error("User id is NULL");
+            throw new InvalidParameterException("User id can not be NULL");
+        }
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             log.error("User with id {} wasn't found", userId);
@@ -118,7 +141,11 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         }
     }
 
-    private Article checkArticleExist(long articleId) {
+    private Article checkArticleExist(Long articleId) {
+        if (articleId == null) {
+            log.error("Article id is NULL");
+            throw new InvalidParameterException("Article id can not be NULL");
+        }
         Optional<Article> article = articleRepository.findById(articleId);
         if (article.isEmpty()) {
             log.error("Article with id {} wasn't found", article);
