@@ -103,7 +103,7 @@ public class PublicUserControllerTest {
         mockMvc.perform(get("/api/v1/public/users/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(1L))
-                .andExpect(jsonPath("$.userName").value("JohnDoe"));
+                .andExpect(jsonPath("$.username").value("JohnDoe"));
     }
 
     @Test
@@ -126,9 +126,9 @@ public class PublicUserControllerTest {
         mockMvc.perform(get("/api/v1/public/users"))
                 .andDo(print())
                 .andExpect(jsonPath("$[0].userId").value(dto1.getUserId()))
-                .andExpect(jsonPath("$[0].userName").value(dto1.getUsername()))
+                .andExpect(jsonPath("$[0].username").value(dto1.getUsername()))
                 .andExpect(jsonPath("$[1].userId").value(dto2.getUserId()))
-                .andExpect(jsonPath("$[1].userName").value(dto2.getUsername()))
+                .andExpect(jsonPath("$[1].username").value(dto2.getUsername()))
                 .andExpect(status().isOk());
     }
 

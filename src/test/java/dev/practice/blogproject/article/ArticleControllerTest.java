@@ -63,7 +63,7 @@ public class ArticleControllerTest {
                 .andExpect(jsonPath("$.title").value(articleFull.getTitle()))
                 .andExpect(jsonPath("$.content").value(articleFull.getContent()))
                 .andExpect(jsonPath("$.author.userId").value(author.getUserId().intValue()))
-                .andExpect(jsonPath("$.author.userName").value(author.getUserName()))
+                .andExpect(jsonPath("$.author.username").value(author.getUsername()))
                 .andExpect(jsonPath("$.created").value(notNullValue()))
                 .andExpect(jsonPath("$.published").value(nullValue()))
                 .andExpect(jsonPath("$.status").value("CREATED"))
