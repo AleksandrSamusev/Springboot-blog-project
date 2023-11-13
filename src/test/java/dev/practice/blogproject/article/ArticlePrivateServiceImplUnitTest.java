@@ -64,9 +64,6 @@ public class ArticlePrivateServiceImplUnitTest {
                 .when(userRepository.findById(0L))
                 .thenReturn(Optional.of(author));
         Mockito
-                .when(userRepository.getReferenceById(0L))
-                .thenReturn(author);
-        Mockito
                 .when(articleRepository.save(Mockito.any(Article.class)))
                 .thenReturn(savedArticle);
         Mockito
@@ -91,9 +88,6 @@ public class ArticlePrivateServiceImplUnitTest {
         Mockito
                 .when(userRepository.findById(0L))
                 .thenReturn(Optional.of(author));
-        Mockito
-                .when(userRepository.getReferenceById(0L))
-                .thenReturn(author);
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
                 () -> articleService.createArticle(0L, newArticle));
