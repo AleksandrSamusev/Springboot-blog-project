@@ -2,6 +2,7 @@ package dev.practice.blogproject.article;
 
 import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
+import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.models.*;
@@ -47,14 +48,18 @@ public class ArticlePrivateServiceImplUnitTest {
     private final User author = new User(0L, "Harry", "Potter", "HP",
             "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final Article article = new Article(null, "The empty pot",
-            "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED,
-            0L, new HashSet<>(), new HashSet<>());
+    private final User author2 = new User(1L, "Ron", "Weasley", "RW",
+            "rw@gmail.com", LocalDate.of(1981, 9, 16), Role.USER, null,
+            false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final ArticleNewDto newArticle = new ArticleNewDto("The empty pot",
             "Very interesting information", new HashSet<>());
     private final Article savedArticle = new Article(0L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED,
             0L, new HashSet<>(), new HashSet<>());
+    private final Article savedArticle2 = new Article(1L, "A pretty cat",
+            "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED,
+            0L, new HashSet<>(), new HashSet<>());
+    private final ArticleUpdateDto update = new ArticleUpdateDto();
     private final Tag tag1 = new Tag(0L, "Potions", new HashSet<>());
 
 
@@ -106,6 +111,39 @@ public class ArticlePrivateServiceImplUnitTest {
                 "Incorrect message");
         assertThrows(ResourceNotFoundException.class, () -> articleService.createArticle(
                 author.getUserId(), newArticle), "Incorrect exception");
+        Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
+    }
+
+    @Test
+    void article_test_12_Given_notExistingArticle_When_updateArticle_Then_throwException() {
+        Mockito
+                .when(userRepository.findById(0L))
+                .thenReturn(Optional.of(author));
+
+        final ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> articleService.updateArticle(0L, 1000L, Mockito.any()));
+        assertEquals("Article with id 1000 wasn't found", exception.getMessage(),
+                "Incorrect message");
+        assertThrows(ResourceNotFoundException.class, () -> articleService.updateArticle(
+                0L, 1000L, Mockito.any()), "Incorrect exception");
+        Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
+    }
+
+    @Test
+    void article_test_13_Given_userIsNotAuthor_When_updateArticle_Then_throwException() {
+        Mockito
+                .when(userRepository.findById(1L))
+                .thenReturn(Optional.of(author2));
+        Mockito
+                .when(articleRepository.findById(0L))
+                .thenReturn(Optional.of(savedArticle));
+
+        final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
+                () -> articleService.updateArticle(1L, 0L, Mockito.any()));
+        assertEquals("Article with id 0 is not belongs to user with id 1. Action is forbidden",
+                exception.getMessage(), "Incorrect message");
+        assertThrows(ActionForbiddenException.class, () -> articleService.updateArticle(
+                1L, 0L, Mockito.any()), "Incorrect exception");
         Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
     }
 

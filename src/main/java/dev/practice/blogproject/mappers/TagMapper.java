@@ -24,13 +24,9 @@ public class TagMapper {
                 tag.getName());
     }
 
-    public static Tag toTag(TagFullDto dto) {
-        return new Tag(dto.getTagId(), dto.getName(), new HashSet<>());
-    }
-
     public static Tag toTag(TagNewDto dto) {
         Tag tag = new Tag();
-        tag.setName(dto.getName());
+        tag.setName(dto.getName().trim());
         return tag;
     }
 }
