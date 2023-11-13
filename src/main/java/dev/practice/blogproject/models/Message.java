@@ -25,11 +25,11 @@ public class Message {
     private String message;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", updatable = false, insertable = false)
+    @JoinColumn(name = "sender_id", updatable = false, insertable = false)
     private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", updatable = false, insertable = false)
+    @JoinColumn(name = "recipient_id", updatable = false, insertable = false)
     private User recipient;
 
     @Column(name = "created")

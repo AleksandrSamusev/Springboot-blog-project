@@ -68,8 +68,8 @@ public class UserServiceTest {
 
         List<UserShortDto> result = userService.getAllUsers();
 
-        assertEquals(result.get(0).getUserName(), user1.getUsername());
-        assertEquals(result.get(1).getUserName(), user2.getUsername());
+        assertEquals(result.get(0).getUsername(), user1.getUsername());
+        assertEquals(result.get(1).getUsername(), user2.getUsername());
         verify(userRepositoryMock, times(1)).findAll();
     }
 
@@ -81,8 +81,8 @@ public class UserServiceTest {
         UserShortDto dto1 = userService.getUserById(1L);
         UserShortDto dto2 = userService.getUserById(2L);
 
-        assertEquals(dto1.getUserName(), user1.getUsername());
-        assertEquals(dto2.getUserName(), user2.getUsername());
+        assertEquals(dto1.getUsername(), user1.getUsername());
+        assertEquals(dto2.getUsername(), user2.getUsername());
 
         verify(userRepositoryMock, times(2)).findById(anyLong());
     }

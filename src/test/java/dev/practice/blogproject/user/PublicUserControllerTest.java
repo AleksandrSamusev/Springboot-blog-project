@@ -19,37 +19,23 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashSet;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 
 @WebMvcTest(PublicUserController.class)
-public class UserControllerTest {
+public class PublicUserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -93,8 +79,8 @@ public class UserControllerTest {
         UserFullDto result = new UserFullDto(1L, "John", "Doe",
                 "johnDoe", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), Role.USER,
-                "Hi! I'm John", false, new HashSet<MessageFullDto>(), new HashSet<MessageFullDto>(),
-                new HashSet<ArticleShortDto>(), new HashSet<CommentShortDto>());
+                "Hi! I'm John", false, new HashSet<>(), new HashSet<>(),
+                new HashSet<>(), new HashSet<>());
 
         Mockito.when(userService.createUser(dto)).thenThrow(InvalidParameterException.class);
 
@@ -140,9 +126,9 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/v1/public/users"))
                 .andDo(print())
                 .andExpect(jsonPath("$[0].userId").value(dto1.getUserId()))
-                .andExpect(jsonPath("$[0].userName").value(dto1.getUserName()))
+                .andExpect(jsonPath("$[0].userName").value(dto1.getUsername()))
                 .andExpect(jsonPath("$[1].userId").value(dto2.getUserId()))
-                .andExpect(jsonPath("$[1].userName").value(dto2.getUserName()))
+                .andExpect(jsonPath("$[1].userName").value(dto2.getUsername()))
                 .andExpect(status().isOk());
     }
 

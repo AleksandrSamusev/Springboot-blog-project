@@ -76,7 +76,7 @@ public class ArticlePrivateServiceImplUnitTest {
         assertThat(result.getTitle()).isEqualTo(savedArticle.getTitle());
         assertThat(result.getContent()).isEqualTo(savedArticle.getContent());
         assertThat(result.getAuthor().getUserId()).isEqualTo(0L);
-        assertThat(result.getAuthor().getUserName()).isEqualTo("HP");
+        assertThat(result.getAuthor().getUsername()).isEqualTo("HP");
         assertThat(result.getStatus()).isEqualTo(ArticleStatus.CREATED);
         Mockito.verify(articleRepository, Mockito.times(1)).save(Mockito.any(Article.class));
     }
