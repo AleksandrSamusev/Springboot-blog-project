@@ -195,18 +195,22 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(3L)).thenReturn(Optional.of(user3));
         ActionForbiddenException thrown = assertThrows(ActionForbiddenException.class, ()->
                 userService.deleteUser(1L, 3L));
+        assertEquals("Action forbidden for current user", thrown.getMessage());
     }
 
     @Test
     public void user_test_15_Given_userIdNotExist_When_deleteUser_Then_ResourceNotFoundException() {
+        
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, ()->
                 userService.deleteUser(2L, 1L));
+        assertEquals("User with given ID = 2 not found", thrown.getMessage());
     }
 
     @Test
     public void user_test_16_Given_currentUserIdNotExist_When_deleteUser_Then_ResourceNotFoundException() {
-        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(user1));
+
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, ()->
                 userService.deleteUser(1L, 2L));
+        assertEquals("User with given ID = 1 not found", thrown.getMessage());
     }
 }
