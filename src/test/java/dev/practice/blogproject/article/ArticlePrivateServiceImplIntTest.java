@@ -5,6 +5,7 @@ import dev.practice.blogproject.dtos.article.ArticleNewDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.dtos.tag.TagShortDto;
+import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.ArticleRepository;
@@ -122,8 +123,7 @@ public class ArticlePrivateServiceImplIntTest {
                 () -> articleService.createArticle(author.getUserId(), newArticle));
         assertEquals("Article with title The empty pot already exist", exception.getMessage(),
                 "Incorrect message");
-        assertThrows(InvalidParameterException.class, () -> articleService.createArticle(
-                author.getUserId(), newArticle), "Incorrect exception");
+        assertThat(exception).isInstanceOf(InvalidParameterException.class);
     }
 
     @Test
@@ -226,8 +226,7 @@ public class ArticlePrivateServiceImplIntTest {
                 () -> articleService.updateArticle(author.getUserId(), articleSaved2.getArticleId(), update));
         assertEquals("Article with title THE EMPTY POT    already exist",
                 exception.getMessage(), "Incorrect message");
-        assertThrows(InvalidParameterException.class, () -> articleService.updateArticle(
-                author.getUserId(), articleSaved2.getArticleId(), update), "Incorrect exception");
+        assertThat(exception).isInstanceOf(InvalidParameterException.class);
     }
 
 

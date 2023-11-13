@@ -96,8 +96,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 () -> articleService.createArticle(0L, newArticle));
         assertEquals("User with id 0 is blocked", exception.getMessage(),
                 "Incorrect message");
-        assertThrows(ActionForbiddenException.class, () -> articleService.createArticle(
-                author.getUserId(), newArticle), "Incorrect exception");
+        assertThat(exception).isInstanceOf(ActionForbiddenException.class);
         Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
     }
 
@@ -107,8 +106,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 () -> articleService.createArticle(1L, newArticle));
         assertEquals("User with id 1 wasn't found", exception.getMessage(),
                 "Incorrect message");
-        assertThrows(ResourceNotFoundException.class, () -> articleService.createArticle(
-                author.getUserId(), newArticle), "Incorrect exception");
+        assertThat(exception).isInstanceOf(ResourceNotFoundException.class);
         Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
     }
 
@@ -122,8 +120,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 () -> articleService.updateArticle(0L, 1000L, Mockito.any()));
         assertEquals("Article with id 1000 wasn't found", exception.getMessage(),
                 "Incorrect message");
-        assertThrows(ResourceNotFoundException.class, () -> articleService.updateArticle(
-                0L, 1000L, Mockito.any()), "Incorrect exception");
+        assertThat(exception).isInstanceOf(ResourceNotFoundException.class);
         Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
     }
 
@@ -140,22 +137,119 @@ public class ArticlePrivateServiceImplUnitTest {
                 () -> articleService.updateArticle(1L, 0L, Mockito.any()));
         assertEquals("Article with id 0 is not belongs to user with id 1. Action is forbidden",
                 exception.getMessage(), "Incorrect message");
-        assertThrows(ActionForbiddenException.class, () -> articleService.updateArticle(
-                1L, 0L, Mockito.any()), "Incorrect exception");
+        assertThat(exception).isInstanceOf(ActionForbiddenException.class);
         Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
     }
 
     @Test
-    void article_test_18_Given_notAuthorisedUser_When_getArticleById_Then_returnedArticleShortDto() {
+    void article_test_16_Given_authorisedUserNotAuthor_When_getArticleById_Then_returnedArticleShortDto() {
+        savedArticle.setStatus(ArticleStatus.PUBLISHED);
+        savedArticle.setPublished(LocalDateTime.now());
         Mockito
                 .when(articleRepository.findById(0L))
                 .thenReturn(Optional.of(savedArticle));
+        Mockito
+                .when(userRepository.findById(1L))
+                .thenReturn(Optional.of(author2));
 
-        ArticleShortDto result = (ArticleShortDto) articleService.getArticleById(null, 0L).get();
+        ArticleShortDto result = (ArticleShortDto) articleService.getArticleById(1L, 0L).get();
 
         assertThat(result).isInstanceOf(ArticleShortDto.class);
-        
+        assertThat(result.getArticleId()).isEqualTo(savedArticle.getArticleId());
+        assertThat(result.getPublished()).isNotNull();
+    }
 
+    @Test
+    void article_test_17_Given_authorisedAuthorArticlePublished_When_getArticleById_Then_returnedArticleFullDto() {
+        savedArticle.setStatus(ArticleStatus.PUBLISHED);
+        savedArticle.setPublished(LocalDateTime.now());
+        Mockito
+                .when(articleRepository.findById(0L))
+                .thenReturn(Optional.of(savedArticle));
+        Mockito
+                .when(userRepository.findById(0L))
+                .thenReturn(Optional.of(author));
+
+        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(0L, 0L).get();
+
+        assertThat(result).isInstanceOf(ArticleFullDto.class);
+        assertThat(result.getArticleId()).isEqualTo(savedArticle.getArticleId());
+        assertThat(result.getPublished()).isNotNull();
+        assertThat(result.getStatus()).isEqualTo(ArticleStatus.PUBLISHED);
+    }
+
+    @Test
+    void article_test_18_Given_adminArticlePublished_When_getArticleById_Then_returnedArticleFullDto() {
+        savedArticle.setStatus(ArticleStatus.PUBLISHED);
+        savedArticle.setPublished(LocalDateTime.now());
+        author2.setRole(Role.ADMIN);
+        Mockito
+                .when(articleRepository.findById(0L))
+                .thenReturn(Optional.of(savedArticle));
+        Mockito
+                .when(userRepository.findById(1L))
+                .thenReturn(Optional.of(author2));
+
+        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(1L, 0L).get();
+
+        assertThat(result).isInstanceOf(ArticleFullDto.class);
+        assertThat(result.getArticleId()).isEqualTo(savedArticle.getArticleId());
+        assertThat(result.getPublished()).isNotNull();
+        assertThat(result.getStatus()).isEqualTo(ArticleStatus.PUBLISHED);
+    }
+
+    @Test
+    void article_test_19_Given_adminArticleRejected_When_getArticleById_Then_returnedArticleFullDto() {
+        savedArticle.setStatus(ArticleStatus.REJECTED);
+        author2.setRole(Role.ADMIN);
+        Mockito
+                .when(articleRepository.findById(0L))
+                .thenReturn(Optional.of(savedArticle));
+        Mockito
+                .when(userRepository.findById(1L))
+                .thenReturn(Optional.of(author2));
+
+        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(1L, 0L).get();
+
+        assertThat(result).isInstanceOf(ArticleFullDto.class);
+        assertThat(result.getArticleId()).isEqualTo(savedArticle.getArticleId());
+        assertThat(result.getPublished()).isNull();
+        assertThat(result.getStatus()).isEqualTo(ArticleStatus.REJECTED);
+    }
+
+    @Test
+    void article_test_20_Given_authorArticleModerating_When_getArticleById_Then_returnedArticleFullDto() {
+        savedArticle.setStatus(ArticleStatus.MODERATING);
+        Mockito
+                .when(articleRepository.findById(0L))
+                .thenReturn(Optional.of(savedArticle));
+        Mockito
+                .when(userRepository.findById(0L))
+                .thenReturn(Optional.of(author));
+
+        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(0L, 0L).get();
+
+        assertThat(result).isInstanceOf(ArticleFullDto.class);
+        assertThat(result.getArticleId()).isEqualTo(savedArticle.getArticleId());
+        assertThat(result.getPublished()).isNull();
+        assertThat(result.getStatus()).isEqualTo(ArticleStatus.MODERATING);
+    }
+
+    @Test
+    void article_test_21_Given_authorizedUserArticleNotPublished_When_getArticleById_Then_throwException() {
+        savedArticle.setStatus(ArticleStatus.MODERATING);
+        Mockito
+                .when(articleRepository.findById(0L))
+                .thenReturn(Optional.of(savedArticle));
+        Mockito
+                .when(userRepository.findById(1L))
+                .thenReturn(Optional.of(author2));
+
+        final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
+                () -> articleService.getArticleById(1L, 0L));
+        assertEquals("Article with id 0 is not published yet",
+                exception.getMessage(), "Incorrect message");
+        assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
 
 

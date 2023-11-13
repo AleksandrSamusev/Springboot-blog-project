@@ -85,17 +85,9 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
                         article.getStatus());
                 throw new ActionForbiddenException(String.format("Article with id %d is not published yet", articleId));
             }
-            return Optional.of(getArticleByIdForAny(article));
+            return Optional.of(ArticleMapper.toArticleShortDto(article)); // for any registered user
         }
-        return Optional.of(getArticleByIdForOwnerOrAdmin(article));
-    }
-
-    private ArticleShortDto getArticleByIdForAny(Article article) {
-        return ArticleMapper.toArticleShortDto(article);
-    }
-
-    private ArticleFullDto getArticleByIdForOwnerOrAdmin(Article article) {
-        return ArticleMapper.toArticleFullDto(article);
+        return Optional.of(ArticleMapper.toArticleFullDto(article)); // for author and admin
     }
 
 
