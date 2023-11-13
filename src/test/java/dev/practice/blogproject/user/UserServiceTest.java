@@ -200,7 +200,6 @@ public class UserServiceTest {
 
     @Test
     public void user_test_15_Given_userIdNotExist_When_deleteUser_Then_ResourceNotFoundException() {
-        
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, ()->
                 userService.deleteUser(2L, 1L));
         assertEquals("User with given ID = 2 not found", thrown.getMessage());
@@ -208,9 +207,10 @@ public class UserServiceTest {
 
     @Test
     public void user_test_16_Given_currentUserIdNotExist_When_deleteUser_Then_ResourceNotFoundException() {
-
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, ()->
                 userService.deleteUser(1L, 2L));
         assertEquals("User with given ID = 1 not found", thrown.getMessage());
     }
+
+
 }
