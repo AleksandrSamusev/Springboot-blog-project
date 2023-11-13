@@ -3,6 +3,7 @@ package dev.practice.blogproject.services.impl;
 import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
+import dev.practice.blogproject.dtos.tag.TagFullDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
@@ -36,12 +37,18 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         checkUserExist(userId);
         //checkTitleExist(newArticle.getTitle());
 
-        Article article = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, userId));
+        long articleId = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, userId)).getArticleId();
         if (newArticle.getTags() != null && !newArticle.getTags().isEmpty()) {
-            article.setTags(checkTagExist(newArticle.getTags(), article.getArticleId(), userId));
+            Set<Tag> tags = (checkTagExist(newArticle.getTags(), articleId));
+            if (!tags.isEmpty()) {
+                Article article = articleRepository.getReferenceById(articleId);
+                tags.addAll(article.getTags());
+                article.setTags(tags);
+                return ArticleMapper.toArticleFullDto(articleRepository.save(article));
+            }
         }
 
-        return ArticleMapper.toArticleFullDto(articleRepository.save(article));
+        return ArticleMapper.toArticleFullDto(articleRepository.getReferenceById(articleId));
     }
 
     @Override
@@ -73,16 +80,15 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         }
     }
 
-    private Set<Tag> checkTagExist(Set<TagNewDto> tags, long articleId, long userId) {
+    private Set<Tag> checkTagExist(Set<TagNewDto> tags, long articleId) {
         Set<Tag> allTags = new HashSet<>();
         for (TagNewDto newTag : tags) {
             Tag tag = tagRepository.findTagByName(newTag.getName());
             if (tag != null) {
-                tag.getArticles().add(new Article(articleId));
-                tagRepository.save(tag);
+                allTags.add(tag);
                 log.info("Tag with id {} was added to article with id {}", tag.getTagId(), articleId);
             } else {
-                allTags.add(TagMapper.toTag(tagService.createTag(newTag, articleId, userId)));
+                tagService.createTag(newTag, articleId);
             }
         }
         return allTags;

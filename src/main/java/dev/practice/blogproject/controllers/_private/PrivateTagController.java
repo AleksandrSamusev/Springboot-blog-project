@@ -20,7 +20,7 @@ public class PrivateTagController {
     public ResponseEntity<TagFullDto> createTag(@Valid @RequestBody TagNewDto dto,
                                                 @PathVariable Long articleId,
                                                 @RequestHeader("X-Current-User-Id") Long userId) {
-        return new ResponseEntity<>(tagService.createTag(dto, articleId, userId), HttpStatus.CREATED);
+        return new ResponseEntity<>(tagService.createTag(dto, articleId), HttpStatus.CREATED);
     }
 
 

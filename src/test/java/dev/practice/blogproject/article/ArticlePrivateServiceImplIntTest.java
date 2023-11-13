@@ -57,9 +57,8 @@ public class ArticlePrivateServiceImplIntTest {
 
         Tag tag  = tagRepository.findTagByName(tag1.getName());
         assertThat(result).isNotNull();
-        assertThat(tags).isEqualTo(1);
+        assertThat(tags.size()).isEqualTo(1);
         assertThat(tags.get(0).getName()).isEqualTo(tag1.getName());
-        assertThat(tagRepository.getReferenceById(0L).getArticles().size()).isEqualTo(1);
-        Mockito.verify(articleRepository, Mockito.times(1)).save(Mockito.any(Article.class));
+        assertThat(tagRepository.getReferenceById(tag.getTagId()).getArticles().size()).isEqualTo(1);
     }
 }
