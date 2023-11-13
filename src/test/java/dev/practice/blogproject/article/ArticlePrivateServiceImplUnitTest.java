@@ -2,14 +2,15 @@ package dev.practice.blogproject.article;
 
 import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
-import dev.practice.blogproject.dtos.tag.TagNewDto;
-import dev.practice.blogproject.dtos.tag.TagShortDto;
+import dev.practice.blogproject.exceptions.ActionForbiddenException;
+import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.impl.ArticlePrivateServiceImpl;
 import dev.practice.blogproject.services.impl.TagServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,11 +21,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class ArticlePrivateServiceImplUnitTest {
@@ -79,6 +80,33 @@ public class ArticlePrivateServiceImplUnitTest {
         assertThat(result.getAuthor().getUserName()).isEqualTo("HP");
         assertThat(result.getStatus()).isEqualTo(ArticleStatus.CREATED);
         Mockito.verify(articleRepository, Mockito.times(1)).save(Mockito.any(Article.class));
+    }
+
+    @Test
+    void article_test_6_Given_bannedUser_When_createArticle_Then_throwException() {
+        author.setIsBanned(true);
+        Mockito
+                .when(userRepository.findById(0L))
+                .thenReturn(Optional.of(author));
+
+        final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
+                () -> articleService.createArticle(0L, newArticle));
+        assertEquals("User with id 0 is blocked", exception.getMessage(),
+                "Incorrect message");
+        assertThrows(ActionForbiddenException.class, () -> articleService.createArticle(
+                author.getUserId(), newArticle), "Incorrect exception");
+        Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
+    }
+
+    @Test
+    void article_test_7_Given_NotExistingUser_When_createArticle_Then_throwException() {
+        final ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> articleService.createArticle(1L, newArticle));
+        assertEquals("User with id 1 wasn't found", exception.getMessage(),
+                "Incorrect message");
+        assertThrows(ResourceNotFoundException.class, () -> articleService.createArticle(
+                author.getUserId(), newArticle), "Incorrect exception");
+        Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
     }
 
 

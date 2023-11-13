@@ -12,13 +12,12 @@ import java.util.stream.Collectors;
 
 public class ArticleMapper {
 
-    public static Article toArticleFromNew(ArticleNewDto dto, long userId) {
+    public static Article toArticleFromNew(ArticleNewDto dto, User user) {
         Article article = new Article();
         article.setTitle(dto.getTitle());
         article.setContent(dto.getContent());
-        article.setAuthor(new User(userId, null, null, null, null, null,
-                null, null, null, null, null,
-                null, null));
+        article.setAuthor(user);
+        article.setLikes(0L);
         article.setComments(new HashSet<>());
         article.setTags(new HashSet<>());
         return article;
