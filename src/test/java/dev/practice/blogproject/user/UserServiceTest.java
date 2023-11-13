@@ -1,4 +1,4 @@
-package dev.practice.blogproject;
+package dev.practice.blogproject.user;
 
 import dev.practice.blogproject.dtos.user.UserFullDto;
 import dev.practice.blogproject.dtos.user.UserNewDto;
