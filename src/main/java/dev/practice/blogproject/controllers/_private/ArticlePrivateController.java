@@ -4,6 +4,7 @@ import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
 import dev.practice.blogproject.services.ArticlePrivateService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class ArticlePrivateController {
 
     @PostMapping
     public ResponseEntity<ArticleFullDto> createArticle(@RequestHeader("X-Current-User-Id") long userId,
-                                                        @RequestBody ArticleNewDto newArticle) {
+                                                        @Valid @RequestBody ArticleNewDto newArticle) {
         return new ResponseEntity<>(articleService.createArticle(userId, newArticle), HttpStatus.CREATED);
     }
 

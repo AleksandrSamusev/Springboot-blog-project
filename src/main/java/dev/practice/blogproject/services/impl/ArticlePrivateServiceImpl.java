@@ -10,6 +10,7 @@ import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.ArticleMapper;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.Tag;
+import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -33,11 +35,11 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
     @Override
     public ArticleFullDto createArticle(long userId, ArticleNewDto newArticle) {
-        checkUserExist(userId);
-        checkUserIsNotBanned(userId);
+        User user = checkUserExist(userId);
+        checkUserIsNotBanned(user);
         checkTitleExist(newArticle.getTitle());
 
-        long articleId = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, userId)).getArticleId();
+        long articleId = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, user)).getArticleId();
         if (newArticle.getTags() != null && !newArticle.getTags().isEmpty()) {
             Set<Tag> tags = (checkTagExist(newArticle.getTags(), articleId));
             if (!tags.isEmpty()) {
@@ -66,17 +68,19 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
     }
 
-    private void checkUserExist(long userId) {
-        if (userRepository.findById(userId).isEmpty()) {
+    private User checkUserExist(long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
             log.error("User with id {} wasn't found", userId);
             throw new ResourceNotFoundException(String.format("User with id %d wasn't found", userId));
         }
+        return user.get();
     }
 
-    private void checkUserIsNotBanned(long userId) {
-        if (userRepository.getReferenceById(userId).getIsBanned()) {
-            log.error("User with id {} is blocked", userId);
-            throw new ActionForbiddenException(String.format("User with id %d is blocked", userId));
+    private void checkUserIsNotBanned(User user) {
+        if (user.getIsBanned()) {
+            log.error("User with id {} is blocked", user.getUserId());
+            throw new ActionForbiddenException(String.format("User with id %d is blocked", user.getUserId()));
         }
     }
 
