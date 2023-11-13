@@ -13,7 +13,6 @@ import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.TagService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -27,28 +26,26 @@ public class TagServiceImpl implements TagService {
     private final UserRepository userRepository;
 
     @Override
-    public TagFullDto createTag(TagNewDto dto, Long articleId, Long userId) {
-        isValidParameters(dto, articleId, userId);
+    public TagFullDto createTag(TagNewDto dto, Long articleId) {
+        isValidParameters(articleId);
         Article article = articleRepository.findById(articleId).orElseThrow(() ->
                 new ResourceNotFoundException("article with given ID = " + articleId + " not found"));
-        if (!article.getAuthor().getUserId().equals(userId)) {
-            throw new ActionForbiddenException("Action forbidden for current user");
-        } else {
-            Tag tag = TagMapper.toTag(dto);
-            tag.getArticles().add(article);
-            Tag savedTag = tagRepository.save(tag);
 
-            article.getTags().add(savedTag);
-            articleRepository.save(article);
+        Tag tag = TagMapper.toTag(dto);
+        tag.getArticles().add(article);
+        Tag savedTag = tagRepository.save(tag);
 
-            log.info("Tag with ID = " + savedTag.getTagId() + " created");
-            return TagMapper.toTagDto(savedTag);
-        }
+        article.getTags().add(savedTag);
+        articleRepository.save(article);
+
+        log.info("Tag with ID = " + savedTag.getTagId() + " created");
+        return TagMapper.toTagDto(savedTag);
+
     }
 
     @Override
     public void deleteTag(Long tagId, Long userId) {
-        isValidParameters(tagId, userId);
+        isValidParameters(tagId);
         isUserPresent(userId);
         isAdmin(userId);
         isTagPresent(tagId);
@@ -77,11 +74,9 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    private void isValidParameters(Long tagId, Long userId) {
+    private void isValidParameters(Long tagId) {
         if (tagId == null) {
             throw new InvalidParameterException("tagId parameter cannot be NULL");
-        } else if (userId == null) {
-            throw new InvalidParameterException("userId parameter cannot be NULL");
         }
     }
 

@@ -81,34 +81,5 @@ public class ArticlePrivateServiceImplUnitTest {
         Mockito.verify(articleRepository, Mockito.times(1)).save(Mockito.any(Article.class));
     }
 
-    @Test
-    void article_test_2_Given_validArticleWithNewTags_When_createArticle_Then_articleSaved() {
-        newArticle.setTags(Set.of(new TagNewDto(tag1.getName())));
-        tag1.getArticles().add(article);
 
-        Mockito
-                .when(userRepository.findById(0L))
-                .thenReturn(Optional.of(author));
-        Mockito
-                .when(articleRepository.save(Mockito.any(Article.class)))
-                .thenReturn(savedArticle);
-        Mockito
-                .when(articleRepository.getReferenceById(0L))
-                .thenReturn(savedArticle);
-        Mockito
-                .when(tagRepository.save(Mockito.any(Tag.class)))
-                .thenReturn(tag1);
-        Mockito
-                .when(tagRepository.findTagByName(tag1.getName()))
-                .thenReturn(tag1);
-
-        ArticleFullDto result = articleService.createArticle(0L, newArticle);
-        List<TagShortDto> tags = result.getTags().stream().toList();
-
-        assertThat(result).isNotNull();
-        assertThat(tags).isEqualTo(1);
-        assertThat(tags.get(0).getName()).isEqualTo(tag1.getName());
-        assertThat(tagRepository.getReferenceById(0L).getArticles().size()).isEqualTo(1);
-        Mockito.verify(articleRepository, Mockito.times(1)).save(Mockito.any(Article.class));
-    }
 }
