@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDate;
@@ -178,5 +179,34 @@ public class UserServiceTest {
                 userService.updateUser(1L, 3L, updateUser5));
 
         assertEquals("Action forbidden for current user", exception.getMessage());
+    }
+
+    @Test
+    public void user_test_13_Given_validUserId_When_deleteUser_Then_userDeleted() {
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(user1));
+        Mockito.doNothing().when(userRepositoryMock).deleteById(1L);
+        userService.deleteUser(1L, 1L);
+        verify(userRepositoryMock, times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void user_test_14_Given_userIdNotEqualsCurrentUserId_When_deleteUser_Then_ActionForbiddenException() {
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(user1));
+        when(userRepositoryMock.findById(3L)).thenReturn(Optional.of(user3));
+        ActionForbiddenException thrown = assertThrows(ActionForbiddenException.class, ()->
+                userService.deleteUser(1L, 3L));
+    }
+
+    @Test
+    public void user_test_15_Given_userIdNotExist_When_deleteUser_Then_ResourceNotFoundException() {
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, ()->
+                userService.deleteUser(2L, 1L));
+    }
+
+    @Test
+    public void user_test_16_Given_currentUserIdNotExist_When_deleteUser_Then_ResourceNotFoundException() {
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(user1));
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, ()->
+                userService.deleteUser(1L, 2L));
     }
 }
