@@ -54,8 +54,6 @@ public class UserIntegrationTest {
         UserFullDto userFullDto = userService.getUserById(createdUser.getUserId(), createdUser.getUserId());
 
         assertThat(userFullDto.getArticles().size(), equalTo(1));
-
-
     }
 
 
