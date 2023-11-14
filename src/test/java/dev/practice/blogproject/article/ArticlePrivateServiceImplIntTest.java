@@ -3,15 +3,17 @@ package dev.practice.blogproject.article;
 import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
+import dev.practice.blogproject.dtos.comment.CommentNewDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.dtos.tag.TagShortDto;
-import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.ArticleRepository;
+import dev.practice.blogproject.repositories.CommentRepository;
 import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.ArticlePrivateService;
+import dev.practice.blogproject.services.CommentService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
@@ -27,7 +29,6 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 @SpringBootTest(
@@ -39,9 +40,14 @@ public class ArticlePrivateServiceImplIntTest {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final ArticlePrivateService articleService;
+    private final CommentService commentService;
+    private final CommentRepository commentRepository;
 
     private final User user = new User(null, "Harry", "Potter", "HP",
             "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
+            false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
+    private final User user2 = new User(null, "Admin", "Admin", "ADMIN",
+            "admin@gmail.com", LocalDate.of(1990, 9, 10), Role.USER, null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final Tag tag1 = new Tag(null, "Potions", new HashSet<>());
     private final Tag tag2 = new Tag(null, "Cat", new HashSet<>());
@@ -59,6 +65,7 @@ public class ArticlePrivateServiceImplIntTest {
 
     @Test
     void article_test_2_Given_validArticleWithNewTags_When_createArticle_Then_articleSavedWithTag() {
+        dropDB();
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         User author = userRepository.save(user);
 
@@ -75,6 +82,7 @@ public class ArticlePrivateServiceImplIntTest {
 
     @Test
     void article_test_3_Given_validArticleWithExistTag_When_createArticle_Then_articleSavedWithTag() {
+        dropDB();
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         newArticle2.getTags().add(new TagNewDto(tag1.getName()));
         User author = userRepository.save(user);
@@ -93,6 +101,7 @@ public class ArticlePrivateServiceImplIntTest {
 
     @Test
     void article_test_4_Given_validArticleWithExistAndNewTags_When_createArticle_Then_articleSavedWithTags() {
+        dropDB();
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         newArticle2.getTags().add(new TagNewDto(tag1.getName()));
         newArticle2.getTags().add(new TagNewDto(tag2.getName()));
@@ -115,6 +124,7 @@ public class ArticlePrivateServiceImplIntTest {
 
     @Test
     void article_test_5_Given_articleWithTitleAlreadyExist_When_createArticle_Then_throwException() {
+        dropDB();
         User author = userRepository.save(user);
         articleService.createArticle(author.getUserId(), newArticle);
 
@@ -128,6 +138,7 @@ public class ArticlePrivateServiceImplIntTest {
 
     @Test
     void article_test_9_Given_validNewTitle_When_updateArticle_Then_articleUpdatedCorrectly() {
+        dropDB();
         article.getTags().add(tag1);
         article.getTags().add(tag2);
         User author = userRepository.save(user);
@@ -157,6 +168,7 @@ public class ArticlePrivateServiceImplIntTest {
 
     @Test
     void article_test_10_Given_validNewContent_When_updateArticle_Then_articleUpdatedCorrectly() {
+        dropDB();
         article.getTags().add(tag1);
         article.getTags().add(tag2);
         User author = userRepository.save(user);
@@ -186,6 +198,7 @@ public class ArticlePrivateServiceImplIntTest {
 
     @Test
     void article_test_11_Given_validNewContentAndTitle_When_updateArticle_Then_articleUpdatedCorrectly() {
+        dropDB();
         article.getTags().add(tag1);
         article.getTags().add(tag2);
         User author = userRepository.save(user);
@@ -216,6 +229,7 @@ public class ArticlePrivateServiceImplIntTest {
 
     @Test
     void article_test_14_Given_titleAlreadyExist_When_updateArticle_Then_throwException() {
+        dropDB();
         User author = userRepository.save(user);
         articleRepository.save(article);
         Article articleSaved2 = articleRepository.save(article2);
@@ -227,6 +241,54 @@ public class ArticlePrivateServiceImplIntTest {
         assertEquals("Article with title THE EMPTY POT    already exist",
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(InvalidParameterException.class);
+    }
+
+    @Test
+    void article_test_24_Given_authorIdAndValidArticleId_When_deleteArticle_Then_articleDeleted() {
+        dropDB();
+        newArticle.getTags().add(new TagNewDto(tag1.getName()));
+        newArticle.getTags().add(new TagNewDto(tag2.getName()));
+        User author = userRepository.save(user);
+        ArticleFullDto articleSaved = articleService.createArticle(author.getUserId(), newArticle);
+        commentService.createComment(articleSaved.getArticleId(), new CommentNewDto("comment"), author.getUserId());
+
+        articleService.deleteArticle(author.getUserId(), articleSaved.getArticleId());
+
+        assertThat(articleRepository.findAll().size()).isEqualTo(0);
+        assertThat(tagRepository.findAll().size()).isEqualTo(2);
+        assertThat(tagRepository.findAll().get(0).getArticles().size()).isEqualTo(0);
+        assertThat(tagRepository.findAll().get(1).getArticles().size()).isEqualTo(0);
+        assertThat(commentRepository.findAll().size()).isEqualTo(0);
+    }
+
+    @Test
+    void article_test_25_Given_adminAndValidArticleId_When_deleteArticle_Then_articleDeleted() {
+        dropDB();
+        newArticle.getTags().add(new TagNewDto(tag1.getName()));
+        newArticle.getTags().add(new TagNewDto(tag2.getName()));
+        User author = userRepository.save(user);
+        user2.setRole(Role.ADMIN);
+        User admin = userRepository.save(user2);
+        ArticleFullDto articleSaved = articleService.createArticle(author.getUserId(), newArticle);
+        commentService.createComment(articleSaved.getArticleId(), new CommentNewDto("comment"), author.getUserId());
+
+        articleService.deleteArticle(admin.getUserId(), articleSaved.getArticleId());
+
+        assertThat(articleRepository.findAll().size()).isEqualTo(0);
+        assertThat(tagRepository.findAll().size()).isEqualTo(2);
+        assertThat(tagRepository.findAll().get(0).getArticles().size()).isEqualTo(0);
+        assertThat(tagRepository.findAll().get(1).getArticles().size()).isEqualTo(0);
+        assertThat(commentRepository.findAll().size()).isEqualTo(0);
+    }
+
+
+
+    private void dropDB() {
+        commentRepository.deleteAll();
+        tagRepository.deleteAll();
+        articleRepository.deleteAll();
+        commentRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
 

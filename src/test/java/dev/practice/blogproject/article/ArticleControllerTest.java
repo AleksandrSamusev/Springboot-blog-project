@@ -10,6 +10,7 @@ import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.services.ArticlePrivateService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,7 +47,7 @@ public class ArticleControllerTest {
     private final ArticleFullDto articleFull = new ArticleFullDto(1L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED,
             0L, new HashSet<>(), new HashSet<>());
-    private final ArticleShortDto articleShort =  new ArticleShortDto(1L, "The empty pot",
+    private final ArticleShortDto articleShort = new ArticleShortDto(1L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), 0L, new HashSet<>(),
             new HashSet<>());
     private final ArticleNewDto articleNew = new ArticleNewDto("The empty pot",
@@ -130,7 +129,8 @@ public class ArticleControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(mvc -> mvc.getResolvedException().getClass().equals(ActionForbiddenException.class));
     }
 
     @Test
@@ -193,6 +193,19 @@ public class ArticleControllerTest {
                 .getArticleById(Mockito.anyLong(), Mockito.anyLong());
     }
 
+    @Test
+    void article_test_27_authorIdAndValidArticleId_When_deleteArticle_Then_articleDeletedStatusOk() throws Exception {
+        Mockito
+                .doNothing()
+                .when(articleService).deleteArticle(Mockito.anyLong(), Mockito.anyLong());
+
+        mvc.perform(delete("/api/v1/private/articles/{articleId}", 0L)
+                        .header("X-Current-User-Id", 0)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 
 
 }

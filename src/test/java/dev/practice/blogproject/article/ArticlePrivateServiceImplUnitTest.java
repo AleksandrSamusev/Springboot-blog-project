@@ -4,6 +4,8 @@ import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
+import dev.practice.blogproject.dtos.comment.CommentNewDto;
+import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.models.*;
@@ -27,7 +29,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class ArticlePrivateServiceImplUnitTest {
@@ -251,6 +252,24 @@ public class ArticlePrivateServiceImplUnitTest {
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
+
+    @Test
+    void article_test_26_Given_userNotAuthor_When_deleteArticle_Then_throwException() {
+        Mockito
+                .when(articleRepository.findById(0L))
+                .thenReturn(Optional.of(savedArticle));
+        Mockito
+                .when(userRepository.findById(1L))
+                .thenReturn(Optional.of(author2));
+
+        final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
+                () -> articleService.deleteArticle(1L, 0L));
+        assertEquals("Article with id 0 is not belongs to user with id 1. Action is forbidden",
+                exception.getMessage(), "Incorrect message");
+        assertThat(exception).isInstanceOf(ActionForbiddenException.class);
+    }
+
+
 
 
 }

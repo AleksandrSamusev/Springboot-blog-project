@@ -2,7 +2,6 @@ package dev.practice.blogproject.services.impl;
 
 import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
-import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
@@ -48,7 +47,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
                 user.getArticles().add(article);
                 userRepository.save(user);
 
-                log.info("Article with id {} was created by user with id {}", savedArticle.getArticleId(), userId);
+                log.info("Article with id {} was created by user with id {}", article.getArticleId(), userId);
                 return ArticleMapper.toArticleFullDto(articleRepository.save(article));
             }
         }
@@ -56,7 +55,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         user.getArticles().add(savedArticle);
         userRepository.save(user);
 
-        log.info("Article with id {} was created by user with id {}", savedArticle, userId);
+        log.info("Article with id {} was created by user with id {}", savedArticle.getArticleId(), userId);
         return ArticleMapper.toArticleFullDto(savedArticle);
     }
 
@@ -93,7 +92,21 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
     @Override
     public void deleteArticle(long userId, long articleId) {
+        Article article = checkArticleExist(articleId);
+        User user = checkUserExist(userId);
 
+        if (user.getRole() != Role.ADMIN) {
+            checkUserIsAuthor(article, userId);
+        }
+
+        if (!article.getTags().isEmpty()) {
+            for (Tag tag : article.getTags()) {
+                removeArticleFromTag(tag, article);
+            }
+        }
+
+        articleRepository.delete(article);
+        log.info("Article with id {} was deleted", articleId);
     }
 
     private User checkUserExist(Long userId) {
@@ -131,7 +144,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     private Article checkArticleExist(Long articleId) {
         Optional<Article> article = articleRepository.findById(articleId);
         if (article.isEmpty()) {
-            log.error("Article with id {} wasn't found", article);
+            log.error("Article with id {} wasn't found", articleId);
             throw new ResourceNotFoundException(String.format("Article with id %d wasn't found", articleId));
         }
         return article.get();
@@ -162,5 +175,10 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
             }
         }
         return allTags;
+    }
+
+    private void removeArticleFromTag(Tag tag, Article article) {
+        tag.getArticles().remove(article);
+        tagRepository.save(tag);
     }
 }

@@ -44,7 +44,7 @@ public class Article {
     @Column(name = "likes")
     private Long likes;
 
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
     private Set<Comment> comments;
 
     @ManyToMany
@@ -54,8 +54,4 @@ public class Article {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<Tag> tags;
-
-    public Article(long articleId) {
-        this.articleId = articleId;
-    }
 }
