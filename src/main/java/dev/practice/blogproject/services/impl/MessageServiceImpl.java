@@ -84,7 +84,7 @@ public class MessageServiceImpl implements MessageService {
 
     private void checkIfMessageExists(Long id) {
         if (!messageRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Message with gicen ID = " + id + " not found");
+            throw new ResourceNotFoundException("Message with given ID = " + id + " not found");
         }
     }
 
