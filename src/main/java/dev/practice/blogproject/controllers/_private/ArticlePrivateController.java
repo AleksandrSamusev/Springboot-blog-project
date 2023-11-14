@@ -17,27 +17,27 @@ public class ArticlePrivateController {
     private final ArticlePrivateService articleService;
 
     @PostMapping
-    public ResponseEntity<ArticleFullDto> createArticle(@RequestHeader("X-Current-User-Id") long userId,
+    public ResponseEntity<ArticleFullDto> createArticle(@RequestHeader("X-Current-User-Id") Long userId,
                                                         @Valid @RequestBody ArticleNewDto newArticle) {
         return new ResponseEntity<>(articleService.createArticle(userId, newArticle), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{articleId}")
-    public ResponseEntity<ArticleFullDto> updateArticle(@RequestHeader("X-Current-User-Id") long userId,
-                                                        @PathVariable("articleId") long articleId,
+    public ResponseEntity<ArticleFullDto> updateArticle(@RequestHeader("X-Current-User-Id") Long userId,
+                                                        @PathVariable("articleId") Long articleId,
                                                         @RequestBody ArticleUpdateDto updateArticle) {
         return new ResponseEntity<>(articleService.updateArticle(userId, articleId, updateArticle), HttpStatus.OK);
     }
 
     @GetMapping("/{articleId}")
-    public ResponseEntity<?> getArticleById(@RequestHeader("X-Current-User-Id") long userId,
-                                            @PathVariable("articleId") long articleId) {
-        return new ResponseEntity<>(articleService.getArticleById(userId, articleId), HttpStatus.OK);
+    public ResponseEntity<Object> getArticleById(@RequestHeader("X-Current-User-Id") Long userId,
+                                            @PathVariable("articleId") Long articleId) {
+        return new ResponseEntity<>(articleService.getArticleById(userId, articleId).get(), HttpStatus.OK);
     }
 
     @DeleteMapping("/{articleId}")
-    public void deleteArticle(@RequestHeader("X-Current-User-Id") long userId,
-                              @PathVariable("articleId") long articleId) {
+    public void deleteArticle(@RequestHeader("X-Current-User-Id") Long userId,
+                              @PathVariable("articleId") Long articleId) {
         articleService.deleteArticle(userId, articleId);
     }
 }
