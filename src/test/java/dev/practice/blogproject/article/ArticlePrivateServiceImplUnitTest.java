@@ -71,9 +71,6 @@ public class ArticlePrivateServiceImplUnitTest {
         Mockito
                 .when(articleRepository.save(Mockito.any(Article.class)))
                 .thenReturn(savedArticle);
-        Mockito
-                .when(articleRepository.getReferenceById(0L))
-                .thenReturn(savedArticle);
 
         ArticleFullDto result = articleService.createArticle(0L, newArticle);
 

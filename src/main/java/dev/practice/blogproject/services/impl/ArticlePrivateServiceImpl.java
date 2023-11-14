@@ -40,21 +40,26 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         checkUserIsNotBanned(user);
         checkTitleNotExist(newArticle.getTitle(), null);
 
-        long articleId = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, user)).getArticleId();
+        Article savedArticle = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, user));
         if (newArticle.getTags() != null && !newArticle.getTags().isEmpty()) {
-            Set<Tag> tags = (checkTagExist(newArticle.getTags(), articleId));
+            Set<Tag> tags = (checkTagExist(newArticle.getTags(), savedArticle.getArticleId()));
             if (!tags.isEmpty()) {
-                Article article = articleRepository.getReferenceById(articleId);
+                Article article = articleRepository.getReferenceById(savedArticle.getArticleId());
                 tags.addAll(article.getTags());
                 article.setTags(tags);
+                user.getArticles().add(article);
+                userRepository.save(user);
 
-                log.info("Article with id {} was created by user with id {}", articleId, userId);
+                log.info("Article with id {} was created by user with id {}", savedArticle.getArticleId(), userId);
                 return ArticleMapper.toArticleFullDto(articleRepository.save(article));
             }
         }
 
-        log.info("Article with id {} was created by user with id {}", articleId, userId);
-        return ArticleMapper.toArticleFullDto(articleRepository.getReferenceById(articleId));
+        user.getArticles().add(savedArticle);
+        userRepository.save(user);
+
+        log.info("Article with id {} was created by user with id {}", savedArticle, userId);
+        return ArticleMapper.toArticleFullDto(savedArticle);
     }
 
     @Override
