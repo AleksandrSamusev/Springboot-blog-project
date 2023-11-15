@@ -306,13 +306,13 @@ public class CommentServiceTest {
         Article someArticle = new Article(1L, "Potions",
                 "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
                 ArticleStatus.PUBLISHED, 1450L, comments, new HashSet<>());
-        when(articleRepositoryMock.findById(anyLong())).thenReturn(Optional.of(someArticle));
         Comment comment1 = new Comment(5L,
                 "I found this article very interesting!!!", LocalDateTime.now(), someArticle, commentAuthor);
         Comment comment2 = new Comment(6L,
                 "Another comment", LocalDateTime.now(), someArticle, commentAuthor);
         someArticle.getComments().add(comment1);
         someArticle.getComments().add(comment2);
+        when(articleRepositoryMock.findById(anyLong())).thenReturn(Optional.of(someArticle));
 
         List<CommentFullDto> result = commentService.getAllCommentsToArticle(someArticle.getArticleId());
 
