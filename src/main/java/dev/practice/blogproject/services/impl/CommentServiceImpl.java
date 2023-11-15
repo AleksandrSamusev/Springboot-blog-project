@@ -17,7 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,23 +30,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentFullDto createComment(Long articleId, CommentNewDto dto, Long userId) {
-        if (userId == null) {
-            throw new ActionForbiddenException("Action forbidden for given user");
-        }
-        if (articleId == null || dto == null) {
-            throw new InvalidParameterException("Invalid parameter");
-        }
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new ResourceNotFoundException("User with given ID " + userId + " not found"));
-        Article article = articleRepository.findById(articleId).orElseThrow(() ->
-                new ResourceNotFoundException("Article with given ID " + articleId + " not found"));
-
-        Comment comment = new Comment();
-        comment.setComment(dto.getComment());
-        comment.setCommentAuthor(user);
-        comment.setArticle(article);
-        comment.setCreated(LocalDateTime.now());
-
+        isParametersValid(articleId, dto, userId);
+        isUserExists(userId);
+        isArticleExists(articleId);
+        User user = userRepository.findById(userId).get();
+        Article article = articleRepository.findById(articleId).get();
+        Comment comment = CommentMapper.toComment(dto, user, article);
         Comment savedComment = commentRepository.save(comment);
         log.info("Comment with ID = " + savedComment.getCommentId() + " saved");
         return CommentMapper.toCommentFullDto(savedComment);
@@ -53,17 +43,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentFullDto updateComment(CommentNewDto dto, Long commentId, Long userId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-                new ResourceNotFoundException("Comment with given ID = " + commentId + " not found"));
-        if (!userId.equals(comment.getCommentAuthor().getUserId())) {
-            throw new ActionForbiddenException("Action forbidden for given user");
-        }
-        if (dto == null) {
-            throw new InvalidParameterException("Invalid parameter");
-        }
-        if (dto.getComment() != null) {
-            comment.setComment(dto.getComment());
-        }
+        isParametersValid(dto, commentId, userId);
+        isCommentExists(commentId);
+        isUserExists(userId);
+        Comment comment = commentRepository.findById(commentId).get();
+        isActionAllowed(userId, comment);
+        comment.setComment(dto.getComment());
         Comment updatedComment = commentRepository.save(comment);
         log.info("Comment with ID = " + updatedComment.getCommentId() + " updated");
         return CommentMapper.toCommentFullDto(updatedComment);
@@ -71,17 +56,100 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void deleteComment(Long commentId, Long userId) {
-        if (commentId == null || userId == null) {
-            throw new InvalidParameterException("Invalid parameter");
-        }
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-                new ResourceNotFoundException("Comment with given ID = " + commentId + " not found"));
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new ResourceNotFoundException("User with given ID = " + userId + " not found"));
-        if (userId.equals(comment.getCommentAuthor().getUserId()) || user.getRole().name().equals("ADMIN")) {
+        isParametersValid(commentId, userId);
+        isCommentExists(commentId);
+        isUserExists(userId);
+        Comment comment = commentRepository.findById(commentId).get();
+        User user = userRepository.findById(userId).get();
+        if (userId.equals(comment.getCommentAuthor().getUserId())
+                || user.getRole().name().equals("ADMIN")) {
             commentRepository.deleteById(commentId);
         } else {
             throw new ActionForbiddenException("Action forbidden for given user");
         }
     }
+
+    @Override
+    public CommentFullDto getCommentById(Long commentId) {
+        isParametersValid(commentId);
+        isCommentExists(commentId);
+        return CommentMapper.toCommentFullDto(commentRepository.findById(commentId).get());
+    }
+
+    @Override
+    public List<CommentFullDto> getAllCommentsToArticle(Long articleId) {
+        isParametersValid(articleId);
+        isArticleExists(articleId);
+        return articleRepository.findById(articleId).get().getComments()
+                .stream().map(CommentMapper::toCommentFullDto).collect(Collectors.toList());
+    }
+
+
+    private void isParametersValid(Long articleId, CommentNewDto dto, Long userId) {
+        if (articleId == null) {
+            throw new InvalidParameterException("Article ID parameter cannot be null");
+        }
+        if (dto == null) {
+            throw new InvalidParameterException("Dto parameter cannot be null");
+        }
+        if (userId == null) {
+            throw new InvalidParameterException("UserId parameter cannot be null");
+        }
+    }
+
+
+    private void isParametersValid(CommentNewDto dto, Long commentId, Long userId) {
+        if (commentId == null) {
+            throw new InvalidParameterException("Comment ID parameter cannot be null");
+        }
+        if (dto == null) {
+            throw new InvalidParameterException("Dto parameter cannot be null");
+        }
+        if (userId == null) {
+            throw new InvalidParameterException("UserId parameter cannot be null");
+        }
+        if (dto.getComment() == null) {
+            throw new InvalidParameterException("No message given");
+        }
+    }
+
+    private void isParametersValid(Long commentId, Long userId) {
+        if (commentId == null) {
+            throw new InvalidParameterException("Comment ID parameter cannot be null");
+        }
+        if (userId == null) {
+            throw new InvalidParameterException("UserId parameter cannot be null");
+        }
+    }
+
+    private void isParametersValid(Long id) {
+        if (id == null) {
+            throw new InvalidParameterException("ID parameter cannot be null");
+        }
+    }
+
+    private void isUserExists(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ResourceNotFoundException("User with given Id = " + userId + " not found");
+        }
+    }
+
+    private void isArticleExists(Long articleId) {
+        if (!articleRepository.existsById(articleId)) {
+            throw new ResourceNotFoundException("Article with given Id = " + articleId + " not found");
+        }
+    }
+
+    private void isCommentExists(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new ResourceNotFoundException("Comment with given Id = " + commentId + " not found");
+        }
+    }
+
+    private void isActionAllowed(Long userId, Comment comment) {
+        if (!userId.equals(comment.getCommentAuthor().getUserId())) {
+            throw new ActionForbiddenException("Action forbidden for given user");
+        }
+    }
+
 }

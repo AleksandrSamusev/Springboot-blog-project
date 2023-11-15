@@ -290,6 +290,95 @@
         }
       }
     },
+    "/public/comments/{commentId}": {
+      "get": {
+        "tags": [
+          "Public Comment Controller"
+        ],
+        "summary": "Get comment",
+        "description": "Get comment by ID\n",
+        "operationId": "getCommentById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "commentId",
+            "description": "comment ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/public/comments/articles/{articleId}": {
+      "get": {
+        "tags": [
+          "Public Comment Controller"
+        ],
+        "summary": "Get all comments",
+        "description": "Get get all comments to given article\n",
+        "operationId": "getAllComments",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "article ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommentFullDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/private/comments/articles/{articleId}": {
       "post": {
         "tags": [
@@ -516,70 +605,10 @@
         }
       }
     },
-    "/private/tags/{tagId}": {
-      "patch": {
-        "tags": [
-          "Private Tag Controller"
-        ],
-        "summary": "Update tag",
-        "description": "Update tag by given Id\n",
-        "operationId": "updateTag",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "tagId",
-            "description": "Tag ID",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Current-User-Id",
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TagNewDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommentFullDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
+    "/admin/tags/{tagId}": {
       "delete": {
         "tags": [
-          "Private Tag Controller"
+          "Admin Tag Controller"
         ],
         "summary": "Delete tag",
         "description": "Delete tag by given Id\n",
