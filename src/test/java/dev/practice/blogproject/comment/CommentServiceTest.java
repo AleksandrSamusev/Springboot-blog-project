@@ -19,10 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -302,6 +299,7 @@ public class CommentServiceTest {
     @Test
     public void comment_test24_Given_ParametersValid_When_GetAllCommentsToArticle_Then_AllCommentsReturns() {
         when(articleRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
+
         Set<Comment> comments = new HashSet<>();
         Article someArticle = new Article(1L, "Potions",
                 "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
@@ -315,15 +313,16 @@ public class CommentServiceTest {
         someArticle.getComments().add(comment2);
 
         List<CommentFullDto> result = commentService.getAllCommentsToArticle(someArticle.getArticleId());
+        List<CommentFullDto> sortedResult = result.stream().sorted(Comparator.comparing(CommentFullDto::getCommentId)).toList();
 
-        assertEquals(comment1.getCommentId(), result.get(0).getCommentId());
-        assertEquals(comment1.getComment(), result.get(0).getComment());
-        assertEquals(comment1.getCommentAuthor().getUserId(), result.get(0).getCommentAuthor().getUserId());
-        assertEquals(comment1.getArticle().getArticleId(), result.get(0).getArticleId());
-        assertEquals(comment2.getCommentId(), result.get(1).getCommentId());
-        assertEquals(comment2.getComment(), result.get(1).getComment());
-        assertEquals(comment2.getCommentAuthor().getUserId(), result.get(1).getCommentAuthor().getUserId());
-        assertEquals(comment2.getArticle().getArticleId(), result.get(1).getArticleId());
+        assertEquals(comment1.getCommentId(), sortedResult.get(0).getCommentId());
+        assertEquals(comment1.getComment(), sortedResult.get(0).getComment());
+        assertEquals(comment1.getCommentAuthor().getUserId(), sortedResult.get(0).getCommentAuthor().getUserId());
+        assertEquals(comment1.getArticle().getArticleId(), sortedResult.get(0).getArticleId());
+        assertEquals(comment2.getCommentId(), sortedResult.get(1).getCommentId());
+        assertEquals(comment2.getComment(), sortedResult.get(1).getComment());
+        assertEquals(comment2.getCommentAuthor().getUserId(), sortedResult.get(1).getCommentAuthor().getUserId());
+        assertEquals(comment2.getArticle().getArticleId(), sortedResult.get(1).getArticleId());
     }
 
     @Test
