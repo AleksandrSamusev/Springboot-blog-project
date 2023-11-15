@@ -2,10 +2,7 @@ package dev.practice.blogproject.comment;
 
 import dev.practice.blogproject.dtos.comment.CommentFullDto;
 import dev.practice.blogproject.dtos.comment.CommentNewDto;
-import dev.practice.blogproject.dtos.user.UserFullDto;
-import dev.practice.blogproject.dtos.user.UserNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
-import dev.practice.blogproject.dtos.user.UserUpdateDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
@@ -14,12 +11,10 @@ import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.repositories.CommentRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.impl.CommentServiceImpl;
-import dev.practice.blogproject.services.impl.UserServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDate;
@@ -27,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -41,8 +37,6 @@ public class CommentServiceTest {
     CommentRepository commentRepositoryMock;
     @Mock
     ArticleRepository articleRepositoryMock;
-    @InjectMocks
-    UserServiceImpl userService;
     @InjectMocks
     CommentServiceImpl commentService;
 
@@ -241,7 +235,7 @@ public class CommentServiceTest {
         when(userRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
         when(commentRepositoryMock.findById(anyLong())).thenReturn(Optional.of(comment));
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(notAnAuthor));
-        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, ()->
+        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
                 commentService.deleteComment(1L, notAnAuthor.getUserId()));
         assertEquals("Action forbidden for given user", ex.getMessage());
     }
@@ -249,7 +243,7 @@ public class CommentServiceTest {
     @Test
     public void comment_test17_Given_CommentNotExists_When_DeleteComment_Then_ResourceNotFoundException() {
         when(commentRepositoryMock.existsById(anyLong())).thenReturn(Boolean.FALSE);
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 commentService.deleteComment(1L, notAnAuthor.getUserId()));
         assertEquals("Comment with given Id = 1 not found", ex.getMessage());
     }
@@ -258,7 +252,7 @@ public class CommentServiceTest {
     public void comment_test18_Given_UserNotExists_When_DeleteComment_Then_ResourceNotFoundException() {
         when(commentRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
         when(userRepositoryMock.existsById(anyLong())).thenReturn(Boolean.FALSE);
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 commentService.deleteComment(1L, author.getUserId()));
         assertEquals("User with given Id = 1 not found", ex.getMessage());
     }
@@ -266,7 +260,7 @@ public class CommentServiceTest {
     @Test
     public void comment_test19_Given_CommentIdIsNull_When_DeleteComment_Then_InvalidParameterException() {
 
-        InvalidParameterException ex = assertThrows(InvalidParameterException.class, ()->
+        InvalidParameterException ex = assertThrows(InvalidParameterException.class, () ->
                 commentService.deleteComment(null, author.getUserId()));
         assertEquals("Comment ID parameter cannot be null", ex.getMessage());
     }
@@ -274,7 +268,7 @@ public class CommentServiceTest {
     @Test
     public void comment_test20_Given_UserIdIsNull_When_DeleteComment_Then_InvalidParameterException() {
 
-        InvalidParameterException ex = assertThrows(InvalidParameterException.class, ()->
+        InvalidParameterException ex = assertThrows(InvalidParameterException.class, () ->
                 commentService.deleteComment(1L, null));
         assertEquals("UserId parameter cannot be null", ex.getMessage());
     }
@@ -293,15 +287,59 @@ public class CommentServiceTest {
     @Test
     public void comment_test22_Given_CommentNotExists_When_GetCommentById_Then_ResourceNotFoundException() {
         when(commentRepositoryMock.existsById(anyLong())).thenReturn(Boolean.FALSE);
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 commentService.getCommentById(comment.getCommentId()));
         assertEquals("Comment with given Id = 1 not found", ex.getMessage());
     }
 
     @Test
     public void comment_test23_Given_CommentIdIsNull_When_GetCommentById_Then_InvalidParameterException() {
-        InvalidParameterException ex = assertThrows(InvalidParameterException.class, ()->
+        InvalidParameterException ex = assertThrows(InvalidParameterException.class, () ->
                 commentService.getCommentById(null));
+        assertEquals("ID parameter cannot be null", ex.getMessage());
+    }
+
+    @Test
+    public void comment_test24_Given_ParametersValid_When_GetAllCommentsToArticle_Then_AllCommentsReturns() {
+        when(articleRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
+        Set<Comment> comments = new HashSet<>();
+        Article someArticle = new Article(1L, "Potions",
+                "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
+                ArticleStatus.PUBLISHED, 1450L, comments, new HashSet<>());
+        when(articleRepositoryMock.findById(anyLong())).thenReturn(Optional.of(someArticle));
+        Comment comment1 = new Comment(5L,
+                "I found this article very interesting!!!", LocalDateTime.now(), someArticle, commentAuthor);
+        Comment comment2 = new Comment(6L,
+                "Another comment", LocalDateTime.now(), someArticle, commentAuthor);
+        someArticle.getComments().add(comment1);
+        someArticle.getComments().add(comment2);
+
+        List<CommentFullDto> result = commentService.getAllCommentsToArticle(someArticle.getArticleId());
+
+        assertEquals(comment1.getCommentId(), result.get(0).getCommentId());
+        assertEquals(comment1.getComment(), result.get(0).getComment());
+        assertEquals(comment1.getCommentAuthor().getUserId(), result.get(0).getCommentAuthor().getUserId());
+        assertEquals(comment1.getArticle().getArticleId(), result.get(0).getArticleId());
+        assertEquals(comment2.getCommentId(), result.get(1).getCommentId());
+        assertEquals(comment2.getComment(), result.get(1).getComment());
+        assertEquals(comment2.getCommentAuthor().getUserId(), result.get(1).getCommentAuthor().getUserId());
+        assertEquals(comment2.getArticle().getArticleId(), result.get(1).getArticleId());
+    }
+
+    @Test
+    public void comments_test25_Given_ArticleNotExists_When_getAllCommentsToArticle_Then_ResourceNotFound() {
+        when(articleRepositoryMock.existsById(anyLong())).thenReturn(Boolean.FALSE);
+
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+                commentService.getAllCommentsToArticle(article.getArticleId()));
+        assertEquals("Article with given Id = 1 not found", ex.getMessage());
+    }
+
+    @Test
+    public void comments_test25_Given_ArticleIdIsNull_When_getAllCommentsToArticle_Then_InvalidParameter() {
+
+        InvalidParameterException ex = assertThrows(InvalidParameterException.class, ()->
+                commentService.getAllCommentsToArticle(null));
         assertEquals("ID parameter cannot be null", ex.getMessage());
     }
 }
