@@ -287,7 +287,7 @@ public class CommentServiceTest {
         assertEquals(dto.getCommentId(), fullComment.getCommentId());
         assertEquals(dto.getComment(), fullComment.getComment());
         assertEquals(dto.getCommentAuthor().getUserId(), fullComment.getCommentAuthor().getUserId());
-        assertEquals(dto.getArticleId(), fullComment.getArticleId());
+        assertEquals(dto.getArticleId(), fullComment.getArticleId()); //
     }
 
     @Test
