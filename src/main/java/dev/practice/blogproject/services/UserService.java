@@ -10,6 +10,8 @@ import java.util.List;
 public interface UserService {
     List<UserShortDto> getAllUsers();
 
+    List<UserFullDto> getAllUsers(Long currentUserId);
+
     UserShortDto getUserById(Long id);
 
     UserFullDto getUserById(Long userId, Long id);

@@ -30,6 +30,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().map(UserMapper::toUserShortDto).collect(Collectors.toList());
     }
 
+    public List<UserFullDto> getAllUsers(Long currentUserId) {
+        isUserExists(currentUserId);
+        isAdmin(currentUserId);
+        return userRepository.findAll().stream().map(UserMapper::toUserFullDto)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public UserShortDto getUserById(Long userId) {
         Optional<User> dto = userRepository.findById(userId);
@@ -43,7 +50,7 @@ public class UserServiceImpl implements UserService {
     public UserFullDto getUserById(Long userId, Long currentUserId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found with given id " + userId));
-        isUserPresent(currentUserId);
+        isUserExists(currentUserId);
         String role = userRepository.findById(currentUserId).get().getRole().name();
         if (userId.equals(currentUserId) || role.equals("ADMIN")) {
             return UserMapper.toUserFullDto(user);
@@ -73,7 +80,7 @@ public class UserServiceImpl implements UserService {
     public UserFullDto updateUser(Long userId, Long currentUserId, UserUpdateDto dto) {
         User userFromBd = userRepository.findById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User with given ID = " + userId + " not found"));
-        isUserPresent(currentUserId);
+        isUserExists(currentUserId);
         if (!userRepository.findById(currentUserId).get().getUserId().equals(userId)) {
             throw new ActionForbiddenException("Action forbidden for current user");
         }
@@ -103,23 +110,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId, Long currentUserId) {
-        isUserPresent(userId);
-        isUserPresent(currentUserId);
-        isAuthorized(userId, currentUserId);
+        isUserExists(userId);
+        isUserExists(currentUserId);
+        isUserAuthorized(userId, currentUserId);
         userRepository.deleteById(userId);
     }
 
 
-    private void isUserPresent(Long userId) {
+    private void isUserExists(Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new ResourceNotFoundException("User with given ID = " + userId + " not found");
         }
     }
 
-    private void isAuthorized(Long userId, Long currentUserId) {
+    private void isUserAuthorized(Long userId, Long currentUserId) {
         if (userRepository.findById(currentUserId).isPresent()) {
             String role = userRepository.findById(currentUserId).get().getRole().name();
             if (!role.equals("ADMIN") && !userId.equals(currentUserId)) {
+                throw new ActionForbiddenException("Action forbidden for current user");
+            }
+        }
+    }
+
+    private void isAdmin(Long userId) {
+        if (userRepository.findById(userId).isPresent()) {
+            String role = userRepository.findById(userId).get().getRole().name();
+            if (!role.equals("ADMIN")) {
                 throw new ActionForbiddenException("Action forbidden for current user");
             }
         }

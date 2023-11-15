@@ -1,9 +1,13 @@
 package dev.practice.blogproject.mappers;
 
 import dev.practice.blogproject.dtos.comment.CommentFullDto;
+import dev.practice.blogproject.dtos.comment.CommentNewDto;
 import dev.practice.blogproject.dtos.comment.CommentShortDto;
+import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.Comment;
+import dev.practice.blogproject.models.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,8 +31,13 @@ public class CommentMapper {
                 comment.getCommentAuthor().getUserId());
     }
 
-    public static List<CommentShortDto> toCommentDtos(List<Comment> comments) {
-        return comments.stream().map(CommentMapper::toCommentShortDto).collect(Collectors.toList());
+    public static Comment toComment(CommentNewDto dto, User user, Article article) {
+        Comment comment = new Comment();
+        comment.setComment(dto.getComment());
+        comment.setCommentAuthor(user);
+        comment.setArticle(article);
+        comment.setCreated(LocalDateTime.now());
+        return comment;
     }
 
 }
