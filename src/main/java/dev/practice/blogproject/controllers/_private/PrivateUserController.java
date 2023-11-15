@@ -1,6 +1,7 @@
 package dev.practice.blogproject.controllers._private;
 
 import dev.practice.blogproject.dtos.user.UserFullDto;
+import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.dtos.user.UserUpdateDto;
 import dev.practice.blogproject.services.UserService;
 import jakarta.validation.Valid;
@@ -9,11 +10,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/private")
 public class PrivateUserController {
     private final UserService userService;
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserFullDto>> getAllUsers(
+            @RequestHeader("X-Current-User-Id") Long currentUserId) {
+        return new ResponseEntity<>(userService.getAllUsers(currentUserId), HttpStatus.OK);
+    }
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserFullDto> getUserById(@PathVariable Long userId,
