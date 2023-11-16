@@ -16,7 +16,7 @@ public class PrivateTagController {
 
     private final TagService tagService;
 
-    @PostMapping("/tags/article/{articleId}")
+    @PostMapping("/tags/articles/{articleId}")
     public ResponseEntity<TagFullDto> createTag(@Valid @RequestBody TagNewDto dto,
                                                 @PathVariable Long articleId,
                                                 @RequestHeader("X-Current-User-Id") Long userId) {
