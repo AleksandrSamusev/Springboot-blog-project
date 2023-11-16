@@ -18,7 +18,10 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ArticlePublicController.class)
@@ -53,5 +56,31 @@ public class ArticlePublicControllerTest {
                 .andExpect(status().isOk());
 
         Mockito.verify(articleService, Mockito.times(1)).getAllArticles();
+    }
+
+    @Test
+    void article_test_8_Given_anyUserArticleExist_When_getArticleById_Then_returnArticleStatusOk() throws Exception {
+        Mockito
+                .when(articleService.getArticleById(Mockito.anyLong()))
+                .thenReturn(articleShort);
+
+        mvc.perform(get("/api/v1/public/articles/{articleId}", 1L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.articleId").value(1))
+                .andExpect(jsonPath("$.title").value(articleShort.getTitle()))
+                .andExpect(jsonPath("$.content").value(articleShort.getContent()))
+                .andExpect(jsonPath("$.author.userId").value(author.getUserId().intValue()))
+                .andExpect(jsonPath("$.author.username").value(author.getUsername()))
+                .andExpect(jsonPath("$.created").doesNotExist())
+                .andExpect(jsonPath("$.published").value(notNullValue()))
+                .andExpect(jsonPath("$.status").doesNotExist())
+                .andExpect(jsonPath("$.likes").value(0))
+                .andExpect(jsonPath("$.comments").isEmpty())
+                .andExpect(jsonPath("$.tags").isEmpty());
+
+        Mockito.verify(articleService, Mockito.times(1)).getArticleById(1L);
     }
 }

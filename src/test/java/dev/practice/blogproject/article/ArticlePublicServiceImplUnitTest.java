@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -52,5 +53,16 @@ public class ArticlePublicServiceImplUnitTest {
         List<ArticleShortDto> result = articleService.getAllArticles();
 
         assertThat(result.size()).isEqualTo(2);
+    }
+
+    @Test
+    void article_test_4_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() {
+        Mockito
+                .when(articleRepository.findById(0L))
+                .thenReturn(Optional.of(savedArticle));
+
+        ArticleShortDto result = articleService.getArticleById(0L);
+
+        assertThat(result.getArticleId()).isEqualTo(0);
     }
 }

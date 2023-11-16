@@ -1,6 +1,8 @@
 package dev.practice.blogproject.article;
 
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
+import dev.practice.blogproject.exceptions.ActionForbiddenException;
+import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.models.Role;
@@ -10,6 +12,7 @@ import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.ArticlePublicService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,8 +21,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
 @SpringBootTest(
@@ -50,6 +55,7 @@ public class ArticlePublicServiceImplIntTest {
 
     @Test
     void article_test_2_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticlesNewFirst() {
+        dropDB();
         userRepository.save(user);
         Article newer = articleRepository.save(article);
         Article older = articleRepository.save(article2);
@@ -61,6 +67,47 @@ public class ArticlePublicServiceImplIntTest {
         assertThat(result.get(0)).isInstanceOf(ArticleShortDto.class);
         assertThat(result.get(0).getArticleId()).isEqualTo(newer.getArticleId());
         assertThat(result.get(1).getArticleId()).isEqualTo(older.getArticleId());
+    }
+
+    @Test
+    void article_test_5_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() {
+        dropDB();
+        userRepository.save(user);
+        Article saved = articleRepository.save(article);
+
+        ArticleShortDto result = articleService.getArticleById(saved.getArticleId());
+
+        assertThat(result.getArticleId()).isEqualTo(saved.getArticleId());
+        assertThat(result).isInstanceOf(ArticleShortDto.class);
+    }
+
+    @Test
+    void article_test_6_Given_anyUserArticleNotExist_When_getArticleById_Then_throwException() {
+        dropDB();
+
+        final ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> articleService.getArticleById(Long.MAX_VALUE));
+        assertEquals(String.format("Article with id %d wasn't found", Long.MAX_VALUE), exception.getMessage(),
+                "Incorrect message");
+        assertThat(exception).isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void article_test_7_Given_anyUserArticleNotPublished_When_getArticleById_Then_throwException() {
+        dropDB();
+        userRepository.save(user);
+        Article saved = articleRepository.save(article3);
+
+        final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
+                () -> articleService.getArticleById(saved.getArticleId()));
+        assertEquals(String.format("Article with id %d is not published yet", saved.getArticleId()),
+                exception.getMessage(), "Incorrect message");
+        assertThat(exception).isInstanceOf(ActionForbiddenException.class);
+    }
+
+    private void dropDB() {
+        articleRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
 
