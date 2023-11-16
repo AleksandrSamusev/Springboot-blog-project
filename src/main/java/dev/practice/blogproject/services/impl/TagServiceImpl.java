@@ -84,7 +84,7 @@ public class TagServiceImpl implements TagService {
     }
 
     private void isUserExists(Long userId) {
-        if (userRepository.findById(userId).isEmpty()) {
+        if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User with given ID = " + userId + " not found");
         }
     }

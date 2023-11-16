@@ -124,9 +124,11 @@ public class TagServiceTest {
         articles.add(article);
         Tag tag = new Tag(1L, "tag1", articles);
         article.getTags().add(tag);
+        when(articleRepositoryMock.existsById(anyLong())).thenReturn(true);
         when(articleRepositoryMock.findById(anyLong())).thenReturn(Optional.of(article));
         when(tagRepositoryMock.save(any())).thenReturn(tag);
         when(articleRepositoryMock.save(any())).thenReturn(article);
+
 
         TagFullDto result = tagService.createTag(newTag, article.getArticleId());
 
@@ -153,7 +155,7 @@ public class TagServiceTest {
 
         when(articleRepositoryMock.existsById(anyLong())).thenReturn(true);
         when(tagRepositoryMock.findTagByName(any())).thenReturn(tag);
-        when(articleRepositoryMock.findById(anyLong())).thenReturn(Optional.of(article));
+
 
         InvalidParameterException ex = assertThrows(InvalidParameterException.class, ()->
                 tagService.createTag(newTag, article.getArticleId()));
@@ -180,9 +182,8 @@ public class TagServiceTest {
 
     @Test
     public void tag_test12_Given_UserIsNotAdmin_When_DeleteTag_Then_ActionForbidden() {
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
+when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(notAdmin));
-        doNothing().when(tagRepositoryMock).deleteById(1L);
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, ()->
         tagService.deleteTag(1L, admin.getUserId()));
@@ -203,10 +204,9 @@ public class TagServiceTest {
     @Test
     public void tag_test14_Given_UserNotExists_When_DeleteTag_Then_ResourceNotFound() {
         when(userRepositoryMock.existsById(anyLong())).thenReturn(false);
-
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
-                tagService.deleteTag(1L, admin.getUserId()));
-        assertEquals("User with given ID = 10 not found", ex.getMessage());
+                tagService.deleteTag(1L, 1L));
+        assertEquals("User with given ID = 1 not found", ex.getMessage());
     }
 
     @Test
