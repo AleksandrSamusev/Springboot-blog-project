@@ -6,12 +6,11 @@ import dev.practice.blogproject.dtos.tag.TagShortDto;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.Tag;
 
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class TagMapper {
 
-    public static TagFullDto toTagDto(Tag tag) {
+    public static TagFullDto toTagFullDto(Tag tag) {
         return new TagFullDto(
                 tag.getTagId(),
                 tag.getName(),
