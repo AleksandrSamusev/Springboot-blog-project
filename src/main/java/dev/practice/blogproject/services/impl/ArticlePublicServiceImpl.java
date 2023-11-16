@@ -1,6 +1,8 @@
 package dev.practice.blogproject.services.impl;
 
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
+import dev.practice.blogproject.mappers.ArticleMapper;
+import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.services.ArticlePublicService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
 
     @Override
     public List<ArticleShortDto> getAllArticles() {
-        return null;
+        return ArticleMapper.toListArticleShort(articleRepository.findArticlesByStatusOrderByPublishedDesc(
+                ArticleStatus.PUBLISHED));
     }
 }

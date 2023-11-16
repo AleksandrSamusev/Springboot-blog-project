@@ -191,7 +191,8 @@ public class ArticlePrivateControllerTest {
     }
 
     @Test
-    void article_test_27_authorIdAndValidArticleId_When_deleteArticle_Then_articleDeletedStatusOk() throws Exception {
+    void article_test_27_Given_authorIdAndValidArticleId_When_deleteArticle_Then_articleDeletedStatusOk()
+            throws Exception {
         Mockito
                 .doNothing()
                 .when(articleService).deleteArticle(Mockito.anyLong(), Mockito.anyLong());
