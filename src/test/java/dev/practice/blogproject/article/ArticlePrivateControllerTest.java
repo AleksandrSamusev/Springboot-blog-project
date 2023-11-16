@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ArticlePrivateController.class)
-public class ArticleControllerTest {
+public class ArticlePrivateControllerTest {
     @MockBean
     private ArticlePrivateService articleService;
 
