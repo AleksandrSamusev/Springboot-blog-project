@@ -30,9 +30,12 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagFullDto createTag(TagNewDto dto, Long articleId) {
-        isValidParameters(articleId);
-        Article article = articleRepository.findById(articleId).orElseThrow(() ->
-                new ResourceNotFoundException("article with given ID = " + articleId + " not found"));
+        isValidParameters(articleId, dto);
+        isArticleExists(articleId);
+        if(tagRepository.findTagByName(dto.getName())!=null) {
+            throw new InvalidParameterException("Tag with given name = " + dto.getName() + " already exists");
+        }
+        Article article = articleRepository.findById(articleId).get();
 
         Tag tag = TagMapper.toTag(dto);
         tag.getArticles().add(article);
@@ -58,6 +61,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<TagFullDto> getAllArticleTags(Long articleId) {
+        isValidParameters(articleId);
         isArticleExists(articleId);
         return articleRepository.findById(articleId).get().getTags()
                 .stream().map(TagMapper::toTagFullDto).collect(Collectors.toList());
@@ -65,6 +69,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagFullDto getTagById(Long tagId) {
+        isValidParameters(tagId);
         isTagExists(tagId);
         return TagMapper.toTagFullDto(tagRepository.findById(tagId).get());
     }
@@ -91,14 +96,30 @@ public class TagServiceImpl implements TagService {
     }
 
     private void isArticleExists(Long articleId) {
-        if(articleRepository.existsById(articleId)) {
+        if(!articleRepository.existsById(articleId)) {
             throw new ResourceNotFoundException("Article with given ID = " + articleId + " not found");
         }
     }
 
-    private void isValidParameters(Long tagId) {
-        if (tagId == null) {
-            throw new InvalidParameterException("tagId parameter cannot be NULL");
+    private void isValidParameters(Long id) {
+        if (id == null) {
+            throw new InvalidParameterException("Id parameter cannot be null");
+        }
+    }
+
+    private void isValidParameters(Long id, Long userId) {
+        if (id == null || userId == null) {
+            throw new InvalidParameterException("Id parameter cannot be null");
+        }
+
+    }
+
+    private void isValidParameters(Long id, TagNewDto dto) {
+        if (id == null) {
+            throw new InvalidParameterException("Id parameter cannot be null");
+        }
+        if(dto.getName().isBlank()) {
+            throw new InvalidParameterException("Tag name cannot be blank");
         }
     }
 }

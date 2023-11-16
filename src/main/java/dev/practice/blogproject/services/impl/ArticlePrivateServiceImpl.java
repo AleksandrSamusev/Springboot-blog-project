@@ -162,6 +162,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     private Set<Tag> checkTagExist(Set<TagNewDto> tags, long articleId) {
         Set<Tag> allTags = new HashSet<>();
         for (TagNewDto newTag : tags) {
+
             Tag tag = tagRepository.findTagByName(newTag.getName().trim());
             if (tag != null) {
                 allTags.add(tag);
@@ -181,4 +182,5 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         tag.getArticles().remove(article);
         tagRepository.save(tag);
     }
+
 }
