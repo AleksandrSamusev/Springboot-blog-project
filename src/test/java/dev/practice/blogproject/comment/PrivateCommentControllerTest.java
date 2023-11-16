@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -51,7 +52,8 @@ public class PrivateCommentControllerTest {
             ArticleStatus.PUBLISHED, 1450L, new HashSet<>(), new HashSet<>());
 
     private final CommentFullDto fullComment = new CommentFullDto(1L,
-            "I found this article very interesting!!!", LocalDateTime.now(), article.getArticleId(), shortUser);
+            "I found this article very interesting!!!",
+            LocalDateTime.now(), article.getArticleId(), shortUser);
 
     private final CommentFullDto fullUpdatedComment = new CommentFullDto(2L,
             "Updated!", LocalDateTime.now(), article.getArticleId(), shortUser);
@@ -63,7 +65,6 @@ public class PrivateCommentControllerTest {
     @Test
     public void comment_test28_CreateCommentTest() throws Exception {
         when(commentService.createComment(anyLong(), any(), anyLong())).thenReturn(fullComment);
-
         mockMvc.perform(post("/api/v1/private/comments/article/1")
                         .header("X-Current-User-Id", 1)
                         .content(mapper.writeValueAsString(newDto))
@@ -80,7 +81,6 @@ public class PrivateCommentControllerTest {
     @Test
     public void comment_test29_UpdateCommentTest() throws Exception {
         when(commentService.updateComment(any(), anyLong(), anyLong())).thenReturn(fullUpdatedComment);
-
         mockMvc.perform(patch("/api/v1/private/comments/1")
                         .header("X-Current-User-Id", 1)
                         .content(mapper.writeValueAsString(dtoForUpdate))
@@ -97,7 +97,6 @@ public class PrivateCommentControllerTest {
     @Test
     public void comment_test30_DeleteCommentTest() throws Exception {
         doNothing().when(commentService).deleteComment(anyLong(), anyLong());
-
         mockMvc.perform(delete("/api/v1/private/comments/1")
                         .header("X-Current-User-Id", 1))
                 .andExpect(status().isOk());

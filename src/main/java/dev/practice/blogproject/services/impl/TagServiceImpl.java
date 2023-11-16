@@ -16,6 +16,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -39,18 +42,31 @@ public class TagServiceImpl implements TagService {
         articleRepository.save(article);
 
         log.info("Tag with ID = " + savedTag.getTagId() + " created");
-        return TagMapper.toTagDto(savedTag);
+        return TagMapper.toTagFullDto(savedTag);
 
     }
 
     @Override
     public void deleteTag(Long tagId, Long userId) {
         isValidParameters(tagId);
-        isUserPresent(userId);
+        isUserExists(userId);
         isAdmin(userId);
-        isTagPresent(tagId);
+        isTagExists(tagId);
         tagRepository.deleteById(tagId);
         log.info("Tag with ID = " + tagId + " successfully deleted");
+    }
+
+    @Override
+    public List<TagFullDto> getAllArticleTags(Long articleId) {
+        isArticleExists(articleId);
+        return articleRepository.findById(articleId).get().getTags()
+                .stream().map(TagMapper::toTagFullDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public TagFullDto getTagById(Long tagId) {
+        isTagExists(tagId);
+        return TagMapper.toTagFullDto(tagRepository.findById(tagId).get());
     }
 
 
@@ -62,31 +78,27 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    private void isUserPresent(Long userId) {
+    private void isUserExists(Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new ResourceNotFoundException("User with given ID = " + userId + " not found");
         }
     }
 
-    private void isTagPresent(Long tagId) {
+    private void isTagExists(Long tagId) {
         if (!tagRepository.existsById(tagId)) {
             throw new ResourceNotFoundException("Tag with given ID = " + tagId + " not found");
+        }
+    }
+
+    private void isArticleExists(Long articleId) {
+        if(articleRepository.existsById(articleId)) {
+            throw new ResourceNotFoundException("Article with given ID = " + articleId + " not found");
         }
     }
 
     private void isValidParameters(Long tagId) {
         if (tagId == null) {
             throw new InvalidParameterException("tagId parameter cannot be NULL");
-        }
-    }
-
-    private void isValidParameters(TagNewDto dto, Long articleId, Long userId) {
-        if (dto == null) {
-            throw new InvalidParameterException("dto parameter cannot be NULL");
-        } else if (articleId == null) {
-            throw new InvalidParameterException("articleId parameter cannot be NULL");
-        } else if (userId == null) {
-            throw new InvalidParameterException("userId parameter cannot be NULL");
         }
     }
 }
