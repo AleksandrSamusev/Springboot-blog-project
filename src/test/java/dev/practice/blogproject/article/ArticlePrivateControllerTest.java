@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ArticlePrivateController.class)
-public class ArticleControllerTest {
+public class ArticlePrivateControllerTest {
     @MockBean
     private ArticlePrivateService articleService;
 
@@ -191,7 +191,8 @@ public class ArticleControllerTest {
     }
 
     @Test
-    void article_test_27_authorIdAndValidArticleId_When_deleteArticle_Then_articleDeletedStatusOk() throws Exception {
+    void article_test_27_Given_authorIdAndValidArticleId_When_deleteArticle_Then_articleDeletedStatusOk()
+            throws Exception {
         Mockito
                 .doNothing()
                 .when(articleService).deleteArticle(Mockito.anyLong(), Mockito.anyLong());

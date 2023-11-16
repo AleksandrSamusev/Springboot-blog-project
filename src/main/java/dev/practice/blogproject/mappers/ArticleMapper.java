@@ -9,6 +9,7 @@ import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.models.User;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ArticleMapper {
@@ -58,6 +59,10 @@ public class ArticleMapper {
         article.setStatus(ArticleStatus.CREATED);
         article.setPublished(null);
         return article;
+    }
+
+    public static List<ArticleShortDto> toListArticleShort(List<Article> articles) {
+        return articles.stream().map(ArticleMapper::toArticleShortDto).toList();
     }
 
 }

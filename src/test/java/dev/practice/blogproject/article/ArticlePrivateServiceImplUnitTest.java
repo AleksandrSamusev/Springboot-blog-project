@@ -4,16 +4,12 @@ import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
-import dev.practice.blogproject.dtos.comment.CommentNewDto;
-import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.ArticleRepository;
-import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.impl.ArticlePrivateServiceImpl;
-import dev.practice.blogproject.services.impl.TagServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,14 +34,9 @@ public class ArticlePrivateServiceImplUnitTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private TagRepository tagRepository;
-
     @InjectMocks
     private ArticlePrivateServiceImpl articleService;
 
-    @InjectMocks
-    private TagServiceImpl tagService;
 
     private final User author = new User(0L, "Harry", "Potter", "HP",
             "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
@@ -268,8 +259,6 @@ public class ArticlePrivateServiceImplUnitTest {
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
-
-
 
 
 }
