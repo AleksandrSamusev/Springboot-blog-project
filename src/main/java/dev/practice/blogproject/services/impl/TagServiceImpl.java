@@ -107,13 +107,6 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    private void isValidParameters(Long id, Long userId) {
-        if (id == null || userId == null) {
-            throw new InvalidParameterException("Id parameter cannot be null");
-        }
-
-    }
-
     private void isValidParameters(Long id, TagNewDto dto) {
         if (id == null) {
             throw new InvalidParameterException("Id parameter cannot be null");
