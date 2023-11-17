@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,16 +45,19 @@ public class ArticlePublicControllerTest {
     @Test
     void article_test_3_Given_anyUser_When_getAllArticles_Then_returnAllPublishedStatusOk() throws Exception {
         Mockito
-                .when(articleService.getAllArticles())
+                .when(articleService.getAllArticles(Mockito.any(), Mockito.any()))
                 .thenReturn(List.of(articleShort, articleShort2));
 
         mvc.perform(get("/api/v1/public/articles")
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(10))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Mockito.verify(articleService, Mockito.times(1)).getAllArticles();
+        Mockito.verify(articleService, Mockito.times(1)).getAllArticles(
+                Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -82,5 +84,24 @@ public class ArticlePublicControllerTest {
                 .andExpect(jsonPath("$.tags").isEmpty());
 
         Mockito.verify(articleService, Mockito.times(1)).getArticleById(1L);
+    }
+
+    @Test
+    void article_test_11_Given_anyUserAuthorExist_When_getAllArticlesByUserId_Then_returnPublishedArticlesStatusOk()
+            throws Exception {
+        Mockito
+                .when(articleService.getAllArticlesByUserId(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(articleShort));
+
+        mvc.perform(get("/api/v1/public/articles/users/{userId}", 0L)
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(10))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Mockito.verify(articleService, Mockito.times(1)).getAllArticlesByUserId(
+                Mockito.any(), Mockito.any(), Mockito.any());
     }
 }

@@ -6,10 +6,14 @@ import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.ArticleMapper;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.ArticleStatus;
+import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.ArticleRepository;
+import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.ArticlePublicService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +24,7 @@ import java.util.Optional;
 @Slf4j
 public class ArticlePublicServiceImpl implements ArticlePublicService {
     private final ArticleRepository articleRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ArticleShortDto getArticleById(Long articleId) {
@@ -30,9 +35,20 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
     }
 
     @Override
-    public List<ArticleShortDto> getAllArticles() {
-        return ArticleMapper.toListArticleShort(articleRepository.findArticlesByStatusOrderByPublishedDesc(
-                ArticleStatus.PUBLISHED));
+    public List<ArticleShortDto> getAllArticles(Integer from, Integer size) {
+        PageRequest pageable = PageRequest.of(from / size, size);
+        return ArticleMapper.toListArticleShort(articleRepository.findAllByStatusOrderByPublishedDesc(
+                ArticleStatus.PUBLISHED, pageable));
+    }
+
+    @Override
+    public List<ArticleShortDto> getAllArticlesByUserId(Long userId, Integer from, Integer size) {
+        checkUserExist(userId);
+        PageRequest pageable = PageRequest.of(
+                from / size, size, Sort.by("published").descending());
+
+        return ArticleMapper.toListArticleShort(articleRepository.findAllByAuthorUserIdAndStatus(
+                userId, ArticleStatus.PUBLISHED, pageable));
     }
 
     private Article checkArticleExist(Long articleId) {
@@ -51,5 +67,14 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
             throw new ActionForbiddenException(String.format("Article with id %d is not published yet",
                     article.getArticleId()));
         }
+    }
+
+    private User checkUserExist(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            log.error("User with id {} wasn't found", userId);
+            throw new ResourceNotFoundException(String.format("User with id %d wasn't found", userId));
+        }
+        return user.get();
     }
 }

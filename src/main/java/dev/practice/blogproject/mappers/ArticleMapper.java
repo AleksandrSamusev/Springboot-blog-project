@@ -65,4 +65,8 @@ public class ArticleMapper {
         return articles.stream().map(ArticleMapper::toArticleShortDto).toList();
     }
 
+    public static List<ArticleFullDto> toListArticleFull(List<Article> articles) {
+        return articles.stream().map(ArticleMapper::toArticleFullDto).toList();
+    }
+
 }

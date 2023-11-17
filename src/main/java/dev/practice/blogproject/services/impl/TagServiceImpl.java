@@ -31,7 +31,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagFullDto createTag(TagNewDto dto, Long articleId) {
         isArticleExists(articleId);
-        if(tagRepository.findTagByName(dto.getName())!=null) {
+        if (tagRepository.findTagByName(dto.getName()) != null) {
             throw new InvalidParameterException("Tag with given name = " + dto.getName() + " already exists");
         }
         Article article = articleRepository.findById(articleId).get();
@@ -92,7 +92,7 @@ public class TagServiceImpl implements TagService {
     }
 
     private void isArticleExists(Long articleId) {
-        if(!articleRepository.existsById(articleId)) {
+        if (!articleRepository.existsById(articleId)) {
             throw new ResourceNotFoundException("Article with given ID = " + articleId + " not found");
         }
     }

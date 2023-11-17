@@ -4,6 +4,7 @@ import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
 import dev.practice.blogproject.dtos.article.ArticleUpdateDto;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ArticlePrivateService {
@@ -14,4 +15,6 @@ public interface ArticlePrivateService {
     Optional<?> getArticleById(Long userId, Long articleId);
 
     void deleteArticle(long userId, long articleId);
+
+    List<ArticleFullDto> getAllArticlesByUserId(Long userId, Integer from, Integer size, String status);
 }
