@@ -21,28 +21,30 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserFullDto {
 
+    @NotNull(message = "User ID cannot be null")
     private Long userId;
 
-    @NotBlank
+    @NotBlank(message = "User first name cannot be blank")
     private String firstName;
 
-    @NotBlank
+    @NotBlank(message = "User last name cannot be blank")
     private String lastName;
 
-    @NotBlank
+    @NotBlank(message = "Username cannot be blank")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "User email cannot be blank")
     private String email;
 
-    @NotNull
+    @NotNull(message = "User birth date cannot be null")
     private LocalDate birthDate;
 
-    @NotNull
+    @NotNull(message = "Role cannot be null")
     private Role role;
+
     private String about;
 
-    @NotNull
+    @NotNull(message = "Is banned parameter cannot be null")
     private Boolean isBanned;
     private Set<MessageFullDto> sentMessages = new HashSet<>();
     private Set<MessageFullDto> receivedMessages = new HashSet<>();

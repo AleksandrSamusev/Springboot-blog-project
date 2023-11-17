@@ -22,23 +22,24 @@ public class Article {
     @Column(name = "article_id")
     private Long articleId;
 
-    @Column(name = "title")
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
 
     @Column(name = "published")
     private LocalDateTime published;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ArticleStatus status = ArticleStatus.CREATED;
 
     @Column(name = "likes")

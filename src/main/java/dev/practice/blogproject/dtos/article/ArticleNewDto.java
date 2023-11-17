@@ -16,12 +16,12 @@ import java.util.Set;
 @NoArgsConstructor
 public class ArticleNewDto {
 
-    @NotBlank
-    @Length(max = 250)
+    @NotBlank(message = "Title cannot be blank")
+    @Length(max = 250, message = "Title length should be 250 chars max")
     private String title;
 
-    @NotBlank
-    @Length(max = 30000)
+    @NotBlank(message = "Content cannot be blank")
+    @Length(max = 30000, message = "Content length should be 30000 chars max")
     private String content;
     private Set<TagNewDto> tags;
 

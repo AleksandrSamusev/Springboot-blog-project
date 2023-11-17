@@ -13,10 +13,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TagShortDto {
 
-    @NotNull
+    @NotNull(message = "Tag ID cannot be null")
     private Long tagId;
 
-    @NotBlank
+    @NotBlank(message = "Tag name cannot be blank")
     String name;
 
 }

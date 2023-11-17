@@ -16,21 +16,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class MessageFullDto {
 
+    @NotNull(message = "Message ID cannot be null")
     private Long messageId;
 
-    @NotBlank
+    @NotBlank(message = "Message cannot be blank")
     private String message;
 
-    @NotNull
+    @NotNull(message = "Sender cannot be null")
     private UserShortDto sender;
 
-    @NotNull
+    @NotNull(message = "Recipient cannot be null")
     private UserShortDto recipient;
 
-    @NotNull
+    @NotNull(message = "Created parameter cannot be null")
     private LocalDateTime created;
 
-    @NotNull
+    @NotNull(message = "Is deleted cannot be null")
     private boolean isDeleted;
 
 }

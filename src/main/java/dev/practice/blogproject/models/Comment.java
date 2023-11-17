@@ -21,10 +21,10 @@ public class Comment {
     @Column(name = "comment_id")
     private Long commentId;
 
-    @Column(name = "comment")
+    @Column(name = "comment", nullable = false)
     private String comment;
 
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
 
     @ManyToOne

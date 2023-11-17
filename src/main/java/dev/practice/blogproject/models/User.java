@@ -23,30 +23,30 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "username")
+    @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "birthdate")
+    @Column(name = "birthdate", nullable = false)
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthDate;
 
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
     @Column(name = "about")
     private String about;
 
-    @Column(name = "is_banned")
+    @Column(name = "is_banned", nullable = false)
     private Boolean isBanned = false;
 
     @OneToMany(mappedBy = "sender")
