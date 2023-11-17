@@ -30,7 +30,6 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagFullDto createTag(TagNewDto dto, Long articleId) {
-        isValidParameters(articleId, dto);
         isArticleExists(articleId);
         if(tagRepository.findTagByName(dto.getName())!=null) {
             throw new InvalidParameterException("Tag with given name = " + dto.getName() + " already exists");
@@ -51,7 +50,6 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public void deleteTag(Long tagId, Long userId) {
-        isValidParameters(tagId);
         isUserExists(userId);
         isAdmin(userId);
         isTagExists(tagId);
@@ -61,7 +59,6 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<TagFullDto> getAllArticleTags(Long articleId) {
-        isValidParameters(articleId);
         isArticleExists(articleId);
         return articleRepository.findById(articleId).get().getTags()
                 .stream().map(TagMapper::toTagFullDto).collect(Collectors.toList());
@@ -69,7 +66,6 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagFullDto getTagById(Long tagId) {
-        isValidParameters(tagId);
         isTagExists(tagId);
         return TagMapper.toTagFullDto(tagRepository.findById(tagId).get());
     }
@@ -98,21 +94,6 @@ public class TagServiceImpl implements TagService {
     private void isArticleExists(Long articleId) {
         if(!articleRepository.existsById(articleId)) {
             throw new ResourceNotFoundException("Article with given ID = " + articleId + " not found");
-        }
-    }
-
-    private void isValidParameters(Long id) {
-        if (id == null) {
-            throw new InvalidParameterException("Id parameter cannot be null");
-        }
-    }
-
-    private void isValidParameters(Long id, TagNewDto dto) {
-        if (id == null) {
-            throw new InvalidParameterException("Id parameter cannot be null");
-        }
-        if(dto.getName().isBlank()) {
-            throw new InvalidParameterException("Tag name cannot be blank");
         }
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/private")
-public class PrivateTagController {
+public class TagPrivateController {
 
     private final TagService tagService;
 

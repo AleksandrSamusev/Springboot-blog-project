@@ -3,7 +3,6 @@ package dev.practice.blogproject.services.impl;
 import dev.practice.blogproject.dtos.comment.CommentFullDto;
 import dev.practice.blogproject.dtos.comment.CommentNewDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
-import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.CommentMapper;
 import dev.practice.blogproject.models.Article;
@@ -30,7 +29,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentFullDto createComment(Long articleId, CommentNewDto dto, Long userId) {
-        isParametersValid(articleId, dto, userId);
         isUserExists(userId);
         isArticleExists(articleId);
         User user = userRepository.findById(userId).get();
@@ -43,7 +41,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentFullDto updateComment(CommentNewDto dto, Long commentId, Long userId) {
-        isParametersValid(dto, commentId, userId);
         isCommentExists(commentId);
         isUserExists(userId);
         Comment comment = commentRepository.findById(commentId).get();
@@ -56,7 +53,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void deleteComment(Long commentId, Long userId) {
-        isParametersValid(commentId, userId);
         isCommentExists(commentId);
         isUserExists(userId);
         Comment comment = commentRepository.findById(commentId).get();
@@ -71,61 +67,15 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentFullDto getCommentById(Long commentId) {
-        isParametersValid(commentId);
         isCommentExists(commentId);
         return CommentMapper.toCommentFullDto(commentRepository.findById(commentId).get());
     }
 
     @Override
     public List<CommentFullDto> getAllCommentsToArticle(Long articleId) {
-        isParametersValid(articleId);
         isArticleExists(articleId);
         return articleRepository.findById(articleId).get().getComments()
                 .stream().map(CommentMapper::toCommentFullDto).collect(Collectors.toList());
-    }
-
-
-    private void isParametersValid(Long articleId, CommentNewDto dto, Long userId) {
-        if (articleId == null) {
-            throw new InvalidParameterException("Article ID parameter cannot be null");
-        }
-        if (dto == null) {
-            throw new InvalidParameterException("Dto parameter cannot be null");
-        }
-        if (userId == null) {
-            throw new InvalidParameterException("UserId parameter cannot be null");
-        }
-    }
-
-
-    private void isParametersValid(CommentNewDto dto, Long commentId, Long userId) {
-        if (commentId == null) {
-            throw new InvalidParameterException("Comment ID parameter cannot be null");
-        }
-        if (dto == null) {
-            throw new InvalidParameterException("Dto parameter cannot be null");
-        }
-        if (userId == null) {
-            throw new InvalidParameterException("UserId parameter cannot be null");
-        }
-        if (dto.getComment() == null) {
-            throw new InvalidParameterException("No message given");
-        }
-    }
-
-    private void isParametersValid(Long commentId, Long userId) {
-        if (commentId == null) {
-            throw new InvalidParameterException("Comment ID parameter cannot be null");
-        }
-        if (userId == null) {
-            throw new InvalidParameterException("UserId parameter cannot be null");
-        }
-    }
-
-    private void isParametersValid(Long id) {
-        if (id == null) {
-            throw new InvalidParameterException("ID parameter cannot be null");
-        }
     }
 
     private void isUserExists(Long userId) {

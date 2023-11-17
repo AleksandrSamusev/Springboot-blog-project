@@ -1,6 +1,6 @@
 package dev.practice.blogproject.message;
 
-import dev.practice.blogproject.controllers._private.PrivateMessageController;
+import dev.practice.blogproject.controllers._private.MessagePrivateController;
 import dev.practice.blogproject.dtos.message.MessageFullDto;
 import dev.practice.blogproject.dtos.message.MessageNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
@@ -27,8 +27,8 @@ import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PrivateMessageController.class)
-public class PrivateMessageControllerTest {
+@WebMvcTest(MessagePrivateController.class)
+public class MessagePrivateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

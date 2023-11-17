@@ -1,6 +1,6 @@
 package dev.practice.blogproject.user;
 
-import dev.practice.blogproject.controllers._private.PrivateUserController;
+import dev.practice.blogproject.controllers._private.UserPrivateController;
 import dev.practice.blogproject.dtos.user.UserUpdateDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,8 +27,8 @@ import java.util.HashSet;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PrivateUserController.class)
-public class PrivateUserControllerTest {
+@WebMvcTest(UserPrivateController.class)
+public class UserPrivateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

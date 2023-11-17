@@ -1,7 +1,6 @@
 package dev.practice.blogproject.controllers._private;
 
 import dev.practice.blogproject.dtos.user.UserFullDto;
-import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.dtos.user.UserUpdateDto;
 import dev.practice.blogproject.services.UserService;
 import jakarta.validation.Valid;
@@ -15,7 +14,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/private")
-public class PrivateUserController {
+public class UserPrivateController {
     private final UserService userService;
 
     @GetMapping("/users")

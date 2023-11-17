@@ -1,10 +1,7 @@
 package dev.practice.blogproject.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.practice.blogproject.controllers._public.PublicUserController;
-import dev.practice.blogproject.dtos.article.ArticleShortDto;
-import dev.practice.blogproject.dtos.comment.CommentShortDto;
-import dev.practice.blogproject.dtos.message.MessageFullDto;
+import dev.practice.blogproject.controllers._public.UserPublicController;
 import dev.practice.blogproject.dtos.user.UserFullDto;
 import dev.practice.blogproject.dtos.user.UserNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
@@ -35,8 +32,8 @@ import java.util.HashSet;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest(PublicUserController.class)
-public class PublicUserControllerTest {
+@WebMvcTest(UserPublicController.class)
+public class UserPublicControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,8 +47,8 @@ public class PublicUserControllerTest {
     private final UserFullDto result = new UserFullDto(1L, "John", "Doe",
             "johnDoe", "johnDoe@test.test",
             LocalDate.of(2000, 12, 27), Role.USER,
-            "Hi! I'm John", false, new HashSet<MessageFullDto>(), new HashSet<MessageFullDto>(),
-            new HashSet<ArticleShortDto>(), new HashSet<CommentShortDto>());
+            "Hi! I'm John", false, new HashSet<>(), new HashSet<>(),
+            new HashSet<>(), new HashSet<>());
 
     @Test
     public void user_test_17_CreateUserTest() throws Exception {
