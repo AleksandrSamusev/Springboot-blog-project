@@ -13,8 +13,8 @@ import org.hibernate.validator.constraints.Length;
 @NoArgsConstructor
 public class MessageNewDto {
 
-    @NotBlank
-    @Length(max = 500)
+    @NotBlank(message = "Message cannot be blank")
+    @Length(max = 500, message = "Message length should be 500 chars max")
     private String message;
 
 }

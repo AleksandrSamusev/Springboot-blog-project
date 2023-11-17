@@ -13,8 +13,8 @@ import org.hibernate.validator.constraints.Length;
 @NoArgsConstructor
 public class TagNewDto {
 
-    @NotBlank
-    @Length(max = 50)
+    @NotBlank(message = "Tag name cannot be blank")
+    @Length(max = 50, message = "Name length should be 50 chars max")
     private String name;
 
 }

@@ -1,33 +1,31 @@
 package dev.practice.blogproject.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class ErrorResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime timestamp;
-    private List<String> message;
+    private int status;
+    private String path;
+    private List<String> errors = new ArrayList<>();
 
-    public ErrorResponse(List<String> message) {
+    public ErrorResponse(List<String> errors) {
         this.timestamp = LocalDateTime.now();
-        this.message = message;
+        this.errors = errors;
     }
 
-    public LocalDateTime getTimestamp() {
-        return this.timestamp;
+    public void addError(String message) {
+        this.errors.add(message);
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public List<String> getMessage() {
-        return this.message;
-    }
-
-    public void setMessage(List<String> message) {
-        this.message = message;
-    }
 }

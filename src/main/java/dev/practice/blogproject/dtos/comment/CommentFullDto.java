@@ -16,17 +16,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CommentFullDto {
 
+    @NotNull(message = "Comment ID cannot be null")
     private Long commentId;
 
-    @NotBlank
+    @NotBlank(message = "Comment cannot be blank")
     private String comment;
 
-    @NotNull
+    @NotNull(message = "Created parameter cannot be null")
     private LocalDateTime created;
 
-    @NotNull
+    @NotNull(message = "Article ID cannot be null")
     private Long articleId;
 
-    @NotNull
+    @NotNull(message = "Comment author cannot be null")
     private UserShortDto commentAuthor;
 }
