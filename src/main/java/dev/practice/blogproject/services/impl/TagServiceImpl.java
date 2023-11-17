@@ -91,7 +91,7 @@ public class TagServiceImpl implements TagService {
     }
 
     private void isArticleExists(Long articleId) {
-        if (articleRepository.existsById(articleId)) {
+        if(articleRepository.existsById(articleId)) {
             throw new ResourceNotFoundException("Article with given ID = " + articleId + " not found");
         }
     }
