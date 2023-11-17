@@ -48,7 +48,7 @@ public class ArticlePublicServiceImplUnitTest {
     @Test
     void article_test_1_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticles() {
         Mockito
-                .when(articleRepository.findArticlesByStatusOrderByPublishedDesc(ArticleStatus.PUBLISHED, PageRequest.of(0, 10)))
+                .when(articleRepository.findAllByStatusOrderByPublishedDesc(ArticleStatus.PUBLISHED, PageRequest.of(0, 10)))
                 .thenReturn(List.of(savedArticle2, savedArticle));
 
         List<ArticleShortDto> result = articleService.getAllArticles(0, 10);

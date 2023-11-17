@@ -1,5 +1,6 @@
 package dev.practice.blogproject.controllers._public;
 
+import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.services.ArticlePublicService;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,13 @@ public class ArticlePublicController {
     public ResponseEntity<List<ArticleShortDto>> getAllArticles(@RequestParam(defaultValue = "0") Integer from,
                                                                 @RequestParam(defaultValue = "10") Integer size) {
         return new ResponseEntity<>(articleService.getAllArticles(from, size), HttpStatus.OK);
+    }
+
+    @GetMapping("users/{userId}")
+    public ResponseEntity<List<ArticleShortDto>> getAllArticlesByUserId(
+            @PathVariable("userId") Long userId,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return new ResponseEntity<>(articleService.getAllArticlesByUserId(userId, from, size), HttpStatus.OK);
     }
 }
