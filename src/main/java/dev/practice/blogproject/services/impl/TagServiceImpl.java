@@ -31,7 +31,8 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagFullDto createTag(TagNewDto dto, Long articleId) {
         isArticleExists(articleId);
-        if(tagRepository.findTagByName(dto.getName())!=null) {
+        if (tagRepository.findTagByName(dto.getName()) != null) {
+            log.info("InvalidParameterException. Tag with given name = " + dto.getName() + " already exists");
             throw new InvalidParameterException("Tag with given name = " + dto.getName() + " already exists");
         }
         Article article = articleRepository.findById(articleId).get();
@@ -60,6 +61,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public List<TagFullDto> getAllArticleTags(Long articleId) {
         isArticleExists(articleId);
+        log.info("Return all tags for article with ID = " + articleId);
         return articleRepository.findById(articleId).get().getTags()
                 .stream().map(TagMapper::toTagFullDto).collect(Collectors.toList());
     }
@@ -67,6 +69,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagFullDto getTagById(Long tagId) {
         isTagExists(tagId);
+        log.info("Return tag with ID = " + tagId);
         return TagMapper.toTagFullDto(tagRepository.findById(tagId).get());
     }
 
@@ -74,6 +77,7 @@ public class TagServiceImpl implements TagService {
     private void isAdmin(Long userId) {
         if (userRepository.findById(userId).isPresent()) {
             if (!userRepository.findById(userId).get().getRole().name().equals("ADMIN")) {
+                log.info("ActionForbiddenException. Action forbidden for current user");
                 throw new ActionForbiddenException("Action forbidden for current user");
             }
         }
@@ -81,18 +85,21 @@ public class TagServiceImpl implements TagService {
 
     private void isUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {
+            log.info("ResourceNotFoundException. User with given ID = " + userId + " not found");
             throw new ResourceNotFoundException("User with given ID = " + userId + " not found");
         }
     }
 
     private void isTagExists(Long tagId) {
         if (!tagRepository.existsById(tagId)) {
+            log.info("ResourceNotFoundException. Tag with given ID = " + tagId + " not found");
             throw new ResourceNotFoundException("Tag with given ID = " + tagId + " not found");
         }
     }
 
     private void isArticleExists(Long articleId) {
-        if(!articleRepository.existsById(articleId)) {
+        if (!articleRepository.existsById(articleId)) {
+            log.info("ResourceNotFoundException. Article with given ID = " + articleId + " not found");
             throw new ResourceNotFoundException("Article with given ID = " + articleId + " not found");
         }
     }

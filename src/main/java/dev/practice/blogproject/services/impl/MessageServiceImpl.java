@@ -12,11 +12,13 @@ import dev.practice.blogproject.repositories.MessageRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.MessageService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
@@ -38,12 +40,16 @@ public class MessageServiceImpl implements MessageService {
         userRepository.save(currentUser);
         recipient.getReceivedMessages().add(savedMessage);
         userRepository.save(recipient);
+        log.info("Message with ID = " + savedMessage.getMessageId() +
+                " was sent by user with ID = " + currentUserId +
+                " to user with ID = " + recipientId);
         return MessageMapper.toMessageFullDto(savedMessage);
     }
 
     @Override
     public List<MessageFullDto> findAllSentMessages(Long currentUserId) {
         checkIfUserExists(currentUserId);
+        log.info("Returned all sent messages of user with ID = " + currentUserId);
         return userRepository.findById(currentUserId).get().getSentMessages().stream().map(
                 MessageMapper::toMessageFullDto).toList();
     }
@@ -51,6 +57,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<MessageFullDto> findAllReceivedMessages(Long currentUserId) {
         checkIfUserExists(currentUserId);
+        log.info("Returned all received messages of user with ID = " + currentUserId);
         return userRepository.findById(currentUserId).get().getReceivedMessages().stream().map(
                 MessageMapper::toMessageFullDto).toList();
     }
@@ -62,8 +69,10 @@ public class MessageServiceImpl implements MessageService {
         Message message = messageRepository.findById(messageId).get();
         if (message.getSender().getUserId().equals(currentUserId) ||
                 message.getRecipient().getUserId().equals(currentUserId)) {
+            log.info("Return message with ID = " + messageId + " to user with ID = " + currentUserId);
             return MessageMapper.toMessageFullDto(message);
         } else {
+            log.info("ActionForbiddenException. Action forbidden for current user");
             throw new ActionForbiddenException("Action forbidden for current user");
         }
     }
@@ -76,25 +85,30 @@ public class MessageServiceImpl implements MessageService {
         if (message.getRecipient().getUserId().equals(currentUserId)) {
             message.setIsDeleted(Boolean.TRUE);
             messageRepository.save(message);
+            log.info("Message with ID = " + messageId + " marked as deleted by user with ID = " + currentUserId);
         } else {
+            log.info("ActionForbiddenException. Action forbidden for current user");
             throw new ActionForbiddenException("Action forbidden for current user");
         }
     }
 
     private void checkIfMessageExists(Long id) {
         if (!messageRepository.existsById(id)) {
+            log.info("ResourceNotFoundException. Message with given ID = " + id + " not found");
             throw new ResourceNotFoundException("Message with given ID = " + id + " not found");
         }
     }
 
     private void checkIfUserExists(Long id) {
         if (!userRepository.existsById(id)) {
+            log.info("ResourceNotFoundException. User with given ID = " + id + " not found");
             throw new ResourceNotFoundException("User with given ID = " + id + " not found");
         }
     }
 
     private void checkIfActionAllowed(Long recipientId, Long currentUserId) {
         if (recipientId.equals(currentUserId)) {
+            log.info("ActionForbiddenException. Action forbidden for current user");
             throw new ActionForbiddenException("Action forbidden for current user");
         }
     }

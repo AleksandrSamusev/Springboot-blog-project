@@ -25,12 +25,13 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
     public ArticleShortDto getArticleById(Long articleId) {
         Article article = checkArticleExist(articleId);
         checkArticleIsPublished(article);
-
+        log.info("Return article with ID = " + articleId);
         return ArticleMapper.toArticleShortDto(article);
     }
 
     @Override
     public List<ArticleShortDto> getAllArticles() {
+        log.info("Return a list od all articles");
         return ArticleMapper.toListArticleShort(articleRepository.findArticlesByStatusOrderByPublishedDesc(
                 ArticleStatus.PUBLISHED));
     }

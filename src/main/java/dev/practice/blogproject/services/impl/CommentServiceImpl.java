@@ -59,8 +59,10 @@ public class CommentServiceImpl implements CommentService {
         User user = userRepository.findById(userId).get();
         if (userId.equals(comment.getCommentAuthor().getUserId())
                 || user.getRole().name().equals("ADMIN")) {
+            log.info("Comment with ID = " + commentId + " deleted");
             commentRepository.deleteById(commentId);
         } else {
+            log.info("ActionForbiddenException. Action forbidden for given user");
             throw new ActionForbiddenException("Action forbidden for given user");
         }
     }
@@ -68,38 +70,43 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentFullDto getCommentById(Long commentId) {
         isCommentExists(commentId);
+        log.info("Return comment with ID = " + commentId);
         return CommentMapper.toCommentFullDto(commentRepository.findById(commentId).get());
     }
 
     @Override
     public List<CommentFullDto> getAllCommentsToArticle(Long articleId) {
         isArticleExists(articleId);
+        log.info("Returned all comments to article with ID = " + articleId);
         return articleRepository.findById(articleId).get().getComments()
                 .stream().map(CommentMapper::toCommentFullDto).collect(Collectors.toList());
     }
 
     private void isUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {
+            log.info("ResourceNotFoundException. User with given Id = " + userId + " not found");
             throw new ResourceNotFoundException("User with given Id = " + userId + " not found");
         }
     }
 
     private void isArticleExists(Long articleId) {
         if (!articleRepository.existsById(articleId)) {
+            log.info("ResourceNotFoundException. Article with given Id = " + articleId + " not found");
             throw new ResourceNotFoundException("Article with given Id = " + articleId + " not found");
         }
     }
 
     private void isCommentExists(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
+            log.info("ResourceNotFoundException. Comment with given Id = " + commentId + " not found");
             throw new ResourceNotFoundException("Comment with given Id = " + commentId + " not found");
         }
     }
 
     private void isActionAllowed(Long userId, Comment comment) {
         if (!userId.equals(comment.getCommentAuthor().getUserId())) {
+            log.info("ActionForbiddenException. Action forbidden for given user");
             throw new ActionForbiddenException("Action forbidden for given user");
         }
     }
-
 }
