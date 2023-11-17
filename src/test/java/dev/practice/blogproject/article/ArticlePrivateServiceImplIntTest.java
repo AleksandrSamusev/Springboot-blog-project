@@ -435,6 +435,62 @@ public class ArticlePrivateServiceImplIntTest {
         assertThat(exception).isInstanceOf(InvalidParameterException.class);
     }
 
+    @Test
+    void article_test37_Given_articleWithComments_When_updateArticle_Then_commentsDeleted() {
+        dropDB();
+        User author = userRepository.save(user);
+        Article articleSaved = articleRepository.save(article);
+        Comment comment = commentRepository.save(new Comment(null, "comment", LocalDateTime.now(),
+                articleSaved, author));
+        ArticleUpdateDto update = new ArticleUpdateDto();
+        update.setContent("new content");
+        articleSaved.getComments().add(comment);
+        articleRepository.save(articleSaved);
+
+        ArticleFullDto result = articleService.updateArticle(author.getUserId(), articleSaved.getArticleId(), update);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getArticleId()).isEqualTo(articleSaved.getArticleId());
+        assertThat(result.getTitle()).isEqualTo(articleSaved.getTitle());
+        assertThat(result.getContent()).isEqualTo(update.getContent());
+        assertThat(result.getAuthor().getUserId()).isEqualTo(articleSaved.getAuthor().getUserId());
+        assertThat(result.getAuthor().getUsername()).isEqualTo(articleSaved.getAuthor().getUsername());
+        assertThat(result.getStatus()).isEqualTo(ArticleStatus.CREATED);
+        assertThat(result.getCreated()).isEqualTo(articleSaved.getCreated());
+        assertThat(result.getPublished()).isNull();
+        assertThat(result.getLikes()).isEqualTo(0);
+        assertThat(result.getComments().size()).isEqualTo(0);
+        assertThat(result.getTags().size()).isEqualTo(0);
+        assertThat(commentRepository.findAll().size()).isEqualTo(0);
+    }
+
+    @Test
+    void article_test38_Given_articleWithComments_When_updateArticle_Then_commentsInOtherArticlesNotDeleted() {
+        dropDB();
+        User author = userRepository.save(user);
+        Article articleSaved = articleRepository.save(article);
+        article2.setStatus(ArticleStatus.PUBLISHED);
+        article2.setPublished(LocalDateTime.now());
+        Article articleSaved2 = articleRepository.save(article2);
+        Comment comment = commentRepository.save(new Comment(null, "comment", LocalDateTime.now(),
+                articleSaved, author));
+        Comment comment2 = commentRepository.save(new Comment(null, "comment", LocalDateTime.now(),
+                articleSaved2, author));
+        ArticleUpdateDto update = new ArticleUpdateDto();
+        update.setContent("new content");
+        articleSaved.getComments().add(comment);
+        articleRepository.save(articleSaved);
+        articleSaved2.getComments().add(comment2);
+        articleRepository.save(articleSaved2);
+
+        ArticleFullDto result = articleService.updateArticle(author.getUserId(), articleSaved.getArticleId(), update);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getArticleId()).isEqualTo(articleSaved.getArticleId());
+        assertThat(result.getComments().size()).isEqualTo(0);
+        assertThat(commentRepository.findAll().size()).isEqualTo(1);
+    }
+
     private void dropDB() {
         commentRepository.deleteAll();
         tagRepository.deleteAll();

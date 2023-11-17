@@ -10,6 +10,7 @@ import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.ArticleMapper;
 import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.ArticleRepository;
+import dev.practice.blogproject.repositories.CommentRepository;
 import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.ArticlePrivateService;
@@ -33,6 +34,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final TagService tagService;
+    private final CommentRepository commentRepository;
 
     @Override
     public ArticleFullDto createArticle(long userId, ArticleNewDto newArticle) {
@@ -69,6 +71,9 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         checkUserIsAuthor(article, userId);
         if (updateArticle.getTitle() != null && !updateArticle.getTitle().trim().isBlank()) {
             checkTitleNotExist(updateArticle.getTitle(), articleId);
+        }
+        if (!article.getComments().isEmpty()) {
+            commentRepository.deleteAll(article.getComments());
         }
 
         log.info("Article with id {} was updated", articleId);
