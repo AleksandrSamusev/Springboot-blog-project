@@ -1,29 +1,29 @@
 package dev.practice.blogproject.message;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.practice.blogproject.controllers._private.PrivateMessageController;
 import dev.practice.blogproject.dtos.message.MessageFullDto;
 import dev.practice.blogproject.dtos.message.MessageNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
-import dev.practice.blogproject.services.impl.MessageServiceImpl;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
+import dev.practice.blogproject.services.impl.MessageServiceImpl;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PrivateMessageController.class)
@@ -230,7 +230,7 @@ public class PrivateMessageControllerTest {
     }
 
     @Test
-    public void message_test22_deleteMessageTest() throws Exception{
+    public void message_test22_deleteMessageTest() throws Exception {
         doNothing().when(messageService).deleteMessage(anyLong(), anyLong());
 
         mockMvc.perform(delete("/api/v1/private/messages/1")
@@ -239,7 +239,7 @@ public class PrivateMessageControllerTest {
     }
 
     @Test
-    public void message_test23_deleteMessageTestThrowsActionForbiddenException() throws Exception{
+    public void message_test23_deleteMessageTestThrowsActionForbiddenException() throws Exception {
         doThrow(ActionForbiddenException.class).when(messageService).deleteMessage(anyLong(), anyLong());
 
         mockMvc.perform(delete("/api/v1/private/messages/1")
@@ -248,7 +248,7 @@ public class PrivateMessageControllerTest {
     }
 
     @Test
-    public void message_test23_deleteMessageTestThrowsResourceNotFoundException() throws Exception{
+    public void message_test23_deleteMessageTestThrowsResourceNotFoundException() throws Exception {
         doThrow(ResourceNotFoundException.class).when(messageService).deleteMessage(anyLong(), anyLong());
 
         mockMvc.perform(delete("/api/v1/private/messages/1")

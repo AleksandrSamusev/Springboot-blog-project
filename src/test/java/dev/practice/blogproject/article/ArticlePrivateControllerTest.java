@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -203,6 +204,49 @@ public class ArticlePrivateControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void article_test_35_Given_userIdDefaultParameters_When_getAllArticlesByUserId_Then_returnArticlesStatusOK()
+            throws Exception {
+        Mockito
+                .when(articleService.getAllArticlesByUserId(
+                        Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
+                .thenReturn(List.of(articleFull));
+
+        mvc.perform(get("/api/v1/private/articles")
+                        .header("X-Current-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].articleId").value(1));
+
+        Mockito.verify(articleService, Mockito.times(1))
+                .getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString());
+    }
+
+    @Test
+    void article_test_36_Given_userIdStatusCreated_When_getAllArticlesByUserId_Then_returnArticlesStatusOK()
+            throws Exception {
+        Mockito
+                .when(articleService.getAllArticlesByUserId(
+                        Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
+                .thenReturn(List.of(articleFull));
+
+        mvc.perform(get("/api/v1/private/articles")
+                        .header("X-Current-User-Id", 1)
+                        .param("status", "CREATED")
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(10))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].articleId").value(1));
+
+        Mockito.verify(articleService, Mockito.times(1))
+                .getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString());
     }
 
 

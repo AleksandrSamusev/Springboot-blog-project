@@ -56,7 +56,7 @@ public class ArticlePrivateServiceImplIntTest {
     private final ArticleNewDto newArticle2 = new ArticleNewDto("Pot", "Interesting information",
             new HashSet<>());
     private final Article article = new Article(null, "The empty pot",
-            "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now(),
+            "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(5),
             ArticleStatus.PUBLISHED, 1450L, new HashSet<>(), new HashSet<>());
     private final Article article2 = new Article(null, "A pretty cat",
             "Very interesting information", user, LocalDateTime.now(), null, ArticleStatus.CREATED,
@@ -281,7 +281,159 @@ public class ArticlePrivateServiceImplIntTest {
         assertThat(commentRepository.findAll().size()).isEqualTo(0);
     }
 
+    @Test
+    void article_test_28_Given_userIdDefaultSize_When_getAllArticlesByUserId_Then_return10newestArticlesOfUser() {
+        dropDB();
+        User author = userRepository.save(user);
+        for (int i = 0; i < 20; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
 
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10,
+                "ALL");
+
+        assertThat(articleRepository.findAll().size()).isEqualTo(20);
+        assertThat(result.size()).isEqualTo(10);
+        assertThat(result.get(0).getAuthor().getUserId()).isEqualTo(author.getUserId());
+    }
+
+    @Test
+    void article_test_29_Given_userIdSize5from10_When_getAllArticlesByUserId_Then_return5ArticlesOfUser() {
+        dropDB();
+        User author = userRepository.save(user);
+        for (int i = 0; i < 20; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 10, 5,
+                "ALL");
+
+        assertThat(articleRepository.findAll().size()).isEqualTo(20);
+        assertThat(result.size()).isEqualTo(5);
+        assertThat(result.get(0).getAuthor().getUserId()).isEqualTo(author.getUserId());
+        assertThat(result.get(0).getTitle()).isEqualTo("10");
+        assertThat(result.get(4).getTitle()).isEqualTo("14");
+    }
+
+    @Test
+    void article_test_30_Given_userIdStatusPublished_When_getAllArticlesByUserId_Then_return10PublishedArticlesOfUser() {
+        dropDB();
+        User author = userRepository.save(user);
+        for (int i = 0; i < 20; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+        for (int i = 0; i < 5; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), LocalDateTime.now(), ArticleStatus.PUBLISHED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10,
+                "PUBLISHED");
+
+        assertThat(articleRepository.findAll().size()).isEqualTo(25);
+        assertThat(result.size()).isEqualTo(5);
+        assertThat(result.get(0).getAuthor().getUserId()).isEqualTo(author.getUserId());
+        assertThat(result.get(0).getStatus()).isEqualTo(ArticleStatus.PUBLISHED);
+    }
+
+    @Test
+    void article_test_31_Given_userIdStatusRejected_When_getAllArticlesByUserId_Then_return10RejectedArticlesOfUser() {
+        dropDB();
+        User author = userRepository.save(user);
+        for (int i = 0; i < 20; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+        for (int i = 0; i < 5; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), LocalDateTime.now(), ArticleStatus.PUBLISHED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+        articleRepository.save(new Article(null, "r", "some information", author,
+                LocalDateTime.now(), null, ArticleStatus.REJECTED, 0L, new HashSet<>(),
+                new HashSet<>()));
+
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10,
+                "REJECTED");
+
+        assertThat(articleRepository.findAll().size()).isEqualTo(26);
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getAuthor().getUserId()).isEqualTo(author.getUserId());
+        assertThat(result.get(0).getStatus()).isEqualTo(ArticleStatus.REJECTED);
+    }
+
+    @Test
+    void article_test_32_Given_userIdStatusModerating_When_getAllArticlesByUserId_Then_return10ModeratingArticlesOfUser() {
+        dropDB();
+        User author = userRepository.save(user);
+        for (int i = 0; i < 20; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+        for (int i = 0; i < 5; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), LocalDateTime.now(), ArticleStatus.PUBLISHED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+        articleRepository.save(new Article(null, "r", "some information", author,
+                LocalDateTime.now(), null, ArticleStatus.MODERATING, 0L, new HashSet<>(),
+                new HashSet<>()));
+
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10,
+                "MODERATING");
+
+        assertThat(articleRepository.findAll().size()).isEqualTo(26);
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getAuthor().getUserId()).isEqualTo(author.getUserId());
+        assertThat(result.get(0).getStatus()).isEqualTo(ArticleStatus.MODERATING);
+    }
+
+    @Test
+    void article_test_33_Given_userIdStatusCreated_When_getAllArticlesByUserId_Then_return10CreatedArticlesOfUser() {
+        dropDB();
+        User author = userRepository.save(user);
+        for (int i = 0; i < 20; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+        for (int i = 0; i < 5; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), LocalDateTime.now(), ArticleStatus.PUBLISHED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+        articleRepository.save(new Article(null, "r", "some information", author,
+                LocalDateTime.now(), null, ArticleStatus.MODERATING, 0L, new HashSet<>(),
+                new HashSet<>()));
+
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10,
+                "CREATED");
+
+        assertThat(articleRepository.findAll().size()).isEqualTo(26);
+        assertThat(result.size()).isEqualTo(10);
+        assertThat(result.get(0).getAuthor().getUserId()).isEqualTo(author.getUserId());
+        assertThat(result.get(0).getStatus()).isEqualTo(ArticleStatus.CREATED);
+    }
+
+    @Test
+    void article_test_34_Given_userIdUnsupportedStatus_When_getAllArticlesByUserId_Then_throwException() {
+        dropDB();
+        User author = userRepository.save(user);
+
+        final InvalidParameterException exception = Assertions.assertThrows(InvalidParameterException.class,
+                () -> articleService.getAllArticlesByUserId(author.getUserId(), 0, 10, "UNSUPPORTED"));
+        assertEquals("Unknown status: UNSUPPORTED", exception.getMessage(), "Incorrect message");
+        assertThat(exception).isInstanceOf(InvalidParameterException.class);
+    }
 
     private void dropDB() {
         commentRepository.deleteAll();

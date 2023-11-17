@@ -329,7 +329,7 @@ public class CommentServiceTest {
     public void comments_test25_Given_ArticleNotExists_When_getAllCommentsToArticle_Then_ResourceNotFound() {
         when(articleRepositoryMock.existsById(anyLong())).thenReturn(Boolean.FALSE);
 
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 commentService.getAllCommentsToArticle(article.getArticleId()));
         assertEquals("Article with given Id = 1 not found", ex.getMessage());
     }
@@ -337,7 +337,7 @@ public class CommentServiceTest {
     @Test
     public void comments_test25_Given_ArticleIdIsNull_When_getAllCommentsToArticle_Then_InvalidParameter() {
 
-        InvalidParameterException ex = assertThrows(InvalidParameterException.class, ()->
+        InvalidParameterException ex = assertThrows(InvalidParameterException.class, () ->
                 commentService.getAllCommentsToArticle(null));
         assertEquals("ID parameter cannot be null", ex.getMessage());
     }

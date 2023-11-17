@@ -1,13 +1,11 @@
 package dev.practice.blogproject.user;
 
-import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
 import dev.practice.blogproject.dtos.message.MessageFullDto;
 import dev.practice.blogproject.dtos.message.MessageNewDto;
 import dev.practice.blogproject.dtos.user.UserFullDto;
 import dev.practice.blogproject.dtos.user.UserNewDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
-import dev.practice.blogproject.models.Message;
 import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.ArticlePrivateService;
@@ -20,24 +18,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.stream.Collectors;
 
 @Transactional
 @SpringBootTest(
@@ -166,11 +156,11 @@ public class UserIntegrationTest {
         MessageFullDto createdMessage2 = messageService.createMessage(createdUser1.getUserId(),
                 createdUser2.getUserId(), message2);
 
-        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, ()->
+        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
                 messageService.deleteMessage(createdMessage1.getMessageId(), createdUser1.getUserId()));
         assertEquals("Action forbidden for current user", ex.getMessage());
 
-        ActionForbiddenException ex2 = assertThrows(ActionForbiddenException.class, ()->
+        ActionForbiddenException ex2 = assertThrows(ActionForbiddenException.class, () ->
                 messageService.deleteMessage(createdMessage2.getMessageId(), createdUser2.getUserId()));
         assertEquals("Action forbidden for current user", ex2.getMessage());
     }

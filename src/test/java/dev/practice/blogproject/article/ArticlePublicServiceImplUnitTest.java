@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,7 +48,7 @@ public class ArticlePublicServiceImplUnitTest {
     @Test
     void article_test_1_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticles() {
         Mockito
-                .when(articleRepository.findArticlesByStatusOrderByPublishedDesc(ArticleStatus.PUBLISHED))
+                .when(articleRepository.findArticlesByStatusOrderByPublishedDesc(ArticleStatus.PUBLISHED, PageRequest.of(0, 10)))
                 .thenReturn(List.of(savedArticle2, savedArticle));
 
         List<ArticleShortDto> result = articleService.getAllArticles();

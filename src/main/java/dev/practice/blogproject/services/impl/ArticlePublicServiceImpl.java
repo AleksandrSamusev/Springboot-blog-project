@@ -10,6 +10,7 @@ import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.services.ArticlePublicService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,8 +32,9 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
 
     @Override
     public List<ArticleShortDto> getAllArticles() {
+        PageRequest pageable = PageRequest.of(0,0);
         return ArticleMapper.toListArticleShort(articleRepository.findArticlesByStatusOrderByPublishedDesc(
-                ArticleStatus.PUBLISHED));
+                ArticleStatus.PUBLISHED, pageable));
     }
 
     private Article checkArticleExist(Long articleId) {

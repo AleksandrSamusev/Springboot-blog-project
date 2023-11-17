@@ -1,7 +1,6 @@
 package dev.practice.blogproject.controllers._private;
 
 import dev.practice.blogproject.dtos.user.UserFullDto;
-import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.dtos.user.UserUpdateDto;
 import dev.practice.blogproject.services.UserService;
 import jakarta.validation.Valid;
@@ -26,7 +25,7 @@ public class PrivateUserController {
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserFullDto> getUserById(@PathVariable Long userId,
-                                         @RequestHeader("X-Current-User-Id") Long currentUserId) {
+                                                   @RequestHeader("X-Current-User-Id") Long currentUserId) {
         return new ResponseEntity<>(userService.getUserById(userId, currentUserId), HttpStatus.OK);
     }
 
@@ -38,8 +37,8 @@ public class PrivateUserController {
     }
 
     @DeleteMapping("/users/{userId}")
-        public ResponseEntity<HttpStatus> deleteUser (@PathVariable Long userId,
-                                                      @RequestHeader("X-Current-User-Id") Long currentUserId) {
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable Long userId,
+                                                 @RequestHeader("X-Current-User-Id") Long currentUserId) {
         userService.deleteUser(userId, currentUserId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

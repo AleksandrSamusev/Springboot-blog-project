@@ -7,7 +7,6 @@ import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.models.User;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserMapper {
