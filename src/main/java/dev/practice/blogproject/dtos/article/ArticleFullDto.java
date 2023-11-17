@@ -22,23 +22,23 @@ import java.util.Set;
 @NoArgsConstructor
 public class ArticleFullDto {
 
-    @NotNull
+    @NotNull(message = "Article ID cannot be null")
     private Long articleId;
 
-    @NotBlank
+    @NotBlank(message = "Title cannot be blank")
     private String title;
 
-    @NotBlank
+    @NotBlank(message = "Content cannot be blank")
     private String content;
 
-    @NotNull
+    @NotNull(message = "Author cannot be null")
     private UserShortDto author;
 
-    @NotNull
+    @NotNull(message = "Created parameter cannot be null")
     private LocalDateTime created;
     private LocalDateTime published;
 
-    @NotNull
+    @NotNull(message = "Status cannot be null")
     @Enumerated(EnumType.STRING)
     private ArticleStatus status;
     private Long likes;

@@ -19,16 +19,16 @@ import java.util.Set;
 @AllArgsConstructor
 public class ArticleShortDto {
 
-    @NotNull
+    @NotNull(message = "Article ID cannot be null")
     private Long articleId;
 
-    @NotBlank
+    @NotBlank(message = "Title cannot be blank")
     private String title;
 
-    @NotBlank
+    @NotBlank(message = "Content cannot be blank")
     private String content;
 
-    @NotNull
+    @NotNull(message = "Author cannot be null")
     private UserShortDto author;
     private LocalDateTime published;
     private Long likes;

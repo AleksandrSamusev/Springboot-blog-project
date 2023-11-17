@@ -12,10 +12,10 @@ import org.hibernate.validator.constraints.Length;
 @NoArgsConstructor
 public class ArticleUpdateDto {
 
-    @Length(max = 250)
+    @Length(max = 250, message = "Title length should be 250 chars max")
     private String title;
 
-    @Length(max = 30000)
+    @Length(max = 30000, message = "Content length should be 30000 chars max")
     private String content;
 
 }

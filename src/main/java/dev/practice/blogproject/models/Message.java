@@ -21,21 +21,21 @@ public class Message {
     @Column(name = "message_id")
     private Long messageId;
 
-    @Column(name = "message")
+    @Column(name = "message", nullable = false)
     private String message;
 
     @ManyToOne
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "recipient_id")
+    @JoinColumn(name = "recipient_id", nullable = false)
     private User recipient;
 
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
 }
