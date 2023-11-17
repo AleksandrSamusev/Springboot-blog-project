@@ -2,17 +2,17 @@ package dev.practice.blogproject.message;
 
 import dev.practice.blogproject.dtos.message.MessageFullDto;
 import dev.practice.blogproject.dtos.message.MessageNewDto;
+import dev.practice.blogproject.exceptions.ActionForbiddenException;
+import dev.practice.blogproject.exceptions.ResourceNotFoundException;
+import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.MessageRepository;
+import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.impl.MessageServiceImpl;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import dev.practice.blogproject.exceptions.ActionForbiddenException;
-import dev.practice.blogproject.exceptions.ResourceNotFoundException;
-import dev.practice.blogproject.models.*;
-import dev.practice.blogproject.repositories.UserRepository;
-import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

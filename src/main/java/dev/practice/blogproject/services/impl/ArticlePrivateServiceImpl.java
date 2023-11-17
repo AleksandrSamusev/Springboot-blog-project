@@ -10,15 +10,19 @@ import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.ArticleMapper;
 import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.ArticleRepository;
+import dev.practice.blogproject.repositories.CommentRepository;
 import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.ArticlePrivateService;
 import dev.practice.blogproject.services.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,6 +34,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final TagService tagService;
+    private final CommentRepository commentRepository;
 
     @Override
     public ArticleFullDto createArticle(long userId, ArticleNewDto newArticle) {
@@ -67,6 +72,9 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         if (updateArticle.getTitle() != null && !updateArticle.getTitle().trim().isBlank()) {
             checkTitleNotExist(updateArticle.getTitle(), articleId);
         }
+        if (!article.getComments().isEmpty()) {
+            commentRepository.deleteAll(article.getComments());
+        }
 
         log.info("Article with id {} was updated", articleId);
         return ArticleMapper.toArticleFullDto(articleRepository.save(
@@ -89,6 +97,43 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         return Optional.of(ArticleMapper.toArticleFullDto(article)); // for author and admin
     }
 
+    @Override
+    public List<ArticleFullDto> getAllArticlesByUserId(Long userId, Integer from, Integer size, String status) {
+        checkUserExist(userId);
+        PageRequest pageable = PageRequest.of(from / size, size);
+
+        return switch (status) {
+            case "PUBLISHED" -> {
+                pageable.withSort(Sort.by("published").descending());
+                yield ArticleMapper.toListArticleFull(
+                        articleRepository.findAllByAuthorUserIdAndStatus(userId, ArticleStatus.PUBLISHED, pageable));
+            }
+            case "MODERATING" -> {
+                pageable.withSort(Sort.by("created").descending());
+                yield ArticleMapper.toListArticleFull(
+                        articleRepository.findAllByAuthorUserIdAndStatus(userId, ArticleStatus.MODERATING, pageable));
+            }
+            case "REJECTED" -> {
+                pageable.withSort(Sort.by("created").descending());
+                yield ArticleMapper.toListArticleFull(
+                        articleRepository.findAllByAuthorUserIdAndStatus(userId, ArticleStatus.REJECTED, pageable));
+            }
+            case "CREATED" -> {
+                pageable.withSort(Sort.by("created").descending());
+                yield ArticleMapper.toListArticleFull(
+                        articleRepository.findAllByAuthorUserIdAndStatus(userId, ArticleStatus.CREATED, pageable));
+            }
+            case "ALL" -> {
+                pageable.withSort(Sort.by("created").descending());
+                yield ArticleMapper.toListArticleFull(
+                        articleRepository.findAllByAuthorUserId(userId, pageable));
+            }
+            default -> {
+                log.info("Incorrect status: {}", status);
+                throw new InvalidParameterException(String.format("Unknown status: %s", status));
+            }
+        };
+    }
 
     @Override
     public void deleteArticle(long userId, long articleId) {
@@ -108,6 +153,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         articleRepository.delete(article);
         log.info("Article with id {} was deleted", articleId);
     }
+
 
     private User checkUserExist(Long userId) {
         Optional<User> user = userRepository.findById(userId);

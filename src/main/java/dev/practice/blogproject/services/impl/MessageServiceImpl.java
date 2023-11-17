@@ -3,7 +3,6 @@ package dev.practice.blogproject.services.impl;
 import dev.practice.blogproject.dtos.message.MessageFullDto;
 import dev.practice.blogproject.dtos.message.MessageNewDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
-import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.MessageMapper;
 import dev.practice.blogproject.models.Message;

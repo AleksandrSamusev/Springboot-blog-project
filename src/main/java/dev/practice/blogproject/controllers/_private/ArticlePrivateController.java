@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/private/articles")
@@ -31,8 +33,17 @@ public class ArticlePrivateController {
 
     @GetMapping("/{articleId}")
     public ResponseEntity<Object> getArticleById(@RequestHeader("X-Current-User-Id") Long userId,
-                                            @PathVariable("articleId") Long articleId) {
+                                                 @PathVariable("articleId") Long articleId) {
         return new ResponseEntity<>(articleService.getArticleById(userId, articleId).get(), HttpStatus.OK);
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<ArticleFullDto>> getAllArticlesByUserId(
+            @RequestHeader("X-Current-User-Id") Long userId,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "ALL", required = false) String status) {
+        return new ResponseEntity<>(articleService.getAllArticlesByUserId(userId, from, size, status), HttpStatus.OK);
     }
 
     @DeleteMapping("/{articleId}")
