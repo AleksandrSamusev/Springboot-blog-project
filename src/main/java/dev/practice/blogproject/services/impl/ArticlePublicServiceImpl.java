@@ -31,8 +31,8 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
     }
 
     @Override
-    public List<ArticleShortDto> getAllArticles() {
-        PageRequest pageable = PageRequest.of(0,0);
+    public List<ArticleShortDto> getAllArticles(Integer from, Integer size) {
+        PageRequest pageable = PageRequest.of(from / size, size);
         return ArticleMapper.toListArticleShort(articleRepository.findArticlesByStatusOrderByPublishedDesc(
                 ArticleStatus.PUBLISHED, pageable));
     }

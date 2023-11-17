@@ -60,7 +60,7 @@ public class ArticlePublicServiceImplIntTest {
         Article older = articleRepository.save(article2);
         Article created = articleRepository.save(article3);
 
-        List<ArticleShortDto> result = articleService.getAllArticles();
+        List<ArticleShortDto> result = articleService.getAllArticles(0, 10);
 
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0)).isInstanceOf(ArticleShortDto.class);

@@ -51,7 +51,7 @@ public class ArticlePublicServiceImplUnitTest {
                 .when(articleRepository.findArticlesByStatusOrderByPublishedDesc(ArticleStatus.PUBLISHED, PageRequest.of(0, 10)))
                 .thenReturn(List.of(savedArticle2, savedArticle));
 
-        List<ArticleShortDto> result = articleService.getAllArticles();
+        List<ArticleShortDto> result = articleService.getAllArticles(0, 10);
 
         assertThat(result.size()).isEqualTo(2);
     }
