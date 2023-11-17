@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,11 +39,12 @@ public class PrivateMessageControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
+    private final UserShortDto user1 = new UserShortDto(1L, "username1");
+    private final UserShortDto user2 = new UserShortDto(2L, "username2");
+
     @Test
     public void message_test10_createMessageTest() throws Exception {
 
-        UserShortDto user1 = new UserShortDto(1L, "username1");
-        UserShortDto user2 = new UserShortDto(2L, "username2");
         MessageFullDto dto = new MessageFullDto(
                 1L, "new message", user2, user1, LocalDateTime.now(), false);
         MessageNewDto newDto = new MessageNewDto("new message");
@@ -111,8 +113,7 @@ public class PrivateMessageControllerTest {
 
     @Test
     public void message_test14_GetAllSentMessagesTest() throws Exception {
-        UserShortDto user1 = new UserShortDto(1L, "username1");
-        UserShortDto user2 = new UserShortDto(2L, "username2");
+
         MessageFullDto dto = new MessageFullDto(
                 1L, "new message", user2, user1, LocalDateTime.now(), false);
         when(messageService.findAllSentMessages(anyLong())).thenReturn(List.of(dto));
@@ -143,8 +144,7 @@ public class PrivateMessageControllerTest {
 
     @Test
     public void message_test16_GetAllReceivedMessagesTest() throws Exception {
-        UserShortDto user1 = new UserShortDto(1L, "username1");
-        UserShortDto user2 = new UserShortDto(2L, "username2");
+
         MessageFullDto dto = new MessageFullDto(
                 1L, "new message", user2, user1, LocalDateTime.now(), false);
         when(messageService.findAllReceivedMessages(anyLong())).thenReturn(List.of(dto));
@@ -175,8 +175,7 @@ public class PrivateMessageControllerTest {
 
     @Test
     public void message_test18_GetMessageByIdTest() throws Exception {
-        UserShortDto user1 = new UserShortDto(1L, "username1");
-        UserShortDto user2 = new UserShortDto(2L, "username2");
+
         MessageFullDto dto = new MessageFullDto(
                 1L, "new message", user2, user1, LocalDateTime.now(), false);
         when(messageService.findMessageById(1L, 2L)).thenReturn(dto);
@@ -248,11 +247,57 @@ public class PrivateMessageControllerTest {
     }
 
     @Test
-    public void message_test23_deleteMessageTestThrowsResourceNotFoundException() throws Exception{
+    public void message_test24_deleteMessageTestThrowsResourceNotFoundException() throws Exception{
         doThrow(ResourceNotFoundException.class).when(messageService).deleteMessage(anyLong(), anyLong());
 
         mockMvc.perform(delete("/api/v1/private/messages/1")
                         .header("X-Current-User-Id", 1))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void message_test25_Given_MessageIsNull_When_createMessageTest_Then_BadRequest() throws Exception {
+
+        MessageFullDto dto = new MessageFullDto(
+                1L, "new message", user2, user1, LocalDateTime.now(), false);
+
+        MessageNewDto newDto = new MessageNewDto(null);
+
+        when(messageService.createMessage(anyLong(), anyLong(), any())).thenReturn(dto);
+
+        mockMvc.perform(post("/api/v1/private/messages/users/1")
+                        .header("X-Current-User-Id", 2)
+                        .content(mapper.writeValueAsString(newDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Message cannot be blank")));
+    }
+
+    @Test
+    public void message_test26_Given_MessageLength540Chars_When_createMessageTest_Then_BadRequest() throws Exception {
+
+        MessageFullDto dto = new MessageFullDto(
+                1L, "new message", user2, user1, LocalDateTime.now(), false);
+
+        MessageNewDto newDto = new MessageNewDto(
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
+
+        when(messageService.createMessage(anyLong(), anyLong(), any())).thenReturn(dto);
+
+        mockMvc.perform(post("/api/v1/private/messages/users/1")
+                        .header("X-Current-User-Id", 2)
+                        .content(mapper.writeValueAsString(newDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Message length should be 500 chars max")));
     }
 }

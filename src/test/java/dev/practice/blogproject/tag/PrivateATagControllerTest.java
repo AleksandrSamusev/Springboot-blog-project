@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -55,7 +56,37 @@ public class PrivateATagControllerTest {
                 .andExpect(jsonPath("$.articles.size()").value(1));
     }
 
+    @Test
+    public void tag_test20_Given_TagNameIsNull_When_CreateTagTest_Then_BadRequest() throws Exception {
 
+        TagNewDto newTag = new TagNewDto(null);
 
+        when(tagService.createTag(any(), anyLong())).thenReturn(fullDto);
 
+        mockMvc.perform(post("/api/v1/private/tags/articles/1")
+                        .header("X-Current-User-Id", 1)
+                        .content(mapper.writeValueAsString(newTag))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Tag name cannot be blank")));
+    }
+
+    @Test
+    public void tag_test21_Given_TagNameLengthIs60Chars_When_CreateTagTest_Then_BadRequest() throws Exception {
+
+        TagNewDto newTag = new TagNewDto("012345678901234567890123456789012345678901234567890123456789");
+
+        when(tagService.createTag(any(), anyLong())).thenReturn(fullDto);
+
+        mockMvc.perform(post("/api/v1/private/tags/articles/1")
+                        .header("X-Current-User-Id", 1)
+                        .content(mapper.writeValueAsString(newTag))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Name length should be 50 chars max")));
+    }
 }
