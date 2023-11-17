@@ -16,7 +16,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 @ControllerAdvice
@@ -70,7 +69,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(LocalDateTime.now());
         errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        errorResponse.setPath(((ServletWebRequest)request).getRequest().getServletPath());
+        errorResponse.setPath(((ServletWebRequest) request).getRequest().getServletPath());
 
         List<FieldError> errors = ex.getBindingResult().getFieldErrors();
         errors.forEach((err) -> {

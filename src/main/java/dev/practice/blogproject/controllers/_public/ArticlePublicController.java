@@ -1,6 +1,5 @@
 package dev.practice.blogproject.controllers._public;
 
-import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.services.ArticlePublicService;
 import lombok.RequiredArgsConstructor;
