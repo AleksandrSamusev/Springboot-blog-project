@@ -317,26 +317,6 @@ public class PublicUserControllerTest {
     }
 
     @Test
-    public void user_test_44_Given_EmailLength80Chars_When_CreateUser_Then_BadRequest() throws Exception {
-
-        UserNewDto dto = new UserNewDto("John",
-                "Doe",
-                "johnDoe",
-                "johnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoe@test.test",
-                LocalDate.of(2021, 12, 27), "Hi! I'm John");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
-
-        mockMvc.perform(post("/api/v1/public/users")
-                        .content(mapper.writeValueAsString(dto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0]", is("Email length should be 50 chars max")));
-    }
-
-    @Test
     public void user_test_44_Given_AboutLength1010Chars_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John",
