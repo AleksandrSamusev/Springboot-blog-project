@@ -85,4 +85,23 @@ public class ArticlePublicControllerTest {
 
         Mockito.verify(articleService, Mockito.times(1)).getArticleById(1L);
     }
+
+    @Test
+    void article_test_11_Given_anyUserAuthorExist_When_getAllArticlesByUserId_Then_returnPublishedArticlesStatusOk()
+            throws Exception {
+        Mockito
+                .when(articleService.getAllArticlesByUserId(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(articleShort));
+
+        mvc.perform(get("/api/v1/public/articles/users/{userId}", 0L)
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(10))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Mockito.verify(articleService, Mockito.times(1)).getAllArticlesByUserId(
+                Mockito.any(), Mockito.any(), Mockito.any());
+    }
 }

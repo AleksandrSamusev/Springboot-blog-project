@@ -104,6 +104,32 @@ public class ArticlePublicServiceImplIntTest {
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
 
+    @Test
+    void article_test_10_Given_anyUserAuthorExist_When_getAllArticlesByUserId_Then_returnArticles() {
+        dropDB();
+        User author = userRepository.save(user);
+        for (int i = 0; i < 20; i++) {
+            articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+        for (int i = 0; i < 5; i++) {
+            articleRepository.save(new Article(null, String.valueOf(20 + i), "some information", author,
+                    LocalDateTime.now(), LocalDateTime.now(), ArticleStatus.PUBLISHED, 0L, new HashSet<>(),
+                    new HashSet<>()));
+        }
+        articleRepository.save(new Article(null, "r", "some information", author,
+                LocalDateTime.now(), null, ArticleStatus.MODERATING, 0L, new HashSet<>(),
+                new HashSet<>()));
+
+        List<ArticleShortDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10);
+
+        assertThat(articleRepository.findAll().size()).isEqualTo(26);
+        assertThat(result.size()).isEqualTo(5);
+        assertThat(result.get(0)).isInstanceOf(ArticleShortDto.class);
+        assertThat(result.get(0).getTitle()).isEqualTo("24");
+    }
+
     private void dropDB() {
         articleRepository.deleteAll();
         userRepository.deleteAll();

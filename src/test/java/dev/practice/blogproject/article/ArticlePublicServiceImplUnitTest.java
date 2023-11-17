@@ -6,6 +6,7 @@ import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.models.Role;
 import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.ArticleRepository;
+import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.impl.ArticlePublicServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class ArticlePublicServiceImplUnitTest {
     @Mock
     private ArticleRepository articleRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private ArticlePublicServiceImpl articleService;
@@ -66,4 +70,21 @@ public class ArticlePublicServiceImplUnitTest {
 
         assertThat(result.getArticleId()).isEqualTo(0);
     }
+
+    @Test
+    void article_test_9_Given_anyUserAuthorExist_When_getAllArticlesByUserId_Then_returnArticles() {
+        Mockito
+                .when(userRepository.findById(0L))
+                .thenReturn(Optional.of(author));
+
+        Mockito
+                .when(articleRepository.findAllByAuthorUserIdAndStatus(Mockito.anyLong(), Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(savedArticle2));
+
+        List<ArticleShortDto> result = articleService.getAllArticlesByUserId(0L, 0, 10);
+
+        assertThat(result.get(0)).isInstanceOf(ArticleShortDto.class);
+        assertThat(result.size()).isEqualTo(1);
+    }
+
 }
