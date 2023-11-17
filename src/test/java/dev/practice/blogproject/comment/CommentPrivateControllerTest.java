@@ -1,34 +1,36 @@
 package dev.practice.blogproject.comment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.practice.blogproject.controllers._private.PrivateCommentController;
+import dev.practice.blogproject.controllers._private.CommentPrivateController;
 import dev.practice.blogproject.dtos.comment.CommentFullDto;
 import dev.practice.blogproject.dtos.comment.CommentNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.services.impl.CommentServiceImpl;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
+
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PrivateCommentController.class)
-public class PrivateCommentControllerTest {
+@WebMvcTest(CommentPrivateController.class)
+public class CommentPrivateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -99,6 +101,42 @@ public class PrivateCommentControllerTest {
         mockMvc.perform(delete("/api/v1/private/comments/1")
                         .header("X-Current-User-Id", 1))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void comment_test31_Given_MessageIsNull_When__CreateComment_Then_BadRequest() throws Exception {
+
+        CommentNewDto dto = new CommentNewDto(null);
+        when(commentService.createComment(anyLong(), any(), anyLong())).thenReturn(fullComment);
+        mockMvc.perform(post("/api/v1/private/comments/article/1")
+                        .header("X-Current-User-Id", 1)
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Comment cannot be blank")));
+    }
+
+    @Test
+    public void comment_test32_Given_MessageLength510Chars_When__CreateComment_Then_BadRequest() throws Exception {
+
+        CommentNewDto dto = new CommentNewDto("012345678901234567890123456789012345678901234567890123456789" +
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
+
+        when(commentService.createComment(anyLong(), any(), anyLong())).thenReturn(fullComment);
+        mockMvc.perform(post("/api/v1/private/comments/article/1")
+                        .header("X-Current-User-Id", 1)
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Comment length should be 500 chars max")));
     }
 
 }

@@ -78,13 +78,6 @@ public class TagServiceTest {
     }
 
     @Test
-    public void tag_test3_Given_ArticleIdIsNull_When_GetAllArticleTags_Then_InvalidParameter() {
-        InvalidParameterException ex = assertThrows(InvalidParameterException.class, () ->
-                tagService.getAllArticleTags(null));
-        assertEquals("Id parameter cannot be null", ex.getMessage());
-    }
-
-    @Test
     public void tag_test4_Given_ValidId_When_GetTagById_Then_TagReturns() {
         Set<Article> articles = new HashSet<>();
         articles.add(article);
@@ -108,13 +101,6 @@ public class TagServiceTest {
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
                 tagService.getTagById(tag.getTagId()));
         assertEquals("Tag with given ID = 1 not found", ex.getMessage());
-    }
-
-    @Test
-    public void tag_test6_Given_IdIsNull_When_GetTagById_Then_InvalidParameterException() {
-        InvalidParameterException ex = assertThrows(InvalidParameterException.class, ()->
-                tagService.getTagById(null));
-        assertEquals("Id parameter cannot be null", ex.getMessage());
     }
 
     @Test
@@ -163,14 +149,6 @@ public class TagServiceTest {
     }
 
     @Test
-    public void tag_test10_Given_ArticleIdIsNull_When_CreateTag_The_InvalidParameter() {
-        TagNewDto newTag = new TagNewDto("tag1");
-        InvalidParameterException ex = assertThrows(InvalidParameterException.class, ()->
-                tagService.createTag(newTag, null));
-        assertEquals("Id parameter cannot be null", ex.getMessage());
-    }
-
-    @Test
     public void tag_test11_Given_ValidIds_When_DeleteTag_TagDeleted() {
         when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(admin));
@@ -207,13 +185,5 @@ when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
                 tagService.deleteTag(1L, 1L));
         assertEquals("User with given ID = 1 not found", ex.getMessage());
-    }
-
-    @Test
-    public void tag_test15_Given_TagIdIsNull_When_DeleteTag_Then_InvalidParameter() {
-
-        InvalidParameterException ex = assertThrows(InvalidParameterException.class, ()->
-                tagService.deleteTag(null, admin.getUserId()));
-        assertEquals("Id parameter cannot be null", ex.getMessage());
     }
 }

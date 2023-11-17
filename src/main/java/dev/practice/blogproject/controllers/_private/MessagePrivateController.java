@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/private/messages/")
-public class PrivateMessageController {
+public class MessagePrivateController {
     private final MessageService messageService;
 
     @PostMapping("users/{recipientId}")

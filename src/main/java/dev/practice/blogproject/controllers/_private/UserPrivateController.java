@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/private")
-public class PrivateUserController {
+public class UserPrivateController {
     private final UserService userService;
 
     @GetMapping("/users")

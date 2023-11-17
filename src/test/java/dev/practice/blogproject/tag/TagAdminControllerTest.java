@@ -1,6 +1,6 @@
 package dev.practice.blogproject.tag;
 
-import dev.practice.blogproject.controllers._admin.AdminTagController;
+import dev.practice.blogproject.controllers._admin.TagAdminController;
 import dev.practice.blogproject.services.impl.TagServiceImpl;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +12,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AdminTagController.class)
-public class AdminTagControllerTest {
+@WebMvcTest(TagAdminController.class)
+public class TagAdminControllerTest {
 
 
     @Autowired

@@ -31,8 +31,8 @@ public class UserNewDto {
     private String username;
 
     @NotBlank(message = "User email cannot be blank")
-    @Email(message = "Incorrect email format")
     @Length(max = 50, message = "Email length should be 50 chars max")
+    @Email(message = "Incorrect email format")
     private String email;
 
     @NotNull(message = "User birth date cannot be null")
