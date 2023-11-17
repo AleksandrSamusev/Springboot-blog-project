@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -46,18 +47,18 @@ public class PublicUserControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
+    private final UserFullDto result = new UserFullDto(1L, "John", "Doe",
+            "johnDoe", "johnDoe@test.test",
+            LocalDate.of(2000, 12, 27), Role.USER,
+            "Hi! I'm John", false, new HashSet<MessageFullDto>(), new HashSet<MessageFullDto>(),
+            new HashSet<ArticleShortDto>(), new HashSet<CommentShortDto>());
+
     @Test
     public void user_test_17_CreateUserTest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", "Doe",
                 "johnDoe", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
-
-        UserFullDto result = new UserFullDto(1L, "John", "Doe",
-                "johnDoe", "johnDoe@test.test",
-                LocalDate.of(2000, 12, 27), Role.USER,
-                "Hi! I'm John", false, new HashSet<MessageFullDto>(), new HashSet<MessageFullDto>(),
-                new HashSet<ArticleShortDto>(), new HashSet<CommentShortDto>());
 
         Mockito.when(userService.createUser(dto)).thenReturn(result);
 
@@ -69,18 +70,13 @@ public class PublicUserControllerTest {
                 .andExpect(status().isCreated());
     }
 
+
     @Test
     public void user_test_18_CreateUserTestThrowsInvalidParameterException() throws Exception {
 
         UserNewDto dto = new UserNewDto(null, "Doe",
                 "johnDoe", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
-
-        UserFullDto result = new UserFullDto(1L, "John", "Doe",
-                "johnDoe", "johnDoe@test.test",
-                LocalDate.of(2000, 12, 27), Role.USER,
-                "Hi! I'm John", false, new HashSet<>(), new HashSet<>(),
-                new HashSet<>(), new HashSet<>());
 
         Mockito.when(userService.createUser(dto)).thenThrow(InvalidParameterException.class);
 
@@ -132,5 +128,244 @@ public class PublicUserControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void user_test_35_Given_FirstNameIsNull_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto(null, "Doe",
+                "johnDoe", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("User first name cannot be blank")));
+    }
+
+    @Test
+    public void user_test_36_Given_LastNameIsNull_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto("John", null,
+                "johnDoe", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("User last name cannot be blank")));
+    }
+
+    @Test
+    public void user_test_37_Given_UsernameIsNull_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto("John", "Doe",
+                null, "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Username cannot be blank")));
+    }
+
+
+    @Test
+    public void user_test_37_Given_EmailIsNull_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto("John", "Doe",
+                "johnDoe", null,
+                LocalDate.of(2000, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("User email cannot be blank")));
+    }
+
+
+    @Test
+    public void user_test_38_Given_EmailIsNotValid_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto("John", "Doe",
+                "johnDoe", "johnDoetest.test",
+                LocalDate.of(2000, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Incorrect email format")));
+    }
+
+
+    @Test
+    public void user_test_39_Given_SeveralNullParams_When_CreateUser_Then_BadRequestAndListErrors() throws Exception {
+
+        UserNewDto dto = new UserNewDto(null, null,
+                null, null,
+                LocalDate.of(2000, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.size()", is(4)));
+    }
+
+    @Test
+    public void user_test_40_Given_BirthDateInFuture_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto("John", "Doe",
+                "johnDoe", "johnDoe@test.test",
+                LocalDate.of(2025, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Birth date should be in past")));
+    }
+
+    @Test
+    public void user_test_41_Given_FirstNameLength52Chars_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto("JohnJohnJohnJohnJohnJohnJohnJohnJohnJohnJohnJohnJohn",
+                "Doe",
+                "johnDoe", "johnDoe@test.test",
+                LocalDate.of(2021, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Users first name should be 50 chars max")));
+    }
+
+    @Test
+    public void user_test_42_Given_LastNameLength60Chars_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto("John",
+                "DoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoe",
+                "johnDoe", "johnDoe@test.test",
+                LocalDate.of(2021, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Users last name should be 50 chars max")));
+    }
+
+
+    @Test
+    public void user_test_43_Given_UsernameLength70Chars_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto("John",
+                "Doe",
+                "johnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoe",
+                "johnDoe@test.test",
+                LocalDate.of(2021, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Username should be 50 chars max")));
+    }
+
+    @Test
+    public void user_test_44_Given_EmailLength80Chars_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto("John",
+                "Doe",
+                "johnDoe",
+                "johnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoe@test.test",
+                LocalDate.of(2021, 12, 27), "Hi! I'm John");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Email length should be 50 chars max")));
+    }
+
+    @Test
+    public void user_test_44_Given_AboutLength1010Chars_When_CreateUser_Then_BadRequest() throws Exception {
+
+        UserNewDto dto = new UserNewDto("John",
+                "Doe",
+                "johnDoe",
+                "johnDoe@test.test",
+                LocalDate.of(2021, 12, 27),
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                        "01234567890123456789");
+
+        Mockito.when(userService.createUser(dto)).thenReturn(result);
+
+        mockMvc.perform(post("/api/v1/public/users")
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("About should be 1000 char max")));
+    }
 
 }

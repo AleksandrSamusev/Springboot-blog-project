@@ -13,10 +13,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserShortDto {
 
-    @NotNull
+    @NotNull(message = "User ID cannot be null")
     private Long userId;
 
-    @NotBlank
+    @NotBlank(message = "Username cannot be blank")
     private String username;
 
 }

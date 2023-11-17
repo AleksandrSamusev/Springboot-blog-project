@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -100,6 +101,42 @@ public class PrivateCommentControllerTest {
         mockMvc.perform(delete("/api/v1/private/comments/1")
                         .header("X-Current-User-Id", 1))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void comment_test31_Given_MessageIsNull_When__CreateComment_Then_BadRequest() throws Exception {
+
+        CommentNewDto dto = new CommentNewDto(null);
+        when(commentService.createComment(anyLong(), any(), anyLong())).thenReturn(fullComment);
+        mockMvc.perform(post("/api/v1/private/comments/article/1")
+                        .header("X-Current-User-Id", 1)
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Comment cannot be blank")));
+    }
+
+    @Test
+    public void comment_test32_Given_MessageLength510Chars_When__CreateComment_Then_BadRequest() throws Exception {
+
+        CommentNewDto dto = new CommentNewDto("012345678901234567890123456789012345678901234567890123456789" +
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+                "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
+
+        when(commentService.createComment(anyLong(), any(), anyLong())).thenReturn(fullComment);
+        mockMvc.perform(post("/api/v1/private/comments/article/1")
+                        .header("X-Current-User-Id", 1)
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Comment length should be 500 chars max")));
     }
 
 }
