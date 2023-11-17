@@ -212,5 +212,26 @@ public class UserServiceTest {
         assertEquals("User with given ID = 1 not found", thrown.getMessage());
     }
 
+    @Test
+    public void user_test_45_Given_UsernameWithWhitespaces_When_createUser_Then_userCreated() {
+
+        UserNewDto newUser3 = new UserNewDto("Harry", "Potter",
+                "harry      Potter", "harryPotter@test.test",
+                LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
+
+        User user4 = new User(3L, "Harry", "Potter",
+                "harryPotter", "harryPotter@test.test",
+                LocalDate.of(1901, 5, 13), Role.USER, "Hi! I'm Harry", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(userRepositoryMock.findByUsernameOrEmail(anyString(), anyString())).thenReturn(null);
+        when(userRepositoryMock.save(any())).thenReturn(user4);
+
+        UserFullDto createdUser = userService.createUser(newUser3);
+
+        assertEquals(createdUser.getClass(), UserFullDto.class);
+        assertEquals(createdUser.getUsername(), "harryPotter");
+    }
+
 
 }

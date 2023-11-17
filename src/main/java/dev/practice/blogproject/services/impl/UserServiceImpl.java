@@ -62,6 +62,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserFullDto createUser(UserNewDto dto) {
+        String username = dto.getUsername().replaceAll("\\s+","");
+        dto.setUsername(username);
         if (userRepository.findByUsernameOrEmail(dto.getUsername(), dto.getEmail()) != null) {
             if (dto.getUsername().equals(userRepository
                     .findByUsernameOrEmail(dto.getUsername(), dto.getEmail()).getUsername())) {
