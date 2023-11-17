@@ -1,14 +1,8 @@
 package dev.practice.blogproject.tag;
 
-import dev.practice.blogproject.controllers._private.PrivateCommentController;
-import dev.practice.blogproject.controllers._public.PublicTagController;
-import dev.practice.blogproject.dtos.comment.CommentFullDto;
-import dev.practice.blogproject.dtos.comment.CommentNewDto;
+import dev.practice.blogproject.controllers._public.TagPublicController;
 import dev.practice.blogproject.dtos.tag.TagFullDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
-import dev.practice.blogproject.dtos.user.UserShortDto;
-import dev.practice.blogproject.models.*;
-import dev.practice.blogproject.services.impl.CommentServiceImpl;
 import dev.practice.blogproject.services.impl.TagServiceImpl;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,17 +19,14 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PublicTagController.class)
-public class PublicTagControllerTest {
+@WebMvcTest(TagPublicController.class)
+public class TagPublicControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

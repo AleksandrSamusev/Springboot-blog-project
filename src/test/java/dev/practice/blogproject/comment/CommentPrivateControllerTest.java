@@ -1,6 +1,6 @@
 package dev.practice.blogproject.comment;
 
-import dev.practice.blogproject.controllers._private.PrivateCommentController;
+import dev.practice.blogproject.controllers._private.CommentPrivateController;
 import dev.practice.blogproject.dtos.comment.CommentFullDto;
 import dev.practice.blogproject.dtos.comment.CommentNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
@@ -29,8 +29,8 @@ import java.util.HashSet;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PrivateCommentController.class)
-public class PrivateCommentControllerTest {
+@WebMvcTest(CommentPrivateController.class)
+public class CommentPrivateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

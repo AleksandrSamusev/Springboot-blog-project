@@ -1,6 +1,6 @@
 package dev.practice.blogproject.tag;
 
-import dev.practice.blogproject.controllers._private.PrivateTagController;
+import dev.practice.blogproject.controllers._private.TagPrivateController;
 import dev.practice.blogproject.dtos.tag.TagFullDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.services.impl.TagServiceImpl;
@@ -23,7 +23,7 @@ import java.util.Set;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PrivateTagController.class)
+@WebMvcTest(TagPrivateController.class)
 public class PrivateATagControllerTest {
 
     @Autowired

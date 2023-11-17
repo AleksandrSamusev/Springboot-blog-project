@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/private")
-public class PrivateCommentController {
+public class CommentPrivateController {
     private final CommentService commentService;
 
     @PostMapping("/comments/article/{articleId}")

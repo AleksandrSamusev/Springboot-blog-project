@@ -24,7 +24,6 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MessageFullDto createMessage(Long recipientId, Long currentUserId, MessageNewDto dto) {
-        checkIfParametersValid(recipientId, currentUserId, dto);
         checkIfUserExists(recipientId);
         checkIfUserExists(currentUserId);
         checkIfActionAllowed(recipientId, currentUserId);
@@ -88,16 +87,9 @@ public class MessageServiceImpl implements MessageService {
         }
     }
 
-
     private void checkIfUserExists(Long id) {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User with given ID = " + id + " not found");
-        }
-    }
-
-    private void checkIfParametersValid(Long recipientId, Long currentUserId, MessageNewDto dto) {
-        if (recipientId == null || currentUserId == null || dto == null) {
-            throw new InvalidParameterException("Invalid parameter");
         }
     }
 

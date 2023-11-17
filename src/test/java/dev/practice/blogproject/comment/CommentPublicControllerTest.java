@@ -1,6 +1,6 @@
 package dev.practice.blogproject.comment;
 
-import dev.practice.blogproject.controllers._public.PublicCommentController;
+import dev.practice.blogproject.controllers._public.CommentPublicController;
 import dev.practice.blogproject.dtos.comment.CommentFullDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.models.*;
@@ -28,8 +28,8 @@ import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PublicCommentController.class)
-public class PublicCommentControllerTest {
+@WebMvcTest(CommentPublicController.class)
+public class CommentPublicControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
