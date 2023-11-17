@@ -193,21 +193,21 @@ public class UserServiceTest {
     public void user_test_14_Given_userIdNotEqualsCurrentUserId_When_deleteUser_Then_ActionForbiddenException() {
         when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(user1));
         when(userRepositoryMock.findById(3L)).thenReturn(Optional.of(user3));
-        ActionForbiddenException thrown = assertThrows(ActionForbiddenException.class, ()->
+        ActionForbiddenException thrown = assertThrows(ActionForbiddenException.class, () ->
                 userService.deleteUser(1L, 3L));
         assertEquals("Action forbidden for current user", thrown.getMessage());
     }
 
     @Test
     public void user_test_15_Given_userIdNotExist_When_deleteUser_Then_ResourceNotFoundException() {
-        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
                 userService.deleteUser(2L, 1L));
         assertEquals("User with given ID = 2 not found", thrown.getMessage());
     }
 
     @Test
     public void user_test_16_Given_currentUserIdNotExist_When_deleteUser_Then_ResourceNotFoundException() {
-        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
                 userService.deleteUser(1L, 2L));
         assertEquals("User with given ID = 1 not found", thrown.getMessage());
     }
@@ -234,4 +234,21 @@ public class UserServiceTest {
     }
 
 
+    @Test
+    public void user_test_46_Given_UsernameWithWhitespaces_When_updateUser_Then_userUpdated() {
+
+        User user1 = new User(1L, "Martin", "Potter",
+                "Kirk123123123", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        UserUpdateDto updateUser5 = new UserUpdateDto("Martin", "Potter",
+                "Kirk 123 123 123", "johnDoe@test.test",
+                LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
+
+        when(userRepositoryMock.findById(any())).thenReturn(Optional.of(user1));
+        when(userRepositoryMock.save(any())).thenReturn(user1);
+        UserFullDto dto = userService.updateUser(1L, 1L, updateUser5);
+        assertEquals(dto.getUsername(), "Kirk123123123");
+    }
 }

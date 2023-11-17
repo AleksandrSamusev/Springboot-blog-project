@@ -93,7 +93,8 @@ public class UserServiceImpl implements UserService {
             userFromBd.setLastName(dto.getLastName());
         }
         if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
-            userFromBd.setUsername(dto.getUsername());
+            String uName = dto.getUsername().replaceAll("\\s+","");
+            userFromBd.setUsername(uName);
         }
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
             userFromBd.setEmail(dto.getEmail());
