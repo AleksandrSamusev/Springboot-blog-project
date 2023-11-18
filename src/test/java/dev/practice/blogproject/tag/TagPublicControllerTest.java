@@ -1,28 +1,25 @@
 package dev.practice.blogproject.tag;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.practice.blogproject.controllers._public.TagPublicController;
 import dev.practice.blogproject.dtos.tag.TagFullDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.services.impl.TagServiceImpl;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import java.util.List;
 import java.util.Set;
 
-
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TagPublicController.class)
@@ -55,7 +52,7 @@ public class TagPublicControllerTest {
     }
 
     @Test
-    public void tag_test18_GetTagByIdTest() throws Exception{
+    public void tag_test18_GetTagByIdTest() throws Exception {
         when(tagService.getTagById(anyLong())).thenReturn(fullDto);
 
         mockMvc.perform(get("/api/v1/public/tags/1")

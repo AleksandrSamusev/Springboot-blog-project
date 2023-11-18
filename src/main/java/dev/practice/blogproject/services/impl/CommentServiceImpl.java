@@ -86,7 +86,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private void isUserBanned(Long userId) {
-        if(userRepository.getReferenceById(userId).getIsBanned().equals(Boolean.TRUE)) {
+        if (userRepository.getReferenceById(userId).getIsBanned().equals(Boolean.TRUE)) {
             throw new ActionForbiddenException("Action forbidden. User with ID = " + userId + " is banned");
         }
     }
@@ -107,7 +107,7 @@ public class CommentServiceImpl implements CommentService {
 
     private void isArticlePublished(Long articleId) {
         isArticleExists(articleId);
-        if(!articleRepository.getReferenceById(articleId).getStatus().equals(ArticleStatus.PUBLISHED)) {
+        if (!articleRepository.getReferenceById(articleId).getStatus().equals(ArticleStatus.PUBLISHED)) {
             throw new ActionForbiddenException("Article with ID = " + articleId + " is not published yet!");
         }
     }
