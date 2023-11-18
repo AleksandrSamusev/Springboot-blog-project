@@ -64,6 +64,10 @@ public class CommentServiceTest {
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
             ArticleStatus.PUBLISHED, 1450L, new HashSet<>(), new HashSet<>());
 
+    private final Article unpublishedArticle = new Article(1L, "Potions",
+            "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
+            ArticleStatus.CREATED, 1450L, new HashSet<>(), new HashSet<>());
+
     private final Comment comment = new Comment(1L,
             "I found this article very interesting!!!", LocalDateTime.now(),
             article, commentAuthor);
@@ -81,9 +85,11 @@ public class CommentServiceTest {
     @Test
     public void comment_test1_Given_ValidParameters_When_CreateComment_Then_CommentCreated() {
         when(userRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
+        when(userRepositoryMock.getReferenceById(anyLong())).thenReturn(commentAuthor);
         when(articleRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(commentAuthor));
         when(articleRepositoryMock.findById(anyLong())).thenReturn(Optional.of(article));
+        when(articleRepositoryMock.getReferenceById(anyLong())).thenReturn(article);
         when(commentRepositoryMock.save(any())).thenReturn(comment);
 
         CommentFullDto createdComment = commentService.createComment(1L, newComment, 2L);
@@ -91,6 +97,31 @@ public class CommentServiceTest {
         assertEquals(createdComment.getComment(), newComment.getComment());
         assertEquals(createdComment.getCommentAuthor().getUsername(), commentAuthor.getUsername());
         assertEquals(createdComment.getArticleId(), article.getArticleId());
+    }
+
+    @Test
+    public void comment_test2_1_Given_ArticleNotPublished_When_CreateComment_Then_ActionForbidden() {
+        when(userRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
+        when(userRepositoryMock.getReferenceById(anyLong())).thenReturn(commentAuthor);
+        when(articleRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
+        when(articleRepositoryMock.getReferenceById(anyLong())).thenThrow(new ActionForbiddenException(
+                "Article with ID = 1 is not published yet!"
+        ));
+
+        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
+                commentService.createComment(1L, newComment, 2L));
+        assertEquals("Article with ID = 1 is not published yet!", ex.getMessage());
+    }
+
+    @Test
+    public void comment_test2_2_Given_UserIsBanned_When_CreateComment_Then_ActionForbidden() {
+        when(userRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
+        when(userRepositoryMock.getReferenceById(anyLong())).thenThrow(new ActionForbiddenException(
+                "Action forbidden. User with ID = 1 is banned"));
+
+        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
+                commentService.createComment(1L, newComment, 2L));
+        assertEquals("Action forbidden. User with ID = 1 is banned", ex.getMessage());
     }
 
     @Test
@@ -105,6 +136,7 @@ public class CommentServiceTest {
     @Test
     public void comment_test3_Given_ArticleNotExists_When_CreateComment_Then_ResourceNotFoundException() {
         when(userRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
+        when(userRepositoryMock.getReferenceById(anyLong())).thenReturn(commentAuthor);
         when(articleRepositoryMock.existsById(anyLong())).thenReturn(Boolean.FALSE);
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->

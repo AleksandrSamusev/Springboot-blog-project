@@ -290,6 +290,110 @@
         }
       }
     },
+    "/admin/users/{userId}/ban": {
+      "post": {
+        "tags": [
+          "Admin User Controller"
+        ],
+        "summary": "Ban the user",
+        "description": "Ban the user with given ID\n",
+        "operationId": "banUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/users/{userId}/unban": {
+      "post": {
+        "tags": [
+          "Admin User Controller"
+        ],
+        "summary": "Unban the user",
+        "description": "Unban the user with given ID\n",
+        "operationId": "unbanUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/public/comments/{commentId}": {
       "get": {
         "tags": [
@@ -338,7 +442,7 @@
         "tags": [
           "Public Comment Controller"
         ],
-        "summary": "Get all comments",
+        "summary": "Get all comments to article",
         "description": "Get get all comments to given article\n",
         "operationId": "getAllComments",
         "parameters": [
@@ -693,6 +797,9 @@
           "400": {
             "description": "Bad request"
           },
+          "404": {
+            "description": "Not found"
+          },
           "500": {
             "description": "Internal server error"
           }
@@ -715,6 +822,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad request"
           },
           "404": {
             "description": "Not found"

@@ -6,6 +6,7 @@ import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.CommentMapper;
 import dev.practice.blogproject.models.Article;
+import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.models.Comment;
 import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.ArticleRepository;
@@ -30,7 +31,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentFullDto createComment(Long articleId, CommentNewDto dto, Long userId) {
         isUserExists(userId);
+        isUserBanned(userId);
         isArticleExists(articleId);
+        isArticlePublished(articleId);
         User user = userRepository.findById(userId).get();
         Article article = articleRepository.findById(articleId).get();
         Comment comment = CommentMapper.toComment(dto, user, article);
@@ -82,6 +85,12 @@ public class CommentServiceImpl implements CommentService {
                 .stream().map(CommentMapper::toCommentFullDto).collect(Collectors.toList());
     }
 
+    private void isUserBanned(Long userId) {
+        if(userRepository.getReferenceById(userId).getIsBanned().equals(Boolean.TRUE)) {
+            throw new ActionForbiddenException("Action forbidden. User with ID = " + userId + " is banned");
+        }
+    }
+
     private void isUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {
             log.info("ResourceNotFoundException. User with given Id = " + userId + " not found");
@@ -93,6 +102,13 @@ public class CommentServiceImpl implements CommentService {
         if (!articleRepository.existsById(articleId)) {
             log.info("ResourceNotFoundException. Article with given Id = " + articleId + " not found");
             throw new ResourceNotFoundException("Article with given Id = " + articleId + " not found");
+        }
+    }
+
+    private void isArticlePublished(Long articleId) {
+        isArticleExists(articleId);
+        if(!articleRepository.getReferenceById(articleId).getStatus().equals(ArticleStatus.PUBLISHED)) {
+            throw new ActionForbiddenException("Article with ID = " + articleId + " is not published yet!");
         }
     }
 
