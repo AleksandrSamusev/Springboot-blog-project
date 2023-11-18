@@ -17,4 +17,6 @@ public interface ArticlePrivateService {
     void deleteArticle(long userId, long articleId);
 
     List<ArticleFullDto> getAllArticlesByUserId(Long userId, Integer from, Integer size, String status);
+
+    ArticleFullDto publishArticle(Long userId, Long articleId);
 }
