@@ -244,12 +244,16 @@ public class ArticlePrivateServiceImplIntTest {
     }
 
     @Test
-    void article_test_24_Given_authorIdAndValidArticleId_When_deleteArticle_Then_articleDeleted() {
+    void article_test_24_Given_validIds_When_deleteArticle_Then_articleDeleted() {
         dropDB();
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         newArticle.getTags().add(new TagNewDto(tag2.getName()));
         User author = userRepository.save(user);
         ArticleFullDto articleSaved = articleService.createArticle(author.getUserId(), newArticle);
+        Article dbArticle = articleRepository.getReferenceById(articleSaved.getArticleId());
+        dbArticle.setStatus(ArticleStatus.PUBLISHED);
+        articleRepository.save(dbArticle);
+
         commentService.createComment(articleSaved.getArticleId(), new CommentNewDto("comment"), author.getUserId());
 
         articleService.deleteArticle(author.getUserId(), articleSaved.getArticleId());
@@ -270,6 +274,9 @@ public class ArticlePrivateServiceImplIntTest {
         user2.setRole(Role.ADMIN);
         User admin = userRepository.save(user2);
         ArticleFullDto articleSaved = articleService.createArticle(author.getUserId(), newArticle);
+        Article dbArticle = articleRepository.getReferenceById(articleSaved.getArticleId());
+        dbArticle.setStatus(ArticleStatus.PUBLISHED);
+        articleRepository.save(dbArticle);
         commentService.createComment(articleSaved.getArticleId(), new CommentNewDto("comment"), author.getUserId());
 
         articleService.deleteArticle(admin.getUserId(), articleSaved.getArticleId());
