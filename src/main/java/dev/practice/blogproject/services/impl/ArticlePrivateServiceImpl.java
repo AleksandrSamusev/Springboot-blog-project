@@ -157,7 +157,8 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
     @Override
     public ArticleFullDto publishArticle(Long userId, Long articleId) {
-        checkUserExist(userId);
+        User user = checkUserExist(userId);
+        checkUserIsNotBanned(user);
         Article article = checkArticleExist(articleId);
         checkUserIsAuthor(article, userId);
         article.setStatus(ArticleStatus.MODERATING);
