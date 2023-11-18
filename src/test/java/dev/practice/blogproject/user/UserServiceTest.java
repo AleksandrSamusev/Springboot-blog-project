@@ -260,7 +260,7 @@ public class UserServiceTest {
     public void user_test_46_Given_UsernameWithWhitespaces_When_updateUser_Then_userUpdated() {
 
         User user1 = new User(1L, "Martin", "Potter",
-                "Kirk123123123", "johnDoe@test.test",
+                "Kirk456456456", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", false,
                 new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
