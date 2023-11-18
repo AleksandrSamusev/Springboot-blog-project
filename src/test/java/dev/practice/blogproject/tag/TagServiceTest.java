@@ -1,17 +1,20 @@
 package dev.practice.blogproject.tag;
+
 import dev.practice.blogproject.dtos.tag.TagFullDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
+import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.InvalidParameterException;
-import dev.practice.blogproject.repositories.*;
+import dev.practice.blogproject.exceptions.ResourceNotFoundException;
+import dev.practice.blogproject.models.*;
+import dev.practice.blogproject.repositories.ArticleRepository;
+import dev.practice.blogproject.repositories.TagRepository;
+import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.impl.TagServiceImpl;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import dev.practice.blogproject.exceptions.ActionForbiddenException;
-import dev.practice.blogproject.exceptions.ResourceNotFoundException;
-import dev.practice.blogproject.models.*;
-import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -98,7 +101,7 @@ public class TagServiceTest {
         Tag tag = new Tag(1L, "tag1", articles);
         article.getTags().add(tag);
         when(tagRepositoryMock.existsById(anyLong())).thenReturn(false);
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 tagService.getTagById(tag.getTagId()));
         assertEquals("Tag with given ID = 1 not found", ex.getMessage());
     }
@@ -127,7 +130,7 @@ public class TagServiceTest {
     public void tag_test8_Given_ArticleNotExists_When_createTag_Then_ResourceNotFound() {
         TagNewDto newTag = new TagNewDto("tag1");
         when(articleRepositoryMock.existsById(anyLong())).thenReturn(false);
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 tagService.createTag(newTag, article.getArticleId()));
         assertEquals("Article with given ID = 1 not found", ex.getMessage());
     }
@@ -143,7 +146,7 @@ public class TagServiceTest {
         when(tagRepositoryMock.findTagByName(any())).thenReturn(tag);
 
 
-        InvalidParameterException ex = assertThrows(InvalidParameterException.class, ()->
+        InvalidParameterException ex = assertThrows(InvalidParameterException.class, () ->
                 tagService.createTag(newTag, article.getArticleId()));
         assertEquals("Tag with given name = tag1 already exists", ex.getMessage());
     }
@@ -160,11 +163,11 @@ public class TagServiceTest {
 
     @Test
     public void tag_test12_Given_UserIsNotAdmin_When_DeleteTag_Then_ActionForbidden() {
-when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
+        when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(notAdmin));
 
-        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, ()->
-        tagService.deleteTag(1L, admin.getUserId()));
+        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
+                tagService.deleteTag(1L, admin.getUserId()));
         assertEquals("Action forbidden for current user", ex.getMessage());
     }
 
@@ -174,7 +177,7 @@ when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(admin));
         when(tagRepositoryMock.existsById(anyLong())).thenReturn(false);
 
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 tagService.deleteTag(1L, admin.getUserId()));
         assertEquals("Tag with given ID = 1 not found", ex.getMessage());
     }
@@ -182,7 +185,7 @@ when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
     @Test
     public void tag_test14_Given_UserNotExists_When_DeleteTag_Then_ResourceNotFound() {
         when(userRepositoryMock.existsById(anyLong())).thenReturn(false);
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 tagService.deleteTag(1L, 1L));
         assertEquals("User with given ID = 1 not found", ex.getMessage());
     }

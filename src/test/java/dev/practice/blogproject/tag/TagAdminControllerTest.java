@@ -2,14 +2,15 @@ package dev.practice.blogproject.tag;
 
 import dev.practice.blogproject.controllers._admin.TagAdminController;
 import dev.practice.blogproject.services.impl.TagServiceImpl;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TagAdminController.class)
@@ -23,7 +24,7 @@ public class TagAdminControllerTest {
     private TagServiceImpl tagService;
 
     @Test
-    public void tag_test19_DeleteTagTest() throws Exception{
+    public void tag_test19_DeleteTagTest() throws Exception {
         doNothing().when(tagService).deleteTag(anyLong(), anyLong());
         mockMvc.perform(delete("/api/v1/admin/tags/1")
                         .header("X-Current-User-Id", 1))

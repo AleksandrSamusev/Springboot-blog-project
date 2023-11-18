@@ -4,7 +4,6 @@ import dev.practice.blogproject.dtos.comment.CommentFullDto;
 import dev.practice.blogproject.dtos.comment.CommentNewDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
-import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.ArticleRepository;
@@ -288,7 +287,7 @@ public class CommentServiceTest {
     public void comments_test25_Given_ArticleNotExists_When_getAllCommentsToArticle_Then_ResourceNotFound() {
         when(articleRepositoryMock.existsById(anyLong())).thenReturn(Boolean.FALSE);
 
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 commentService.getAllCommentsToArticle(article.getArticleId()));
         assertEquals("Article with given Id = 1 not found", ex.getMessage());
     }
