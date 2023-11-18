@@ -130,6 +130,30 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
+    @Override
+    public UserFullDto banUser(Long userId, Long currentUserId) {
+        isUserExists(userId);
+        isUserExists(currentUserId);
+        isAdmin(currentUserId);
+        User user = userRepository.getReferenceById(userId);
+        user.setIsBanned(Boolean.TRUE);
+        User savedUser = userRepository.save(user);
+        log.info("User with ID = " + userId+ " was banned by admin with ID = " + currentUserId);
+        return UserMapper.toUserFullDto(savedUser);
+    }
+
+    @Override
+    public UserFullDto unbanUser(Long userId, Long currentUserId) {
+        isUserExists(userId);
+        isUserExists(currentUserId);
+        isAdmin(currentUserId);
+        User user = userRepository.getReferenceById(userId);
+        user.setIsBanned(Boolean.FALSE);
+        User savedUser = userRepository.save(user);
+        log.info("User with ID = " + userId+ " was unbanned by admin with ID = " + currentUserId);
+        return UserMapper.toUserFullDto(savedUser);
+    }
+
 
     private void isUserExists(Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
