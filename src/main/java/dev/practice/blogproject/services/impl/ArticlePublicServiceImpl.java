@@ -30,7 +30,7 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
     public ArticleShortDto getArticleById(Long articleId) {
         Article article = checkArticleExist(articleId);
         checkArticleIsPublished(article);
-
+        log.info("Return article with ID = " + articleId);
         return ArticleMapper.toArticleShortDto(article);
     }
 

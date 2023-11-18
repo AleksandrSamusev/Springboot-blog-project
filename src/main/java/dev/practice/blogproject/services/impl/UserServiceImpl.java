@@ -27,12 +27,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserShortDto> getAllUsers() {
+        log.info("Returned the List of all UserShortDto users by User request");
         return userRepository.findAll().stream().map(UserMapper::toUserShortDto).collect(Collectors.toList());
     }
 
     public List<UserFullDto> getAllUsers(Long currentUserId) {
         isUserExists(currentUserId);
         isAdmin(currentUserId);
+        log.info("Returned the List of all UserFullDto users by Admin request");
         return userRepository.findAll().stream().map(UserMapper::toUserFullDto)
                 .collect(Collectors.toList());
     }
@@ -41,8 +43,10 @@ public class UserServiceImpl implements UserService {
     public UserShortDto getUserById(Long userId) {
         Optional<User> dto = userRepository.findById(userId);
         if (dto.isEmpty()) {
+            log.info("ResourceNotFoundException. User with given id " + userId + " not found");
             throw new ResourceNotFoundException("User with given id " + userId + " not found");
         }
+        log.info("Returned user with id = " + userId + " by User request");
         return UserMapper.toUserShortDto(dto.get());
     }
 
@@ -53,20 +57,27 @@ public class UserServiceImpl implements UserService {
         isUserExists(currentUserId);
         String role = userRepository.findById(currentUserId).get().getRole().name();
         if (userId.equals(currentUserId) || role.equals("ADMIN")) {
+            log.info("Returned user with id = " + userId + " by Admin request");
             return UserMapper.toUserFullDto(user);
         } else {
+            log.info("ActionForbiddenException. Action forbidden for current user");
             throw new ActionForbiddenException("Action forbidden for current user");
         }
-
     }
 
     @Override
     public UserFullDto createUser(UserNewDto dto) {
+        String username = dto.getUsername().replaceAll("\\s+","");
+        dto.setUsername(username);
         if (userRepository.findByUsernameOrEmail(dto.getUsername(), dto.getEmail()) != null) {
             if (dto.getUsername().equals(userRepository
                     .findByUsernameOrEmail(dto.getUsername(), dto.getEmail()).getUsername())) {
+                log.info("InvalidParameterException. User with given Username = " +
+                        dto.getUsername() + "already exists");
                 throw new InvalidParameterException("User with given Username already exists");
             } else {
+                log.info("InvalidParameterException. User with given email = " +
+                        dto.getEmail() + "already exists");
                 throw new InvalidParameterException("User with given email already exists");
             }
         }
@@ -82,6 +93,7 @@ public class UserServiceImpl implements UserService {
                 new ResourceNotFoundException("User with given ID = " + userId + " not found"));
         isUserExists(currentUserId);
         if (!userRepository.findById(currentUserId).get().getUserId().equals(userId)) {
+            log.info("ActionForbiddenException. Action forbidden for current user");
             throw new ActionForbiddenException("Action forbidden for current user");
         }
         if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
@@ -91,7 +103,8 @@ public class UserServiceImpl implements UserService {
             userFromBd.setLastName(dto.getLastName());
         }
         if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
-            userFromBd.setUsername(dto.getUsername());
+            String uName = dto.getUsername().replaceAll("\\s+","");
+            userFromBd.setUsername(uName);
         }
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
             userFromBd.setEmail(dto.getEmail());
@@ -113,12 +126,38 @@ public class UserServiceImpl implements UserService {
         isUserExists(userId);
         isUserExists(currentUserId);
         isUserAuthorized(userId, currentUserId);
+        log.info("User with ID = " + userId + " deleted");
         userRepository.deleteById(userId);
+    }
+
+    @Override
+    public UserFullDto banUser(Long userId, Long currentUserId) {
+        isUserExists(userId);
+        isUserExists(currentUserId);
+        isAdmin(currentUserId);
+        User user = userRepository.getReferenceById(userId);
+        user.setIsBanned(Boolean.TRUE);
+        User savedUser = userRepository.save(user);
+        log.info("User with ID = " + userId+ " was banned by admin with ID = " + currentUserId);
+        return UserMapper.toUserFullDto(savedUser);
+    }
+
+    @Override
+    public UserFullDto unbanUser(Long userId, Long currentUserId) {
+        isUserExists(userId);
+        isUserExists(currentUserId);
+        isAdmin(currentUserId);
+        User user = userRepository.getReferenceById(userId);
+        user.setIsBanned(Boolean.FALSE);
+        User savedUser = userRepository.save(user);
+        log.info("User with ID = " + userId+ " was unbanned by admin with ID = " + currentUserId);
+        return UserMapper.toUserFullDto(savedUser);
     }
 
 
     private void isUserExists(Long userId) {
         if (userRepository.findById(userId).isEmpty()) {
+            log.info("ResourceNotFoundException. User with given ID = " + userId + " not found");
             throw new ResourceNotFoundException("User with given ID = " + userId + " not found");
         }
     }
@@ -127,6 +166,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findById(currentUserId).isPresent()) {
             String role = userRepository.findById(currentUserId).get().getRole().name();
             if (!role.equals("ADMIN") && !userId.equals(currentUserId)) {
+                log.info("ActionForbiddenException. Action forbidden for current user");
                 throw new ActionForbiddenException("Action forbidden for current user");
             }
         }

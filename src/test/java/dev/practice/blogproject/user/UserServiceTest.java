@@ -62,6 +62,28 @@ public class UserServiceTest {
             LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
 
 
+
+    User admin = new User(1L, "Sam", "Samson",
+            "samSamson", "samSamson@test.test",
+            LocalDate.of(1980, 1, 1), Role.ADMIN, "Hi! I'm Sam", false,
+            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+    User noAdmin = new User(2L, "Martin", "Potter",
+            "Kirk123123123", "johnDoe@test.test",
+            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", true,
+            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+    User noAdminUnbanned = new User(2L, "Martin", "Potter",
+            "Kirk123123123", "johnDoe@test.test",
+            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", false,
+            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+    User noAdminBanned = new User(2L, "Martin", "Potter",
+            "Kirk123123123", "johnDoe@test.test",
+            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", true,
+            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+
     @Test
     public void user_test_1_When_getAllUsers_Then_returnListOfAllUsers() {
         when(userRepositoryMock.findAll()).thenReturn(List.of(user1, user2));
@@ -212,5 +234,137 @@ public class UserServiceTest {
         assertEquals("User with given ID = 1 not found", thrown.getMessage());
     }
 
+    @Test
+    public void user_test_45_Given_UsernameWithWhitespaces_When_createUser_Then_userCreated() {
 
+        UserNewDto newUser3 = new UserNewDto("Harry", "Potter",
+                "harry      Potter", "harryPotter@test.test",
+                LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
+
+        User user4 = new User(3L, "Harry", "Potter",
+                "harryPotter", "harryPotter@test.test",
+                LocalDate.of(1901, 5, 13), Role.USER, "Hi! I'm Harry", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(userRepositoryMock.findByUsernameOrEmail(anyString(), anyString())).thenReturn(null);
+        when(userRepositoryMock.save(any())).thenReturn(user4);
+
+        UserFullDto createdUser = userService.createUser(newUser3);
+
+        assertEquals(createdUser.getClass(), UserFullDto.class);
+        assertEquals(createdUser.getUsername(), "harryPotter");
+    }
+
+
+    @Test
+    public void user_test_46_Given_UsernameWithWhitespaces_When_updateUser_Then_userUpdated() {
+
+        User user1 = new User(1L, "Martin", "Potter",
+                "Kirk123123123", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        UserUpdateDto updateUser5 = new UserUpdateDto("Martin", "Potter",
+                "Kirk 123 123 123", "johnDoe@test.test",
+                LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
+
+        when(userRepositoryMock.findById(any())).thenReturn(Optional.of(user1));
+        when(userRepositoryMock.save(any())).thenReturn(user1);
+        UserFullDto dto = userService.updateUser(1L, 1L, updateUser5);
+        assertEquals(dto.getUsername(), "Kirk123123123");
+    }
+
+    @Test
+    public void user_test_46_1_Given_ValidIds_When_banUser_Then_userBanned() {
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(admin));
+        when(userRepositoryMock.findById(2L)).thenReturn(Optional.of(noAdmin));
+        when(userRepositoryMock.getReferenceById(anyLong())).thenReturn(noAdmin);
+        when(userRepositoryMock.save(any())).thenReturn(noAdminBanned);
+
+        UserFullDto result = userService.banUser(2L, 1L);
+
+        assertEquals(result.getUserId() ,noAdmin.getUserId());
+        assertEquals(result.getFirstName(), noAdmin.getFirstName());
+        assertEquals(result.getLastName(), noAdmin.getLastName());
+        assertEquals(result.getIsBanned(), Boolean.TRUE);
+    }
+
+    @Test
+    public void user_test_46_2_Given_ValidIds_When_unbanUser_Then_userBanned() {
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(admin));
+        when(userRepositoryMock.findById(2L)).thenReturn(Optional.of(noAdminBanned));
+        when(userRepositoryMock.getReferenceById(anyLong())).thenReturn(noAdmin);
+        when(userRepositoryMock.save(any())).thenReturn(noAdminUnbanned);
+
+        UserFullDto result = userService.unbanUser(2L, 1L);
+
+        assertEquals(result.getUserId() ,noAdmin.getUserId());
+        assertEquals(result.getFirstName(), noAdmin.getFirstName());
+        assertEquals(result.getLastName(), noAdmin.getLastName());
+        assertEquals(result.getIsBanned(), Boolean.FALSE);
+    }
+
+    @Test
+    public void user_test_46_3_Given_userNotExists_When_banUser_Then_ResourceNotFound() {
+        when(userRepositoryMock.findById(2L)).thenThrow(new ResourceNotFoundException(
+                "User with given ID = 2 not found"
+        ));
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+                userService.banUser(2L, 1L));
+        assertEquals("User with given ID = 2 not found", ex.getMessage());
+    }
+
+    @Test
+    public void user_test_46_4_Given_currentUserNotExists_When_banUser_Then_ResourceNotFound() {
+        when(userRepositoryMock.findById(2L)).thenReturn(Optional.ofNullable(noAdmin));
+        when(userRepositoryMock.findById(1L)).thenThrow(new ResourceNotFoundException(
+                "User with given ID = 1 not found"
+        ));
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+                userService.banUser(2L, 1L));
+        assertEquals("User with given ID = 1 not found", ex.getMessage());
+    }
+
+    @Test
+    public void user_test_46_5_Given_currentUserNotAdmin_When_banUser_Then_ActionForbidden() {
+        when(userRepositoryMock.findById(2L)).thenReturn(Optional.ofNullable(noAdmin));
+        when(userRepositoryMock.findById(1L)).thenThrow(new ActionForbiddenException(
+                "Action forbidden for current user"
+        ));
+        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, ()->
+                userService.banUser(2L, 1L));
+        assertEquals("Action forbidden for current user", ex.getMessage());
+    }
+
+    @Test
+    public void user_test_46_6_Given_userNotExists_When_unbanUser_Then_ResourceNotFound() {
+        when(userRepositoryMock.findById(2L)).thenThrow(new ResourceNotFoundException(
+                "User with given ID = 2 not found"
+        ));
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+                userService.unbanUser(2L, 1L));
+        assertEquals("User with given ID = 2 not found", ex.getMessage());
+    }
+
+    @Test
+    public void user_test_46_7_Given_currentUserNotExists_When_unbanUser_Then_ResourceNotFound() {
+        when(userRepositoryMock.findById(2L)).thenReturn(Optional.ofNullable(noAdmin));
+        when(userRepositoryMock.findById(1L)).thenThrow(new ResourceNotFoundException(
+                "User with given ID = 1 not found"
+        ));
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+                userService.unbanUser(2L, 1L));
+        assertEquals("User with given ID = 1 not found", ex.getMessage());
+    }
+
+    @Test
+    public void user_test_46_8_Given_currentUserNotAdmin_When_unbanUser_Then_ActionForbidden() {
+        when(userRepositoryMock.findById(2L)).thenReturn(Optional.ofNullable(noAdmin));
+        when(userRepositoryMock.findById(1L)).thenThrow(new ActionForbiddenException(
+                "Action forbidden for current user"
+        ));
+        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, ()->
+                userService.unbanUser(2L, 1L));
+        assertEquals("Action forbidden for current user", ex.getMessage());
+    }
 }

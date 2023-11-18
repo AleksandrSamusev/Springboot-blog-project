@@ -21,4 +21,8 @@ public interface UserService {
     UserFullDto updateUser(Long userId, Long currentUserId, UserUpdateDto dto);
 
     void deleteUser(Long userId, Long currentUserId);
+
+    UserFullDto banUser(Long userId, Long currentUserId);
+
+    UserFullDto unbanUser(Long userId, Long currentUserId);
 }
