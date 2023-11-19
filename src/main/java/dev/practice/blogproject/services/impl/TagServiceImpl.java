@@ -1,13 +1,16 @@
 package dev.practice.blogproject.services.impl;
 
+import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.tag.TagFullDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.InvalidParameterException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
+import dev.practice.blogproject.mappers.ArticleMapper;
 import dev.practice.blogproject.mappers.TagMapper;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.Tag;
+import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
@@ -17,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,6 +78,43 @@ public class TagServiceImpl implements TagService {
         return TagMapper.toTagFullDto(tagRepository.findById(tagId).get());
     }
 
+    @Override
+    public ArticleFullDto addTagsToArticle(Long userId, Long articleId, List<TagNewDto> tags) {
+        isUserExists(userId);
+        Article article = isArticleExists(articleId);
+        checkUserIsAuthor(article, userId);
+
+        if (tags.isEmpty()) {
+            log.info("Tags connected to article with id {} wasn't changed. New tags list was empty", articleId);
+            return ArticleMapper.toArticleFullDto(article);
+        }
+
+        for (TagNewDto newTag : tags) {
+            newTag.setName(newTag.getName().trim().toLowerCase());
+
+            Tag tag = tagRepository.findTagByName(newTag.getName());
+            if (tag != null) {
+                if (!article.getTags().contains(tag)) {
+                    tag.getArticles().add(article);
+                    tagRepository.save(tag);
+
+                    article.getTags().add(tag);
+                    articleRepository.save(article);
+                    log.info("Tag with id {} was added to article with id {}", tag.getTagId(), articleId);
+                }
+            } else {
+               createTag(newTag, articleId);
+            }
+        }
+
+        return ArticleMapper.toArticleFullDto(articleRepository.getReferenceById(articleId));
+    }
+
+    @Override
+    public ArticleFullDto removeTagsFromArticle(Long userId, Long articleId, List<TagNewDto> tags) {
+        return null;
+    }
+
 
     private void isAdmin(Long userId) {
         if (userRepository.findById(userId).isPresent()) {
@@ -83,11 +125,13 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    private void isUserExists(Long userId) {
-        if (!userRepository.existsById(userId)) {
+    private User isUserExists(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
             log.info("ResourceNotFoundException. User with given ID = " + userId + " not found");
             throw new ResourceNotFoundException("User with given ID = " + userId + " not found");
         }
+        return user.get();
     }
 
     private void isTagExists(Long tagId) {
@@ -97,11 +141,22 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    private void isArticleExists(Long articleId) {
-        if (!articleRepository.existsById(articleId)) {
+    private Article isArticleExists(Long articleId) {
+        Optional<Article> article = articleRepository.findById(articleId);
+        if (article.isEmpty()) {
             log.info("ResourceNotFoundException. Article with given ID = " + articleId + " not found");
 
             throw new ResourceNotFoundException("Article with given ID = " + articleId + " not found");
+        }
+        return article.get();
+    }
+
+    private void checkUserIsAuthor(Article article, long userId) {
+        if (article.getAuthor().getUserId() != userId) {
+            log.error("Article with id {} is not belongs to user with id {}", article.getArticleId(), userId);
+            throw new ActionForbiddenException(String.format(
+                    "Article with id %d is not belongs to user with id %d. Action is forbidden",
+                    article.getArticleId(), userId));
         }
     }
 }

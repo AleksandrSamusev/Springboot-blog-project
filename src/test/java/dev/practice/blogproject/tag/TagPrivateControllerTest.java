@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TagPrivateController.class)
-public class PrivateATagControllerTest {
+public class TagPrivateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
