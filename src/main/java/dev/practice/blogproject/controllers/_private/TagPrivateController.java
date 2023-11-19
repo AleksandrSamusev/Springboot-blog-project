@@ -35,7 +35,7 @@ public class TagPrivateController {
     @PatchMapping("/articles/{articleId}/remove")
     public ResponseEntity<ArticleFullDto> removeTagsFromArticle(@RequestHeader("X-Current-User-Id") Long userId,
                                                                 @PathVariable Long articleId,
-                                                                @RequestParam List<TagNewDto> tags) {
+                                                                @RequestParam List<Long> tags) {
         return new ResponseEntity<>(tagService.removeTagsFromArticle(userId, articleId, tags), HttpStatus.OK);
     }
 

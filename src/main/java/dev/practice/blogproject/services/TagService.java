@@ -17,5 +17,5 @@ public interface TagService {
 
     ArticleFullDto addTagsToArticle(Long userId, Long articleId, List<TagNewDto> tags);
 
-    ArticleFullDto removeTagsFromArticle(Long userId, Long articleId, List<TagNewDto> tags);
+    ArticleFullDto removeTagsFromArticle(Long userId, Long articleId, List<Long> tags);
 }

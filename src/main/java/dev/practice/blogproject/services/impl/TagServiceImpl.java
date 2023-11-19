@@ -36,6 +36,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagFullDto createTag(TagNewDto dto, Long articleId) {
         isArticleExists(articleId);
+        dto.setName(dto.getName().toLowerCase().trim());
         if (tagRepository.findTagByName(dto.getName()) != null) {
             log.info("InvalidParameterException. Tag with given name = " + dto.getName() + " already exists");
             throw new InvalidParameterException("Tag with given name = " + dto.getName() + " already exists");
@@ -111,8 +112,26 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public ArticleFullDto removeTagsFromArticle(Long userId, Long articleId, List<TagNewDto> tags) {
-        return null;
+    public ArticleFullDto removeTagsFromArticle(Long userId, Long articleId, List<Long> tags) {
+        isUserExists(userId);
+        Article article = isArticleExists(articleId);
+        checkUserIsAuthor(article, userId);
+
+        if (tags.isEmpty()) {
+            log.info("Tags connected to article with id {} wasn't changed. Tags list was empty", articleId);
+            return ArticleMapper.toArticleFullDto(article);
+        }
+
+        for (Long tagId : tags) {
+            Tag tag = isTagExists(tagId);
+            tag.getArticles().remove(article);
+            tagRepository.save(tag);
+
+            article.getTags().remove(tag);
+            log.info("Tags with id {} unconnected from article with id {}", tagId, articleId);
+        }
+
+        return ArticleMapper.toArticleFullDto(articleRepository.save(article));
     }
 
 
@@ -134,11 +153,13 @@ public class TagServiceImpl implements TagService {
         return user.get();
     }
 
-    private void isTagExists(Long tagId) {
-        if (!tagRepository.existsById(tagId)) {
+    private Tag isTagExists(Long tagId) {
+        Optional<Tag> tag = tagRepository.findById(tagId);
+        if (tag.isEmpty()) {
             log.info("ResourceNotFoundException. Tag with given ID = " + tagId + " not found");
             throw new ResourceNotFoundException("Tag with given ID = " + tagId + " not found");
         }
+        return tag.get();
     }
 
     private Article isArticleExists(Long articleId) {
