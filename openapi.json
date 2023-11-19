@@ -776,9 +776,9 @@
         "tags": [
           "Private Tag Controller"
         ],
-        "summary": "Add tags to an article",
-        "description": "add tags to an article\n",
-        "operationId": "addTags",
+        "summary": "Remove tags from an article",
+        "description": "remove tags from an article\n",
+        "operationId": "removeTags",
         "parameters": [
           {
             "in": "path",
@@ -805,9 +805,11 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/components/schemas/TagNewDto"
+                "type": "integer",
+                "format": "int64"
               }
-            }
+            },
+            "required": true
           }
         ],
         "responses": {
