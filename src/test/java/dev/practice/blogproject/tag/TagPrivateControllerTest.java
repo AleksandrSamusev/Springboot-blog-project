@@ -1,6 +1,5 @@
 package dev.practice.blogproject.tag;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.practice.blogproject.controllers._private.TagPrivateController;
 import dev.practice.blogproject.dtos.article.ArticleFullDto;

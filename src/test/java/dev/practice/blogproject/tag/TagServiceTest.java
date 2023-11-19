@@ -84,7 +84,6 @@ public class TagServiceTest {
         articles.add(article);
         Tag tag = new Tag(1L, "tag1", articles);
         article.getTags().add(tag);
-        when(tagRepositoryMock.existsById(tag.getTagId())).thenReturn(true);
         when(tagRepositoryMock.findById(anyLong())).thenReturn(Optional.of(tag));
         TagFullDto result = tagService.getTagById(tag.getTagId());
         assertEquals(result.getTagId(), tag.getTagId());
@@ -98,7 +97,6 @@ public class TagServiceTest {
         articles.add(article);
         Tag tag = new Tag(1L, "tag1", articles);
         article.getTags().add(tag);
-        when(tagRepositoryMock.existsById(anyLong())).thenReturn(false);
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 tagService.getTagById(tag.getTagId()));
         assertEquals("Tag with given ID = 1 not found", ex.getMessage());
@@ -149,8 +147,9 @@ public class TagServiceTest {
 
     @Test
     public void tag_test11_Given_ValidIds_When_DeleteTag_TagDeleted() {
+        Tag tag = new Tag(1L, "tag1", Set.of(article));
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(admin));
-        when(tagRepositoryMock.existsById(anyLong())).thenReturn(true);
+        when(tagRepositoryMock.findById(anyLong())).thenReturn(Optional.of(tag));
         doNothing().when(tagRepositoryMock).deleteById(1L);
         tagService.deleteTag(1L, admin.getUserId());
         verify(tagRepositoryMock, times(1)).deleteById(1L);
@@ -168,7 +167,6 @@ public class TagServiceTest {
     @Test
     public void tag_test13_Given_TagNotExists_When_DeleteTag_Then_ResourceNotFound() {
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(admin));
-        when(tagRepositoryMock.existsById(anyLong())).thenReturn(false);
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 tagService.deleteTag(1L, admin.getUserId()));
