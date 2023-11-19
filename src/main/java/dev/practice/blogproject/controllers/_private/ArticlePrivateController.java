@@ -47,8 +47,15 @@ public class ArticlePrivateController {
     }
 
     @DeleteMapping("/{articleId}")
-    public void deleteArticle(@RequestHeader("X-Current-User-Id") Long userId,
+    public ResponseEntity<HttpStatus> deleteArticle(@RequestHeader("X-Current-User-Id") Long userId,
                               @PathVariable("articleId") Long articleId) {
         articleService.deleteArticle(userId, articleId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping("/{articleId}/publish")
+    public ResponseEntity<ArticleFullDto> publishArticle(@RequestHeader("X-Current-User-Id") Long userId,
+                                                        @PathVariable("articleId") Long articleId) {
+        return new ResponseEntity<>(articleService.publishArticle(userId, articleId), HttpStatus.OK);
     }
 }

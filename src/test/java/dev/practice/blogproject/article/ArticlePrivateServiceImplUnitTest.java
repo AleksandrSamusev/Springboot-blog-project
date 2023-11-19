@@ -260,5 +260,23 @@ public class ArticlePrivateServiceImplUnitTest {
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
 
+    @Test
+    void article_test_37_Given_articleCreated_When_publishArticle_Then_returnArticle() {
+        Mockito
+                .when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(author));
+        Mockito
+                .when(articleRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(savedArticle));
+        Mockito
+                .when(articleRepository.save(Mockito.any()))
+                .thenReturn(savedArticle);
+
+        ArticleFullDto result = articleService.publishArticle(0L, 0L);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getStatus()).isEqualTo(ArticleStatus.MODERATING);
+    }
+
 
 }

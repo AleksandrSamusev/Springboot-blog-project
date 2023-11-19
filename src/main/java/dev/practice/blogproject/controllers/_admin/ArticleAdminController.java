@@ -25,4 +25,11 @@ public class ArticleAdminController {
         return new ResponseEntity<>(articleService.getAllArticlesByUserId(userId, authorId, from, size, status),
                 HttpStatus.OK);
     }
+
+    @PatchMapping("{articleId}/publish")
+    public ResponseEntity<ArticleFullDto> changeArticleStatus(@RequestHeader("X-Current-User-Id") Long userId,
+                                                              @PathVariable("articleId") Long articleId,
+                                                              @RequestParam boolean publish) {
+        return new ResponseEntity<>(articleService.publishArticle(userId, articleId, publish), HttpStatus.OK);
+    }
 }

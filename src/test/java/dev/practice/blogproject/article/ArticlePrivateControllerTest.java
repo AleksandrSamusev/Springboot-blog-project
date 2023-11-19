@@ -24,8 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -127,8 +126,7 @@ public class ArticlePrivateControllerTest {
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden())
-                .andExpect(mvc -> mvc.getResolvedException().getClass().equals(ActionForbiddenException.class));
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -247,6 +245,52 @@ public class ArticlePrivateControllerTest {
 
         Mockito.verify(articleService, Mockito.times(1))
                 .getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString());
+    }
+
+    @Test
+    void article_test_38_Given_articleCreated_When_publishArticle_Then_returnArticleStatusOk() throws Exception {
+        articleFull.setStatus(ArticleStatus.MODERATING);
+        Mockito
+                .when(articleService.publishArticle(Mockito.anyLong(), Mockito.anyLong()))
+                .thenReturn(articleFull);
+
+        mvc.perform(patch("/api/v1/private/articles/{articleId}/publish", 1L)
+                        .header("X-Current-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.articleId").value(1))
+                .andExpect(jsonPath("$.title").value(articleFull.getTitle()))
+                .andExpect(jsonPath("$.content").value(articleFull.getContent()))
+                .andExpect(jsonPath("$.author.userId").value(author.getUserId().intValue()))
+                .andExpect(jsonPath("$.author.username").value(author.getUsername()))
+                .andExpect(jsonPath("$.created").value(notNullValue()))
+                .andExpect(jsonPath("$.published").value(nullValue()))
+                .andExpect(jsonPath("$.status").value("MODERATING"))
+                .andExpect(jsonPath("$.likes").value(0))
+                .andExpect(jsonPath("$.comments").isEmpty())
+                .andExpect(jsonPath("$.tags").isEmpty());
+
+        Mockito.verify(articleService, Mockito.times(1))
+                .publishArticle(Mockito.anyLong(), Mockito.anyLong());
+    }
+
+    @Test
+    void article_test_39_Given_bannedUser_When_publishArticle_Then_throwExceptionStatusForbidden() throws Exception {
+        Mockito
+                .when(articleService.publishArticle(Mockito.anyLong(), Mockito.anyLong()))
+                .thenThrow(ActionForbiddenException.class);
+
+        mvc.perform(patch("/api/v1/private/articles/{articleId}/publish", 1L)
+                        .header("X-Current-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+
+        Mockito.verify(articleService, Mockito.times(1))
+                .publishArticle(Mockito.anyLong(), Mockito.anyLong());
     }
 
 
