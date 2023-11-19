@@ -10,4 +10,6 @@ public interface ArticlePublicService {
     List<ArticleShortDto> getAllArticles(Integer from, Integer size);
 
     List<ArticleShortDto> getAllArticlesByUserId(Long userId, Integer from, Integer size);
+
+    ArticleShortDto likeArticle(Long articleId);
 }
