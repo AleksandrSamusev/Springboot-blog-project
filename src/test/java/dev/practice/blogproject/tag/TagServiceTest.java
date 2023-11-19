@@ -61,7 +61,6 @@ public class TagServiceTest {
     @Test
     public void tag_test1_When_GetAllArticleTags_Then_ReturnListOfTags() {
         when(articleRepositoryMock.findById(anyLong())).thenReturn(Optional.of(article));
-        when(articleRepositoryMock.existsById(anyLong())).thenReturn(Boolean.TRUE);
         Set<Article> articles = new HashSet<>();
         articles.add(article);
         Tag tag = new Tag(1L, "tag1", articles);
@@ -74,7 +73,6 @@ public class TagServiceTest {
 
     @Test
     public void tag_test2_Given_ArticleNotExists_When_GetAllArticleTags_Then_ResourceNotFound() {
-        when(articleRepositoryMock.existsById(anyLong())).thenReturn(false);
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 tagService.getAllArticleTags(5L));
         assertEquals("Article with given ID = 5 not found", ex.getMessage());
@@ -113,7 +111,6 @@ public class TagServiceTest {
         articles.add(article);
         Tag tag = new Tag(1L, "tag1", articles);
         article.getTags().add(tag);
-        when(articleRepositoryMock.existsById(anyLong())).thenReturn(true);
         when(articleRepositoryMock.findById(anyLong())).thenReturn(Optional.of(article));
         when(tagRepositoryMock.save(any())).thenReturn(tag);
         when(articleRepositoryMock.save(any())).thenReturn(article);
@@ -129,7 +126,6 @@ public class TagServiceTest {
     @Test
     public void tag_test8_Given_ArticleNotExists_When_createTag_Then_ResourceNotFound() {
         TagNewDto newTag = new TagNewDto("tag1");
-        when(articleRepositoryMock.existsById(anyLong())).thenReturn(false);
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 tagService.createTag(newTag, article.getArticleId()));
         assertEquals("Article with given ID = 1 not found", ex.getMessage());
@@ -142,7 +138,7 @@ public class TagServiceTest {
         articles.add(article);
         Tag tag = new Tag(1L, "tag1", articles);
 
-        when(articleRepositoryMock.existsById(anyLong())).thenReturn(true);
+        when(articleRepositoryMock.findById(anyLong())).thenReturn(Optional.of(article));
         when(tagRepositoryMock.findTagByName(any())).thenReturn(tag);
 
 
@@ -153,7 +149,6 @@ public class TagServiceTest {
 
     @Test
     public void tag_test11_Given_ValidIds_When_DeleteTag_TagDeleted() {
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(admin));
         when(tagRepositoryMock.existsById(anyLong())).thenReturn(true);
         doNothing().when(tagRepositoryMock).deleteById(1L);
@@ -163,7 +158,6 @@ public class TagServiceTest {
 
     @Test
     public void tag_test12_Given_UserIsNotAdmin_When_DeleteTag_Then_ActionForbidden() {
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(notAdmin));
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
@@ -173,7 +167,6 @@ public class TagServiceTest {
 
     @Test
     public void tag_test13_Given_TagNotExists_When_DeleteTag_Then_ResourceNotFound() {
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
         when(userRepositoryMock.findById(anyLong())).thenReturn(Optional.of(admin));
         when(tagRepositoryMock.existsById(anyLong())).thenReturn(false);
 
@@ -184,7 +177,6 @@ public class TagServiceTest {
 
     @Test
     public void tag_test14_Given_UserNotExists_When_DeleteTag_Then_ResourceNotFound() {
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(false);
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 tagService.deleteTag(1L, 1L));
         assertEquals("User with given ID = 1 not found", ex.getMessage());

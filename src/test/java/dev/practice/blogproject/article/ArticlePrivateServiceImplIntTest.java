@@ -72,11 +72,11 @@ public class ArticlePrivateServiceImplIntTest {
         ArticleFullDto result = articleService.createArticle(author.getUserId(), newArticle);
 
         List<TagShortDto> tags = result.getTags().stream().toList();
-        Tag tag = tagRepository.findTagByName(tag1.getName());
+        Tag tag = tagRepository.findTagByName(tag1.getName().toLowerCase());
 
         assertThat(result).isNotNull();
         assertThat(tags.size()).isEqualTo(1);
-        assertThat(tags.get(0).getName()).isEqualTo(tag1.getName());
+        assertThat(tags.get(0).getName()).isEqualTo(tag1.getName().toLowerCase());
         assertThat(tagRepository.getReferenceById(tag.getTagId()).getArticles().size()).isEqualTo(1);
     }
 
@@ -91,11 +91,11 @@ public class ArticlePrivateServiceImplIntTest {
         ArticleFullDto result = articleService.createArticle(author.getUserId(), newArticle2);
 
         List<TagShortDto> tags = result.getTags().stream().toList();
-        Tag tag = tagRepository.findTagByName(tag1.getName());
+        Tag tag = tagRepository.findTagByName(tag1.getName().toLowerCase());
 
         assertThat(result).isNotNull();
         assertThat(tags.size()).isEqualTo(1);
-        assertThat(tags.get(0).getName()).isEqualTo(tag1.getName());
+        assertThat(tags.get(0).getName()).isEqualTo(tag1.getName().toLowerCase());
         assertThat(tagRepository.getReferenceById(tag.getTagId()).getArticles().size()).isEqualTo(2);
     }
 
@@ -111,13 +111,13 @@ public class ArticlePrivateServiceImplIntTest {
         ArticleFullDto result = articleService.createArticle(author.getUserId(), newArticle2);
 
         List<TagShortDto> tags = result.getTags().stream().sorted(Comparator.comparing(TagShortDto::getName)).toList();
-        Tag tag = tagRepository.findTagByName(tag1.getName());
-        Tag tag3 = tagRepository.findTagByName(tag2.getName());
+        Tag tag = tagRepository.findTagByName(tag1.getName().toLowerCase());
+        Tag tag3 = tagRepository.findTagByName(tag2.getName().toLowerCase());
 
         assertThat(result).isNotNull();
         assertThat(tags.size()).isEqualTo(2);
-        assertThat(tags.get(1).getName()).isEqualTo(tag1.getName());
-        assertThat(tags.get(0).getName()).isEqualTo(tag2.getName());
+        assertThat(tags.get(1).getName()).isEqualTo(tag1.getName().toLowerCase());
+        assertThat(tags.get(0).getName()).isEqualTo(tag2.getName().toLowerCase());
         assertThat(tagRepository.getReferenceById(tag.getTagId()).getArticles().size()).isEqualTo(2);
         assertThat(tagRepository.getReferenceById(tag3.getTagId()).getArticles().size()).isEqualTo(1);
     }

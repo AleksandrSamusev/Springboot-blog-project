@@ -1,5 +1,6 @@
 package dev.practice.blogproject.controllers._private;
 
+import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.tag.TagFullDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.services.TagService;
@@ -9,18 +10,33 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/private")
+@RequestMapping("/api/v1/private/tags")
 public class TagPrivateController {
-
     private final TagService tagService;
 
-    @PostMapping("/tags/articles/{articleId}")
+    @PostMapping("/articles/{articleId}")
     public ResponseEntity<TagFullDto> createTag(@Valid @RequestBody TagNewDto dto,
                                                 @PathVariable Long articleId,
                                                 @RequestHeader("X-Current-User-Id") Long userId) {
         return new ResponseEntity<>(tagService.createTag(dto, articleId), HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/articles/{articleId}/add")
+    public ResponseEntity<ArticleFullDto> addTagsToArticle(@RequestHeader("X-Current-User-Id") Long userId,
+                                                           @PathVariable Long articleId,
+                                                           @RequestParam List<TagNewDto> tags) {
+        return new ResponseEntity<>(tagService.addTagsToArticle(userId, articleId, tags), HttpStatus.OK);
+    }
+
+    @PatchMapping("/articles/{articleId}/remove")
+    public ResponseEntity<ArticleFullDto> removeTagsFromArticle(@RequestHeader("X-Current-User-Id") Long userId,
+                                                                @PathVariable Long articleId,
+                                                                @RequestParam List<TagNewDto> tags) {
+        return new ResponseEntity<>(tagService.removeTagsFromArticle(userId, articleId, tags), HttpStatus.OK);
     }
 
 

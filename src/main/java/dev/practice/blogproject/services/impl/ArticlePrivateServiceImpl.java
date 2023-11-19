@@ -208,8 +208,9 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     private Set<Tag> checkTagExist(Set<TagNewDto> tags, long articleId) {
         Set<Tag> allTags = new HashSet<>();
         for (TagNewDto newTag : tags) {
+            newTag.setName(newTag.getName().trim().toLowerCase());
 
-            Tag tag = tagRepository.findTagByName(newTag.getName().trim());
+            Tag tag = tagRepository.findTagByName(newTag.getName());
             if (tag != null) {
                 allTags.add(tag);
                 Set<Article> articles = tag.getArticles();
