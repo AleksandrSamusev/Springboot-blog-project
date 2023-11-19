@@ -275,7 +275,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void user_test_46_1_Given_ValidIds_When_banUser_Then_userBanned() {
+    public void user_test_47_Given_ValidIds_When_banUser_Then_userBanned() {
         when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(admin));
         when(userRepositoryMock.findById(2L)).thenReturn(Optional.of(noAdmin));
         when(userRepositoryMock.getReferenceById(anyLong())).thenReturn(noAdmin);
@@ -290,7 +290,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void user_test_46_2_Given_ValidIds_When_unbanUser_Then_userBanned() {
+    public void user_test_48_Given_ValidIds_When_unbanUser_Then_userBanned() {
         when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(admin));
         when(userRepositoryMock.findById(2L)).thenReturn(Optional.of(noAdminBanned));
         when(userRepositoryMock.getReferenceById(anyLong())).thenReturn(noAdmin);
@@ -305,7 +305,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void user_test_46_3_Given_userNotExists_When_banUser_Then_ResourceNotFound() {
+    public void user_test_49_Given_userNotExists_When_banUser_Then_ResourceNotFound() {
         when(userRepositoryMock.findById(2L)).thenThrow(new ResourceNotFoundException(
                 "User with given ID = 2 not found"
         ));
@@ -315,7 +315,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void user_test_46_4_Given_currentUserNotExists_When_banUser_Then_ResourceNotFound() {
+    public void user_test_50_Given_currentUserNotExists_When_banUser_Then_ResourceNotFound() {
         when(userRepositoryMock.findById(2L)).thenReturn(Optional.ofNullable(noAdmin));
         when(userRepositoryMock.findById(1L)).thenThrow(new ResourceNotFoundException(
                 "User with given ID = 1 not found"
@@ -326,7 +326,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void user_test_46_5_Given_currentUserNotAdmin_When_banUser_Then_ActionForbidden() {
+    public void user_test_51_Given_currentUserNotAdmin_When_banUser_Then_ActionForbidden() {
         when(userRepositoryMock.findById(2L)).thenReturn(Optional.ofNullable(noAdmin));
         when(userRepositoryMock.findById(1L)).thenThrow(new ActionForbiddenException(
                 "Action forbidden for current user"
@@ -337,7 +337,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void user_test_46_6_Given_userNotExists_When_unbanUser_Then_ResourceNotFound() {
+    public void user_test_52_Given_userNotExists_When_unbanUser_Then_ResourceNotFound() {
         when(userRepositoryMock.findById(2L)).thenThrow(new ResourceNotFoundException(
                 "User with given ID = 2 not found"
         ));
@@ -347,7 +347,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void user_test_46_7_Given_currentUserNotExists_When_unbanUser_Then_ResourceNotFound() {
+    public void user_test_53_Given_currentUserNotExists_When_unbanUser_Then_ResourceNotFound() {
         when(userRepositoryMock.findById(2L)).thenReturn(Optional.ofNullable(noAdmin));
         when(userRepositoryMock.findById(1L)).thenThrow(new ResourceNotFoundException(
                 "User with given ID = 1 not found"
@@ -358,7 +358,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void user_test_46_8_Given_currentUserNotAdmin_When_unbanUser_Then_ActionForbidden() {
+    public void user_test_54_Given_currentUserNotAdmin_When_unbanUser_Then_ActionForbidden() {
         when(userRepositoryMock.findById(2L)).thenReturn(Optional.ofNullable(noAdmin));
         when(userRepositoryMock.findById(1L)).thenThrow(new ActionForbiddenException(
                 "Action forbidden for current user"
