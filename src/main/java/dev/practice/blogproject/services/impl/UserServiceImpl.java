@@ -67,11 +67,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserFullDto createUser(UserNewDto dto) {
-        String username = dto.getUsername().replaceAll("\\s+","");
+        String username = dto.getUsername().replaceAll("\\s+", "");
+        String email = dto.getEmail().toLowerCase();
         dto.setUsername(username);
+        dto.setEmail(email);
         if (userRepository.findByUsernameOrEmail(dto.getUsername(), dto.getEmail()) != null) {
-            if (dto.getUsername().equals(userRepository
-                    .findByUsernameOrEmail(dto.getUsername(), dto.getEmail()).getUsername())) {
+            if (dto.getUsername().trim().toLowerCase().equals(userRepository
+                    .findByUsernameOrEmail(dto.getUsername(),
+                            dto.getEmail()).getUsername()
+                    .trim().toLowerCase())) {
                 log.info("InvalidParameterException. User with given Username = " +
                         dto.getUsername() + "already exists");
                 throw new InvalidParameterException("User with given Username already exists");
@@ -103,10 +107,17 @@ public class UserServiceImpl implements UserService {
             userFromBd.setLastName(dto.getLastName());
         }
         if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
-            String uName = dto.getUsername().replaceAll("\\s+","");
+            String uName = dto.getUsername().replaceAll("\\s+", "");
+            if(uName.equalsIgnoreCase(userFromBd.getUsername())) {
+                throw new ActionForbiddenException("User with given Username already exists");
+            }
             userFromBd.setUsername(uName);
         }
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            if(userRepository.findByEmail(dto.getEmail()
+                    .replaceAll("\\s+", "").toLowerCase()).isPresent()) {
+                throw new ActionForbiddenException("User with given email already exists");
+            }
             userFromBd.setEmail(dto.getEmail());
         }
         if (dto.getBirthDate() != null) {
@@ -138,7 +149,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getReferenceById(userId);
         user.setIsBanned(Boolean.TRUE);
         User savedUser = userRepository.save(user);
-        log.info("User with ID = " + userId+ " was banned by admin with ID = " + currentUserId);
+        log.info("User with ID = " + userId + " was banned by admin with ID = " + currentUserId);
         return UserMapper.toUserFullDto(savedUser);
     }
 
@@ -150,7 +161,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getReferenceById(userId);
         user.setIsBanned(Boolean.FALSE);
         User savedUser = userRepository.save(user);
-        log.info("User with ID = " + userId+ " was unbanned by admin with ID = " + currentUserId);
+        log.info("User with ID = " + userId + " was unbanned by admin with ID = " + currentUserId);
         return UserMapper.toUserFullDto(savedUser);
     }
 
