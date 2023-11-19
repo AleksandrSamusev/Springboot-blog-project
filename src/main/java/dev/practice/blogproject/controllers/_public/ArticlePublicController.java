@@ -26,9 +26,9 @@ public class ArticlePublicController {
         return new ResponseEntity<>(articleService.getAllArticles(from, size), HttpStatus.OK);
     }
 
-    @GetMapping("users/{userId}")
+    @GetMapping("users/{authorId}")
     public ResponseEntity<List<ArticleShortDto>> getAllArticlesByUserId(
-            @PathVariable("userId") Long userId,
+            @PathVariable("authorId") Long userId,
             @RequestParam(defaultValue = "0") Integer from,
             @RequestParam(defaultValue = "10") Integer size) {
         return new ResponseEntity<>(articleService.getAllArticlesByUserId(userId, from, size), HttpStatus.OK);
