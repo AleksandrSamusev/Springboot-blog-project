@@ -2,8 +2,10 @@ package dev.practice.blogproject.tag;
 
 import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.article.ArticleNewDto;
+import dev.practice.blogproject.dtos.tag.TagFullDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.dtos.tag.TagShortDto;
+import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.models.Role;
 import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.ArticleRepository;
@@ -116,6 +118,38 @@ public class TagIntegrationTest {
         assertThat(result.getTags().size()).isEqualTo(1);
         assertThat(tags.get(0).getName()).isEqualTo(newTag1.getName());
         assertThat(tagRepository.findAll().size()).isEqualTo(1);
+    }
+
+    @Test
+    void tag_test_27_Given_tagConnectedToArticle_When_removeTagsFromArticle_Then_tegRemoved() {
+        dropDB();
+        User savedAuthor = userRepository.save(author);
+        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUserId(), newArticle);
+        TagFullDto savedTag = tagService.createTag(newTag1, savedArticle.getArticleId());
+
+        ArticleFullDto result = tagService.removeTagsFromArticle(
+                savedAuthor.getUserId(), savedArticle.getArticleId(), List.of(savedTag.getTagId()));
+
+        assertThat(result.getTags().size()).isEqualTo(0);
+        assertThat(tagRepository.findAll().size()).isEqualTo(1);
+        assertThat(tagRepository.findAll().get(0).getArticles().size()).isEqualTo(0);
+    }
+
+    @Test
+    void tag_test_28_Given_tagNotConnectedToArticle_When_removeTagsFromArticle_Then_tegRemoved() {
+        dropDB();
+        User savedAuthor = userRepository.save(author);
+        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUserId(), newArticle);
+        ArticleFullDto savedArticle2 = articleService.createArticle(savedAuthor.getUserId(), newArticle2);
+        TagFullDto savedTag = tagService.createTag(newTag1, savedArticle.getArticleId());
+        TagFullDto savedTag2 = tagService.createTag(newTag2, savedArticle2.getArticleId());
+
+        ArticleFullDto result = tagService.removeTagsFromArticle(
+                savedAuthor.getUserId(), savedArticle.getArticleId(), List.of(savedTag2.getTagId()));
+
+        assertThat(result.getTags().size()).isEqualTo(1);
+        assertThat(tagRepository.findAll().size()).isEqualTo(2);
+        assertThat(tagRepository.findById(savedTag2.getTagId()).get().getArticles().size()).isEqualTo(1);
     }
 
     private void dropDB() {

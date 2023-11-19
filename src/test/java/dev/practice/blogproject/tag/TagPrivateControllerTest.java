@@ -8,6 +8,8 @@ import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.dtos.tag.TagShortDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.models.ArticleStatus;
+import dev.practice.blogproject.models.Tag;
+import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.services.impl.TagServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,9 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +40,9 @@ public class TagPrivateControllerTest {
 
     @MockBean
     private TagServiceImpl tagService;
+
+    @MockBean
+    private TagRepository tagRepository;
 
     @Autowired
     private ObjectMapper mapper;
@@ -129,5 +132,32 @@ public class TagPrivateControllerTest {
 
         Mockito.verify(tagService, Mockito.times(1))
                 .addTagsToArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.any());
+    }
+
+    @Test
+    void tag_test_29_Given_listTags_When_removeTagsFromArticle_Then_tegRemoved() throws Exception {
+        when(tagService.removeTagsFromArticle(anyLong(), anyLong(), any())).thenReturn(articleFull);
+
+        mockMvc.perform(patch("/api/v1/private/tags/articles/{articleId}/remove", 1L)
+                        .header("X-Current-User-Id", 1)
+                        .param("tags", String.valueOf(1L), String.valueOf(2L))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.articleId").value(1))
+                .andExpect(jsonPath("$.title").value(articleFull.getTitle()))
+                .andExpect(jsonPath("$.content").value(articleFull.getContent()))
+                .andExpect(jsonPath("$.author.userId").value(articleFull.getAuthor().getUserId().intValue()))
+                .andExpect(jsonPath("$.author.username").value(articleFull.getAuthor().getUsername()))
+                .andExpect(jsonPath("$.created").value(notNullValue()))
+                .andExpect(jsonPath("$.published").value(nullValue()))
+                .andExpect(jsonPath("$.status").value("CREATED"))
+                .andExpect(jsonPath("$.likes").value(0))
+                .andExpect(jsonPath("$.comments").isEmpty())
+                .andExpect(jsonPath("$.tags").isEmpty());
+
+        Mockito.verify(tagService, Mockito.times(1))
+                .removeTagsFromArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.any());
     }
 }
