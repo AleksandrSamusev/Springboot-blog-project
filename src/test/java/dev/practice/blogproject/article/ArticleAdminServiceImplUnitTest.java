@@ -3,11 +3,13 @@ package dev.practice.blogproject.article;
 import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.mappers.UserMapper;
+import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.models.Role;
 import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.repositories.UserRepository;
+import dev.practice.blogproject.services.ArticleAdminService;
 import dev.practice.blogproject.services.ArticlePrivateService;
 import dev.practice.blogproject.services.impl.ArticleAdminServiceImpl;
 import org.junit.jupiter.api.Assertions;
@@ -50,13 +52,15 @@ public class ArticleAdminServiceImplUnitTest {
     private final ArticleFullDto fullArticle = new ArticleFullDto(0L, "The empty pot",
             "Very interesting information", UserMapper.toUserShortDto(author), LocalDateTime.now(), LocalDateTime.now(),
             ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+    private final Article article = new Article(0L, "The empty pot",
+            "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
+            ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
 
     @Test
     void article_test_1_Given_adminAndExistUser_When_getAllArticlesByUserId_Then_returnAllUserArticles() {
         Mockito
                 .when(userRepository.findById(1L))
                 .thenReturn(Optional.of(admin));
-
         Mockito
                 .when(articlePrivateService.getAllArticlesByUserId(
                         Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any()))
@@ -83,5 +87,45 @@ public class ArticleAdminServiceImplUnitTest {
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
         Mockito.verify(articlePrivateService, Mockito.times(0))
                 .getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    void article_test_6_Given_adminPublishTrue_When_publishArticle_Then_returnArticleStatusPublished() {
+        article.setPublished(null);
+        article.setStatus(ArticleStatus.CREATED);
+        Mockito
+                .when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(admin));
+        Mockito
+                .when(articleRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(article));
+        Mockito
+                .when(articleRepository.save(Mockito.any()))
+                .thenReturn(article);
+
+        ArticleFullDto result = articleService.publishArticle(2L, 0L, true);
+
+        assertThat(result.getPublished()).isNotNull();
+        assertThat(result.getStatus()).isEqualTo(ArticleStatus.PUBLISHED);
+    }
+
+    @Test
+    void article_test_7_Given_adminPublishFalse_When_publishArticle_Then_returnArticleStatusRejected() {
+        article.setPublished(null);
+        article.setStatus(ArticleStatus.CREATED);
+        Mockito
+                .when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(admin));
+        Mockito
+                .when(articleRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(article));
+        Mockito
+                .when(articleRepository.save(Mockito.any()))
+                .thenReturn(article);
+
+        ArticleFullDto result = articleService.publishArticle(2L, 0L, false);
+
+        assertThat(result.getPublished()).isNull();
+        assertThat(result.getStatus()).isEqualTo(ArticleStatus.REJECTED);
     }
 }

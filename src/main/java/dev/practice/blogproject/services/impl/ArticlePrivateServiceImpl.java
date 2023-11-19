@@ -135,6 +135,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         };
     }
 
+
     @Override
     public void deleteArticle(long userId, long articleId) {
         Article article = checkArticleExist(articleId);
@@ -152,6 +153,18 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
         articleRepository.delete(article);
         log.info("Article with id {} was deleted", articleId);
+    }
+
+    @Override
+    public ArticleFullDto publishArticle(Long userId, Long articleId) {
+        User user = checkUserExist(userId);
+        checkUserIsNotBanned(user);
+        Article article = checkArticleExist(articleId);
+        checkUserIsAuthor(article, userId);
+        article.setStatus(ArticleStatus.MODERATING);
+
+        log.info("Article with id {} was sent to moderation", articleId);
+        return ArticleMapper.toArticleFullDto(articleRepository.save(article));
     }
 
 

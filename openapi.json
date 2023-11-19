@@ -709,6 +709,130 @@
         }
       }
     },
+    "/private/tags/articles/{articleId}/add": {
+      "patch": {
+        "tags": [
+          "Private Tag Controller"
+        ],
+        "summary": "Add tags to an article",
+        "description": "add tags to an article\n",
+        "operationId": "addTags",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/TagNewDto"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/tags/articles/{articleId}/remove": {
+      "patch": {
+        "tags": [
+          "Private Tag Controller"
+        ],
+        "summary": "Add tags to an article",
+        "description": "add tags to an article\n",
+        "operationId": "addTags",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/TagNewDto"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/admin/tags/{tagId}": {
       "delete": {
         "tags": [
@@ -804,6 +928,76 @@
             "description": "Internal server error"
           }
         }
+      },
+      "get": {
+        "tags": [
+          "Private Article Controller"
+        ],
+        "summary": "Get all articles by user ID",
+        "description": "Get all articles by user ID\n",
+        "operationId": "getArticlesByUserId",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "default": "ALL"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ArticleFullDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
       }
     },
     "/public/articles": {
@@ -820,7 +1014,116 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ArticleShortDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/public/articles/{articleId}": {
+      "get": {
+        "tags": [
+          "Public Article Controller"
+        ],
+        "summary": "Get article by ID",
+        "description": "Get article by ID\n",
+        "operationId": "getArticleById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
                   "$ref": "#/components/schemas/ArticleShortDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/public/articles/users/{authorId}": {
+      "get": {
+        "tags": [
+          "Public Article Controller"
+        ],
+        "summary": "Get articles by author ID",
+        "description": "Get all articles by author ID\n",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "authorId",
+            "description": "Author ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ArticleShortDto"
+                  }
                 }
               }
             }
@@ -864,6 +1167,149 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ArticleShortDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/articles/{articleId}/publish": {
+      "patch": {
+        "tags": [
+          "Admin Article Controller"
+        ],
+        "summary": "Publish article",
+        "description": "Publish or reject given article \n",
+        "operationId": "publishArticle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "publish",
+            "description": "publish",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/articles/users/{authorId}": {
+      "get": {
+        "tags": [
+          "Admin Article Controller"
+        ],
+        "summary": "Get all articles by user ID",
+        "description": "Get all articles by user ID\n",
+        "operationId": "getArticlesByUserId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "authorId",
+            "description": "Author ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "default": "ALL"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ArticleFullDto"
+                  }
                 }
               }
             }
@@ -1029,6 +1475,58 @@
         "responses": {
           "200": {
             "description": "Ok"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/private/articles/{articleId}/publish": {
+      "patch": {
+        "tags": [
+          "Private Article Controller"
+        ],
+        "summary": "Publish article",
+        "description": "Publish article by given ID\n",
+        "operationId": "publishArticle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "X-Current-User-Id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleFullDto"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad request"
