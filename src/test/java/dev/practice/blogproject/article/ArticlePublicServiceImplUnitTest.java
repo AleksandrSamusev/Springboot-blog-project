@@ -3,11 +3,9 @@ package dev.practice.blogproject.article;
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
-import dev.practice.blogproject.models.Article;
-import dev.practice.blogproject.models.ArticleStatus;
-import dev.practice.blogproject.models.Role;
-import dev.practice.blogproject.models.User;
+import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.ArticleRepository;
+import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.impl.ArticlePublicServiceImpl;
 import org.junit.jupiter.api.Assertions;
@@ -24,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -34,6 +33,9 @@ public class ArticlePublicServiceImplUnitTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private TagRepository tagRepository;
 
     @InjectMocks
     private ArticlePublicServiceImpl articleService;
@@ -53,6 +55,7 @@ public class ArticlePublicServiceImplUnitTest {
     private final Article savedArticle2 = new Article(1L, "A pretty cat",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
             ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+
 
 
     @Test

@@ -7,6 +7,7 @@ import dev.practice.blogproject.dtos.user.UserShortDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.services.ArticlePublicService;
+import dev.practice.blogproject.services.TagService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class ArticlePublicControllerTest {
     @MockBean
     private ArticlePublicService articleService;
 
+    @MockBean
+    private TagService tagService;
+
     @Autowired
     private MockMvc mvc;
 
@@ -44,6 +48,7 @@ public class ArticlePublicControllerTest {
     private final ArticleShortDto articleShort2 = new ArticleShortDto(2L, "The pretty pot",
             "Very interesting information", author, LocalDateTime.now().minusDays(2), 0L, new HashSet<>(),
             new HashSet<>());
+    private final List<ArticleShortDto> list = List.of(articleShort, articleShort2);
 
     @Test
     void article_test_3_Given_anyUser_When_getAllArticles_Then_returnAllPublishedStatusOk() throws Exception {
@@ -116,9 +121,9 @@ public class ArticlePublicControllerTest {
                 .thenReturn(articleShort);
 
         mvc.perform(patch("/api/v1/public/articles/{articleId}/like", 0L)
-                .characterEncoding(StandardCharsets.UTF_8)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -127,7 +132,7 @@ public class ArticlePublicControllerTest {
             throws Exception {
         Mockito
                 .when(articleService.likeArticle(Mockito.anyLong()))
-                        .thenThrow(new ResourceNotFoundException("Article with id 0 wasn't found"));
+                .thenThrow(new ResourceNotFoundException("Article with id 0 wasn't found"));
 
         mvc.perform(patch("/api/v1/public/articles/{articleId}/like", 0L)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -148,5 +153,18 @@ public class ArticlePublicControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void article_test_41_Given_ValidId_When_getAllArticlesByTag_Then_ReturnList() throws Exception {
+        Mockito
+                .when(articleService.getAllArticlesByTag(Mockito.anyLong()))
+                .thenReturn(list);
+
+        mvc.perform(get("/api/v1/public/articles/tags/1")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }

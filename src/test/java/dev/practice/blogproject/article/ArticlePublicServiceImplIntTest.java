@@ -1,15 +1,17 @@
 package dev.practice.blogproject.article;
 
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
+import dev.practice.blogproject.dtos.tag.TagFullDto;
+import dev.practice.blogproject.dtos.tag.TagNewDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
-import dev.practice.blogproject.models.Article;
-import dev.practice.blogproject.models.ArticleStatus;
-import dev.practice.blogproject.models.Role;
-import dev.practice.blogproject.models.User;
+import dev.practice.blogproject.mappers.TagMapper;
+import dev.practice.blogproject.models.*;
 import dev.practice.blogproject.repositories.ArticleRepository;
+import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.ArticlePublicService;
+import dev.practice.blogproject.services.TagService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
@@ -19,8 +21,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,7 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ArticlePublicServiceImplIntTest {
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
+    private final TagRepository tagRepository;
     private final ArticlePublicService articleService;
+    private final TagService tagService;
 
 
     private final User user = new User(null, "Harry", "Potter", "HP",
@@ -51,6 +58,14 @@ public class ArticlePublicServiceImplIntTest {
     private final Article article3 = new Article(null, "The title",
             "Very interesting information", user, LocalDateTime.now(), null, ArticleStatus.CREATED,
             0L, new HashSet<>(), new HashSet<>());
+
+    private final Article articleWithTags1 = new Article(1L, "A pretty cat",
+            "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
+            ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+
+    private final Article articleWithTags2 = new Article(2L, "A pretty cat",
+            "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
+            ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
 
     @Test
     void article_test_2_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticlesNewFirst() {
@@ -130,10 +145,33 @@ public class ArticlePublicServiceImplIntTest {
         assertThat(result.get(0).getTitle()).isEqualTo("24");
     }
 
+    @Test
+    public void article_test_40_Given_ValidId_When_GetAllArticlesByTag_Then_ReturnList() {
+        dropDB();
+        Article article2 = new Article(null, "A pretty cat",
+                "Very interesting information", user, LocalDateTime.now().minusDays(2),
+                LocalDateTime.now().minusDays(1), ArticleStatus.PUBLISHED, 0L,
+                new HashSet<>(), new HashSet<>());
+
+        User savedUser = userRepository.save(user);
+        Article savedArticle1 = articleRepository.save(article);
+        TagFullDto createdTag = tagService.createTag(new TagNewDto("tag1"), savedArticle1.getArticleId());
+        Article savedArticle2 = articleRepository.save(article2);
+        tagService.addTagsToArticle(savedUser.getUserId(), savedArticle2.getArticleId(),
+                List.of(new TagNewDto(createdTag.getName())));
+
+        List<ArticleShortDto> result = articleService.getAllArticlesByTag(createdTag.getTagId());
+
+        Assertions.assertEquals(result.size(), 2);
+        Assertions.assertEquals(result.get(0).getArticleId(), savedArticle2.getArticleId());
+        Assertions.assertEquals(result.get(1).getArticleId(), savedArticle1.getArticleId());
+        Assertions.assertEquals(new ArrayList<>(result.get(0).getTags()).get(0).getTagId(), createdTag.getTagId());
+        Assertions.assertEquals(new ArrayList<>(result.get(1).getTags()).get(0).getTagId(), createdTag.getTagId());
+    }
+
+
     private void dropDB() {
         articleRepository.deleteAll();
         userRepository.deleteAll();
     }
-
-
 }

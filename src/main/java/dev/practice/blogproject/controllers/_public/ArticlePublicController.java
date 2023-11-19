@@ -38,4 +38,9 @@ public class ArticlePublicController {
     public ResponseEntity<ArticleShortDto> likeArticle(@PathVariable Long articleId) {
         return new ResponseEntity<>(articleService.likeArticle(articleId), HttpStatus.OK);
     }
+
+    @GetMapping("/tags/{tagId}")
+    public ResponseEntity<List<ArticleShortDto>> getAllArticlesByTag(@PathVariable Long tagId) {
+        return new ResponseEntity<>(articleService.getAllArticlesByTag(tagId), HttpStatus.OK);
+    }
 }

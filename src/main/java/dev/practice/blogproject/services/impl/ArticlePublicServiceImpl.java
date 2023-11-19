@@ -4,10 +4,12 @@ import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.exceptions.ActionForbiddenException;
 import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.mappers.ArticleMapper;
+import dev.practice.blogproject.mappers.TagMapper;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.ArticleRepository;
+import dev.practice.blogproject.repositories.TagRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.ArticlePublicService;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +18,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,7 @@ import java.util.Optional;
 public class ArticlePublicServiceImpl implements ArticlePublicService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
+    private final TagRepository tagRepository;
 
     @Override
     public ArticleShortDto getArticleById(Long articleId) {
@@ -64,6 +69,17 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
         return ArticleMapper.toArticleShortDto(savedArticle);
     }
 
+    @Override
+    public List<ArticleShortDto> getAllArticlesByTag(Long tagId) {
+        isTagExists(tagId);
+        return tagRepository.getReferenceById(tagId).getArticles()
+                .stream()
+                .filter((x)-> x.getPublished() != null)
+                .map(ArticleMapper::toArticleShortDto)
+                .sorted(Comparator.comparing(ArticleShortDto::getPublished))
+                .collect(Collectors.toList());
+    }
+
     private Article checkArticleExist(Long articleId) {
         Optional<Article> article = articleRepository.findById(articleId);
         if (article.isEmpty()) {
@@ -79,6 +95,12 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
                     article.getStatus());
             throw new ActionForbiddenException(String.format("Article with id %d is not published yet",
                     article.getArticleId()));
+        }
+    }
+
+    private void isTagExists(Long tagId) {
+        if(!tagRepository.existsById(tagId)) {
+            throw new ResourceNotFoundException("Tag with given ID = " + tagId + " not found");
         }
     }
 
