@@ -20,7 +20,10 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,5 +84,66 @@ public class ArticleAdminControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void article_test_8_Given_adminPublishFalse_When_publishArticle_Then_ReturnArticleStatusOk() throws Exception {
+        articleFull.setStatus(ArticleStatus.REJECTED);
+        Mockito
+                .when(articleService.publishArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyBoolean()))
+                .thenReturn(articleFull);
+
+        mvc.perform(patch("/api/v1/admin/articles/{articleId}/publish", 1L)
+                        .header("X-Current-User-Id", 1)
+                        .param("publish", String.valueOf(false))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.articleId").value(1))
+                .andExpect(jsonPath("$.title").value(articleFull.getTitle()))
+                .andExpect(jsonPath("$.content").value(articleFull.getContent()))
+                .andExpect(jsonPath("$.author.userId").value(author.getUserId().intValue()))
+                .andExpect(jsonPath("$.author.username").value(author.getUsername()))
+                .andExpect(jsonPath("$.created").value(notNullValue()))
+                .andExpect(jsonPath("$.published").value(nullValue()))
+                .andExpect(jsonPath("$.status").value("REJECTED"))
+                .andExpect(jsonPath("$.likes").value(0))
+                .andExpect(jsonPath("$.comments").isEmpty())
+                .andExpect(jsonPath("$.tags").isEmpty());
+
+        Mockito.verify(articleService, Mockito.times(1))
+                .publishArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyBoolean());
+    }
+
+    @Test
+    void article_test_9_Given_adminPublishTrue_When_publishArticle_Then_ReturnArticleStatusOk() throws Exception {
+        articleFull.setStatus(ArticleStatus.PUBLISHED);
+        articleFull.setPublished(LocalDateTime.now());
+        Mockito
+                .when(articleService.publishArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyBoolean()))
+                .thenReturn(articleFull);
+
+        mvc.perform(patch("/api/v1/admin/articles/{articleId}/publish", 1L)
+                        .header("X-Current-User-Id", 1)
+                        .param("publish", String.valueOf(false))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.articleId").value(1))
+                .andExpect(jsonPath("$.title").value(articleFull.getTitle()))
+                .andExpect(jsonPath("$.content").value(articleFull.getContent()))
+                .andExpect(jsonPath("$.author.userId").value(author.getUserId().intValue()))
+                .andExpect(jsonPath("$.author.username").value(author.getUsername()))
+                .andExpect(jsonPath("$.created").value(notNullValue()))
+                .andExpect(jsonPath("$.published").value(notNullValue()))
+                .andExpect(jsonPath("$.status").value("PUBLISHED"))
+                .andExpect(jsonPath("$.likes").value(0))
+                .andExpect(jsonPath("$.comments").isEmpty())
+                .andExpect(jsonPath("$.tags").isEmpty());
+
+        Mockito.verify(articleService, Mockito.times(1))
+                .publishArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyBoolean());
     }
 }
