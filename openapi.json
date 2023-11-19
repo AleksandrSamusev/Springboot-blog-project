@@ -804,7 +804,9 @@
             "description": "Internal server error"
           }
         }
-      },
+      }
+    },
+    "/public/articles": {
       "get": {
         "tags": [
           "Public Article Controller"
@@ -812,6 +814,49 @@
         "summary": "Get all articles",
         "description": "Get all articles\n",
         "operationId": "getArticles",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleShortDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/public/articles/{articleId}/like": {
+      "patch": {
+        "tags": [
+          "Public Article Controller"
+        ],
+        "summary": "Like article",
+        "description": "Like article by ID\n",
+        "operationId": "likeArticle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "articleId",
+            "description": "Article ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Ok",

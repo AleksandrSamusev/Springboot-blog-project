@@ -33,4 +33,9 @@ public class ArticlePublicController {
             @RequestParam(defaultValue = "10") Integer size) {
         return new ResponseEntity<>(articleService.getAllArticlesByUserId(userId, from, size), HttpStatus.OK);
     }
+
+    @PatchMapping("/{articleId}/like")
+    public ResponseEntity<ArticleShortDto> likeArticle(@PathVariable Long articleId) {
+        return new ResponseEntity<>(articleService.likeArticle(articleId), HttpStatus.OK);
+    }
 }

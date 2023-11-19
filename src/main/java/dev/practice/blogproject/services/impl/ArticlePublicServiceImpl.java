@@ -51,6 +51,17 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
                 userId, ArticleStatus.PUBLISHED, pageable));
     }
 
+    @Override
+    public ArticleShortDto likeArticle(Long articleId) {
+        checkArticleExist(articleId);
+        Article article = articleRepository.getReferenceById(articleId);
+        Long likes = article.getLikes();
+        likes++;
+        article.setLikes(likes);
+        articleRepository.save(article);
+        return null;
+    }
+
     private Article checkArticleExist(Long articleId) {
         Optional<Article> article = articleRepository.findById(articleId);
         if (article.isEmpty()) {
