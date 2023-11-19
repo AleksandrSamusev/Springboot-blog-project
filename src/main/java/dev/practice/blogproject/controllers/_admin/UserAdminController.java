@@ -14,13 +14,13 @@ public class UserAdminController {
 
     private final UserService userService;
 
-    @PostMapping("/{userId}/ban")
+    @PatchMapping("/{userId}/ban")
     public ResponseEntity<UserFullDto> banUser(@PathVariable Long userId,
                                                @RequestHeader("X-Current-User-Id") Long currentUserId) {
         return new ResponseEntity<>(userService.banUser(userId, currentUserId), HttpStatus.OK);
     }
 
-    @PostMapping("/{userId}/unban")
+    @PatchMapping("/{userId}/unban")
     public ResponseEntity<UserFullDto> unbanUser(@PathVariable Long userId,
                                                 @RequestHeader("X-Current-User-Id") Long currentUserId) {
         return new ResponseEntity<>(userService.unbanUser(userId, currentUserId), HttpStatus.OK);

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.practice.blogproject.controllers._public.ArticlePublicController;
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
 import dev.practice.blogproject.dtos.user.UserShortDto;
+import dev.practice.blogproject.exceptions.ActionForbiddenException;
+import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.services.ArticlePublicService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,6 +22,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -103,5 +106,47 @@ public class ArticlePublicControllerTest {
 
         Mockito.verify(articleService, Mockito.times(1)).getAllArticlesByUserId(
                 Mockito.any(), Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    public void article_test_15_Given_ExistingArticle_When_LikeArticle_Then_ReturnArticle_200_OK()
+            throws Exception {
+        Mockito
+                .when(articleService.likeArticle(Mockito.anyLong()))
+                .thenReturn(articleShort);
+
+        mvc.perform(patch("/api/v1/public/articles/{articleId}/like", 0L)
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void article_test_16_Given_ArticleNotExists_When_LikeArticle_Then_404_NOT_FOUND()
+            throws Exception {
+        Mockito
+                .when(articleService.likeArticle(Mockito.anyLong()))
+                        .thenThrow(new ResourceNotFoundException("Article with id 0 wasn't found"));
+
+        mvc.perform(patch("/api/v1/public/articles/{articleId}/like", 0L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void article_test_17_Given_ArticleNotPublished_When_LikeArticle_Then_403_FORBIDDEN()
+            throws Exception {
+        Mockito
+                .when(articleService.likeArticle(Mockito.anyLong()))
+                .thenThrow(new ActionForbiddenException("Article with id 0 is not published yet"));
+
+        mvc.perform(patch("/api/v1/public/articles/{articleId}/like", 0L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 }

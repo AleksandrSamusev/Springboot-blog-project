@@ -1,5 +1,6 @@
 package dev.practice.blogproject.services;
 
+import dev.practice.blogproject.dtos.article.ArticleFullDto;
 import dev.practice.blogproject.dtos.tag.TagFullDto;
 import dev.practice.blogproject.dtos.tag.TagNewDto;
 
@@ -13,4 +14,8 @@ public interface TagService {
     List<TagFullDto> getAllArticleTags(Long articleId);
 
     TagFullDto getTagById(Long tagId);
+
+    ArticleFullDto addTagsToArticle(Long userId, Long articleId, List<TagNewDto> tags);
+
+    ArticleFullDto removeTagsFromArticle(Long userId, Long articleId, List<TagNewDto> tags);
 }

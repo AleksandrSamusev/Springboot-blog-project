@@ -1,6 +1,8 @@
 package dev.practice.blogproject.article;
 
 import dev.practice.blogproject.dtos.article.ArticleShortDto;
+import dev.practice.blogproject.exceptions.ActionForbiddenException;
+import dev.practice.blogproject.exceptions.ResourceNotFoundException;
 import dev.practice.blogproject.models.Article;
 import dev.practice.blogproject.models.ArticleStatus;
 import dev.practice.blogproject.models.Role;
@@ -8,6 +10,7 @@ import dev.practice.blogproject.models.User;
 import dev.practice.blogproject.repositories.ArticleRepository;
 import dev.practice.blogproject.repositories.UserRepository;
 import dev.practice.blogproject.services.impl.ArticlePublicServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,6 +47,9 @@ public class ArticlePublicServiceImplUnitTest {
     private final Article savedArticle = new Article(0L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
             ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+    private final Article afterLike = new Article(0L, "The empty pot",
+            "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
+            ArticleStatus.PUBLISHED, 1L, new HashSet<>(), new HashSet<>());
     private final Article savedArticle2 = new Article(1L, "A pretty cat",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
             ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
@@ -87,4 +93,47 @@ public class ArticlePublicServiceImplUnitTest {
         assertThat(result.size()).isEqualTo(1);
     }
 
+
+    @Test
+    void article_test_12_Given_ExistingArticle_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
+        Mockito
+                .when(articleRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(savedArticle));
+        Mockito
+                .when(articleRepository.getReferenceById(Mockito.anyLong()))
+                .thenReturn(savedArticle);
+        Mockito
+                .when(articleRepository.save(Mockito.any())).thenReturn(afterLike);
+
+        ArticleShortDto result = articleService.likeArticle(0L);
+
+        assertThat(result.getArticleId()).isEqualTo(afterLike.getArticleId());
+        assertThat(result.getLikes()).isEqualTo(1);
+    }
+
+    @Test
+    void article_test_13_Given_ArticleNotExists_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
+        Mockito
+                .when(articleRepository.findById(0L))
+                .thenThrow(new ResourceNotFoundException("Article with id 0 wasn't found"));
+
+        ResourceNotFoundException ex = Assertions.assertThrows(ResourceNotFoundException.class, ()->
+                articleService.likeArticle(0L));
+        Assertions.assertEquals("Article with id 0 wasn't found", ex.getMessage());
+    }
+
+    @Test
+    void article_test_14_Given_ArticleNotPublished_When_likeArticle_Then_ActionForbidden() {
+        Mockito
+                .when(articleRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(savedArticle));
+        Mockito
+                .when(articleRepository.getReferenceById(Mockito.anyLong()))
+                .thenThrow(new ActionForbiddenException("Article with id %d is not published yet"));
+
+
+        ActionForbiddenException ex = Assertions.assertThrows(ActionForbiddenException.class, ()->
+                articleService.likeArticle(0L));
+        Assertions.assertEquals("Article with id %d is not published yet", ex.getMessage());
+    }
 }

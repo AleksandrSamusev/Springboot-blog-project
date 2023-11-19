@@ -27,9 +27,9 @@ public class ArticleAdminController {
     }
 
     @PatchMapping("{articleId}/publish")
-    public ResponseEntity<ArticleFullDto> changeArticleStatus(@RequestHeader("X-Current-User-Id") Long userId,
-                                                              @PathVariable("articleId") Long articleId,
-                                                              @RequestParam boolean publish) {
+    public ResponseEntity<ArticleFullDto> publishArticle(@RequestHeader("X-Current-User-Id") Long userId,
+                                                         @PathVariable("articleId") Long articleId,
+                                                         @RequestParam boolean publish) {
         return new ResponseEntity<>(articleService.publishArticle(userId, articleId, publish), HttpStatus.OK);
     }
 }
