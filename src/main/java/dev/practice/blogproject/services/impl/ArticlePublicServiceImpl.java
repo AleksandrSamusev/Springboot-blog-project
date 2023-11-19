@@ -54,12 +54,14 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
     @Override
     public ArticleShortDto likeArticle(Long articleId) {
         checkArticleExist(articleId);
+        checkArticleIsPublished(articleRepository.getReferenceById(articleId));
         Article article = articleRepository.getReferenceById(articleId);
         Long likes = article.getLikes();
         likes++;
         article.setLikes(likes);
-        articleRepository.save(article);
-        return null;
+        Article savedArticle = articleRepository.save(article);
+        log.info("Add like to article with ID = " + articleId);
+        return ArticleMapper.toArticleShortDto(savedArticle);
     }
 
     private Article checkArticleExist(Long articleId) {
