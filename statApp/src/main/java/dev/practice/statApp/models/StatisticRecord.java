@@ -1,5 +1,6 @@
 package dev.practice.statApp.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +25,7 @@ public class StatisticRecord {
 
     @Column(name = "service_name", nullable = false)
     @NotBlank(message = "Service name cannot be blank")
-    private String serviceName = "mainApp";
+    private String serviceName;
 
     @Column(name = "ip", nullable = false)
     @NotBlank(message = "ip address cannot be blank")
@@ -36,5 +37,6 @@ public class StatisticRecord {
 
     @Column(name = "timestamp", nullable = false)
     @NotNull(message = "Timestamp cannot be null")
-    private LocalDateTime timestamp = LocalDateTime.now();
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime timestamp;
 }
