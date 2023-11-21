@@ -3,7 +3,6 @@ package dev.practice.mainApp.services.impl;
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
 import dev.practice.mainApp.dtos.article.ArticleUpdateDto;
-import dev.practice.mainApp.dtos.tag.TagNewDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
@@ -21,10 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -44,17 +41,14 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
         Article savedArticle = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, user));
         if (newArticle.getTags() != null && !newArticle.getTags().isEmpty()) {
-            Set<Tag> tags = (checkTagExist(newArticle.getTags(), savedArticle.getArticleId()));
-            if (!tags.isEmpty()) {
-                Article article = articleRepository.getReferenceById(savedArticle.getArticleId());
-                tags.addAll(article.getTags());
-                article.setTags(tags);
-                user.getArticles().add(article);
-                userRepository.save(user);
+            ArticleFullDto articleWithTags = tagService.addTagsToArticle(
+                    userId, savedArticle.getArticleId(), newArticle.getTags().stream().toList());
 
-                log.info("Article with id {} was created by user with id {}", article.getArticleId(), userId);
-                return ArticleMapper.toArticleFullDto(articleRepository.save(article));
-            }
+            user.getArticles().add(savedArticle);
+            userRepository.save(user);
+
+            log.info("Article with id {} was created by user with id {}", articleWithTags.getArticleId(), userId);
+            return articleWithTags;
         }
 
         user.getArticles().add(savedArticle);
@@ -216,26 +210,6 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
                     "Article with id %d is not belongs to user with id %d. Action is forbidden",
                     article.getArticleId(), userId));
         }
-    }
-
-    private Set<Tag> checkTagExist(Set<TagNewDto> tags, long articleId) {
-        Set<Tag> allTags = new HashSet<>();
-        for (TagNewDto newTag : tags) {
-            newTag.setName(newTag.getName().trim().toLowerCase());
-
-            Tag tag = tagRepository.findTagByName(newTag.getName());
-            if (tag != null) {
-                allTags.add(tag);
-                Set<Article> articles = tag.getArticles();
-                articles.add(articleRepository.getReferenceById(articleId));
-                tag.setArticles(articles);
-                tagRepository.save(tag);
-                log.info("Tag with id {} was added to article with id {}", tag.getTagId(), articleId);
-            } else {
-                tagService.createTag(newTag, articleId);
-            }
-        }
-        return allTags;
     }
 
     private void removeArticleFromTag(Tag tag, Article article) {
