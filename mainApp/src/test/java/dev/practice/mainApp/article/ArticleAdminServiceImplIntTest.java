@@ -49,10 +49,10 @@ public class ArticleAdminServiceImplIntTest {
             new HashSet<>());
     private final Article article = new Article(null, "The empty pot",
             "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(5),
-            ArticleStatus.PUBLISHED, 1450L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 0L, 1450L, new HashSet<>(), new HashSet<>());
     private final Article article2 = new Article(null, "A pretty cat",
-            "Very interesting information", user, LocalDateTime.now(), null, ArticleStatus.CREATED,
-            0L, new HashSet<>(), new HashSet<>());
+            "Very interesting information", user, LocalDateTime.now(), null,  ArticleStatus.CREATED,
+            0L, 0L, new HashSet<>(), new HashSet<>());
 
     @Test
     void article_test_2_Given_adminAndExistUser_When_getAllArticlesByUserId_Then_returnAllUserArticles() {

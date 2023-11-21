@@ -52,7 +52,7 @@ public class TagPrivateControllerTest {
 
     private final ArticleFullDto articleFull = new ArticleFullDto(1L, "The empty pot",
             "Very interesting information", new UserShortDto(1L, "Harry"),
-            LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, new HashSet<>(), new HashSet<>());
+            LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L, new HashSet<>(), new HashSet<>());
 
     @Test
     public void tag_test16_CreateTagTest() throws Exception {

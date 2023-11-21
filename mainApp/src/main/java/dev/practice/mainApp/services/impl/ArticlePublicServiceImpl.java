@@ -1,29 +1,28 @@
 package dev.practice.mainApp.services.impl;
 
-import dev.practice.mainApp.Client.StatsClient;
+import dev.practice.mainApp.client.StatsClient;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.mappers.ArticleMapper;
 import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.ArticleStatus;
+import dev.practice.mainApp.models.StatisticRecord;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticlePublicService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchProperties;
-import org.springframework.boot.autoconfigure.elasticsearch.RestClientBuilderCustomizer;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,9 +36,10 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
     private final StatsClient statsClient;
 
     @Override
-    public ArticleShortDto getArticleById(Long articleId) {
+    public ArticleShortDto getArticleById(Long articleId, HttpServletRequest request) {
         Article article = checkArticleExist(articleId);
         checkArticleIsPublished(article);
+        createRecordAndSave(request);
         log.info("Return article with ID = " + articleId);
         return ArticleMapper.toArticleShortDto(article);
     }
@@ -79,7 +79,7 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
         isTagExists(tagId);
         return tagRepository.getReferenceById(tagId).getArticles()
                 .stream()
-                .filter((x)-> x.getPublished() != null)
+                .filter((x) -> x.getPublished() != null)
                 .map(ArticleMapper::toArticleShortDto)
                 .sorted(Comparator.comparing(ArticleShortDto::getPublished))
                 .collect(Collectors.toList());
@@ -104,7 +104,7 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
     }
 
     private void isTagExists(Long tagId) {
-        if(!tagRepository.existsById(tagId)) {
+        if (!tagRepository.existsById(tagId)) {
             throw new ResourceNotFoundException("Tag with given ID = " + tagId + " not found");
         }
     }
@@ -116,5 +116,16 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
             throw new ResourceNotFoundException(String.format("User with id %d wasn't found", userId));
         }
         return user.get();
+    }
+
+    private void createRecordAndSave(HttpServletRequest request) {
+        StatisticRecord newRecord = new StatisticRecord(
+                null,
+                "mainApp",
+                request.getRemoteAddr(),
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+        statsClient.addStats(newRecord);
     }
 }

@@ -24,7 +24,7 @@ public class StatisticRecord {
 
     @Column(name = "service_name", nullable = false)
     @NotBlank(message = "Service name cannot be blank")
-    private String serviceName;
+    private String serviceName = "mainApp";
 
     @Column(name = "ip", nullable = false)
     @NotBlank(message = "ip address cannot be blank")

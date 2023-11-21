@@ -1,4 +1,4 @@
-package dev.practice.mainApp.Client;
+package dev.practice.mainApp.client;
 
 import dev.practice.mainApp.models.StatisticRecord;
 import lombok.extern.slf4j.Slf4j;

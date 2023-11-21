@@ -45,7 +45,7 @@ public class TagServiceTest {
 
     private final Article article = new Article(1L, "Potions",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
-            ArticleStatus.PUBLISHED, 1450L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 1450L, 0L, new HashSet<>(), new HashSet<>());
 
     private final User admin = new User(10L, "Kirk", "Douglas",
             "kirkDouglas", "kirkdouglas@test.test",

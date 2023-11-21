@@ -8,6 +8,7 @@ import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.mappers.UserMapper;
+import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.UserService;
@@ -162,6 +163,20 @@ public class UserServiceImpl implements UserService {
         user.setIsBanned(Boolean.FALSE);
         User savedUser = userRepository.save(user);
         log.info("User with ID = " + userId + " was unbanned by admin with ID = " + currentUserId);
+        return UserMapper.toUserFullDto(savedUser);
+    }
+
+    @Override
+    public UserFullDto changeRole(Long userId, String role) {
+        isUserExists(userId);
+        User user = userRepository.getReferenceById(userId);
+        if(role.equals("ADMIN")) {
+            user.setRole(Role.ADMIN);
+        } else {
+            user.setRole(Role.USER);
+        }
+        User savedUser = userRepository.save(user);
+        log.info("The role of the user with ID = {} has changed to ADMIN", userId);
         return UserMapper.toUserFullDto(savedUser);
     }
 

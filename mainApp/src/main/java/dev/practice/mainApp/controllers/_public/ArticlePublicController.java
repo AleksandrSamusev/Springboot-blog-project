@@ -2,6 +2,7 @@ package dev.practice.mainApp.controllers._public;
 
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.services.ArticlePublicService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,9 @@ public class ArticlePublicController {
     public final ArticlePublicService articleService;
 
     @GetMapping("/{articleId}")
-    public ResponseEntity<ArticleShortDto> getArticleById(@PathVariable("articleId") Long articleId) {
-        return new ResponseEntity<>(articleService.getArticleById(articleId), HttpStatus.OK);
+    public ResponseEntity<ArticleShortDto> getArticleById(@PathVariable("articleId") Long articleId,
+                                                          HttpServletRequest request) {
+        return new ResponseEntity<>(articleService.getArticleById(articleId, request), HttpStatus.OK);
     }
 
     @GetMapping
