@@ -291,7 +291,7 @@
       }
     },
     "/admin/users/{userId}/ban": {
-      "post": {
+      "patch": {
         "tags": [
           "Admin User Controller"
         ],
@@ -343,7 +343,7 @@
       }
     },
     "/admin/users/{userId}/unban": {
-      "post": {
+      "patch": {
         "tags": [
           "Admin User Controller"
         ],
@@ -776,9 +776,9 @@
         "tags": [
           "Private Tag Controller"
         ],
-        "summary": "Add tags to an article",
+        "summary": "Remove tags from an article",
         "description": "add tags to an article\n",
-        "operationId": "addTags",
+        "operationId": "removeTags",
         "parameters": [
           {
             "in": "path",
@@ -805,9 +805,11 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/components/schemas/TagNewDto"
+                "type": "integer",
+                "format": "int64"
               }
-            }
+            },
+            "required": true
           }
         ],
         "responses": {
@@ -933,9 +935,9 @@
         "tags": [
           "Private Article Controller"
         ],
-        "summary": "Get all articles by user ID",
+        "summary": "Get all articles",
         "description": "Get all articles by user ID\n",
-        "operationId": "getArticlesByUserId",
+        "operationId": "getAllArticles",
         "parameters": [
           {
             "in": "header",
@@ -1110,6 +1112,52 @@
             "schema": {
               "type": "integer",
               "default": 10
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ArticleShortDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/public/articles/tag/{tagId}": {
+      "get": {
+        "tags": [
+          "Public Article Controller"
+        ],
+        "summary": "Get all articles by tag ID",
+        "description": "Returns a list of articles by given tag\n",
+        "operationId": "getAllArticlesByTagId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tagId",
+            "description": "Tag ID",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
             },
             "required": true
           }
