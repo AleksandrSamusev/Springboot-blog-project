@@ -1,7 +1,7 @@
 package dev.practice.statApp.services;
 
-import dev.practice.statApp.models.Stats;
+import dev.practice.statApp.models.StatisticRecord;
 
 public interface StatsService {
-    Stats addStats(Stats stats);
+    StatisticRecord addStats(StatisticRecord statisticRecord);
 }

@@ -1,6 +1,6 @@
 package dev.practice.statApp.controller;
 
-import dev.practice.statApp.models.Stats;
+import dev.practice.statApp.models.StatisticRecord;
 import dev.practice.statApp.services.StatsService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ public class StatsController {
     private final StatsService statsService;
 
     @PostMapping("/stats")
-    public ResponseEntity<Stats> addStats(@Valid @RequestBody Stats stats) {
-        return new ResponseEntity<>(statsService.addStats(stats), HttpStatus.CREATED);
+    public ResponseEntity<StatisticRecord> addStats(@Valid @RequestBody StatisticRecord statisticRecord) {
+        return new ResponseEntity<>(statsService.addStats(statisticRecord), HttpStatus.CREATED);
     }
 }

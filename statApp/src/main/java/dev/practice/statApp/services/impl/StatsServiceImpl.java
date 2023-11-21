@@ -1,6 +1,6 @@
 package dev.practice.statApp.services.impl;
 
-import dev.practice.statApp.models.Stats;
+import dev.practice.statApp.models.StatisticRecord;
 import dev.practice.statApp.repositories.StatsRepository;
 import dev.practice.statApp.services.StatsService;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ public class StatsServiceImpl implements StatsService {
     private final StatsRepository statsRepository;
 
     @Override
-    public Stats addStats(Stats stats) {
-       return statsRepository.save(stats);
+    public StatisticRecord addStats(StatisticRecord statisticRecord) {
+       return statsRepository.save(statisticRecord);
     }
 }

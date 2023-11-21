@@ -1,5 +1,6 @@
 package dev.practice.mainApp.services.impl;
 
+import dev.practice.mainApp.Client.StatsClient;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
@@ -13,12 +14,16 @@ import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticlePublicService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchProperties;
+import org.springframework.boot.autoconfigure.elasticsearch.RestClientBuilderCustomizer;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,6 +34,7 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
+    private final StatsClient statsClient;
 
     @Override
     public ArticleShortDto getArticleById(Long articleId) {
