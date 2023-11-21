@@ -3,7 +3,6 @@ package dev.practice.mainApp.services.impl;
 import dev.practice.mainApp.dtos.message.MessageFullDto;
 import dev.practice.mainApp.dtos.message.MessageNewDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
-import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.mappers.MessageMapper;
 import dev.practice.mainApp.models.Message;
 import dev.practice.mainApp.models.User;
@@ -16,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j

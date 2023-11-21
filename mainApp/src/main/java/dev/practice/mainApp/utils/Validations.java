@@ -88,10 +88,13 @@ public class Validations {
         }
     }
 
-    public void isTagExists(Long tagId) {
-        if (!tagRepository.existsById(tagId)) {
+    public Tag isTagExists(Long tagId) {
+        Optional<Tag> tag = tagRepository.findById(tagId);
+        if (tag.isEmpty()) {
+            log.error("Tag with given ID = " + tagId + " not found");
             throw new ResourceNotFoundException("Tag with given ID = " + tagId + " not found");
         }
+        return tag.get();
     }
 
     public Comment isCommentExists(Long commentId) {

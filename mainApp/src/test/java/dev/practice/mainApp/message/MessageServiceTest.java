@@ -6,7 +6,6 @@ import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.MessageRepository;
-import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.impl.MessageServiceImpl;
 import dev.practice.mainApp.utils.Validations;
 import org.junit.Test;
@@ -18,7 +17,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
