@@ -3,11 +3,9 @@ package dev.practice.mainApp.utils;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
-import dev.practice.mainApp.models.Article;
-import dev.practice.mainApp.models.ArticleStatus;
-import dev.practice.mainApp.models.Role;
-import dev.practice.mainApp.models.User;
+import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.ArticleRepository;
+import dev.practice.mainApp.repositories.CommentRepository;
 import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +21,38 @@ public class Validations {
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
     private final TagRepository tagRepository;
+    private final CommentRepository commentRepository;
 
+    public User checkUserExist(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            log.error("User with id {} wasn't found", userId);
+            throw new ResourceNotFoundException(String.format("User with id %d wasn't found", userId));
+        }
+        return user.get();
+    }
+
+    public void checkUserIsNotBanned(User user) {
+        if (user.getIsBanned()) {
+            log.error("User with id {} is blocked", user.getUserId());
+            throw new ActionForbiddenException(String.format("User with id %d is blocked", user.getUserId()));
+        }
+    }
 
     public void checkUserIsAdmin(Long userId) {
         if (userRepository.findById(userId).get().getRole() != Role.ADMIN) {
             log.error("User with id {} is not ADMIN", userId);
             throw new ActionForbiddenException(String.format(
                     "User with id %d is not ADMIN. Access is forbidden", userId));
+        }
+    }
+
+    public void checkUserIsAuthor(Article article, long userId) {
+        if (article.getAuthor().getUserId() != userId) {
+            log.error("Article with id {} is not belongs to user with id {}", article.getArticleId(), userId);
+            throw new ActionForbiddenException(String.format(
+                    "Article with id %d is not belongs to user with id %d. Action is forbidden",
+                    article.getArticleId(), userId));
         }
     }
 
@@ -51,28 +74,6 @@ public class Validations {
         }
     }
 
-    public void isTagExists(Long tagId) {
-        if (!tagRepository.existsById(tagId)) {
-            throw new ResourceNotFoundException("Tag with given ID = " + tagId + " not found");
-        }
-    }
-
-    public User checkUserExist(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            log.error("User with id {} wasn't found", userId);
-            throw new ResourceNotFoundException(String.format("User with id %d wasn't found", userId));
-        }
-        return user.get();
-    }
-
-    public void checkUserIsNotBanned(User user) {
-        if (user.getIsBanned()) {
-            log.error("User with id {} is blocked", user.getUserId());
-            throw new ActionForbiddenException(String.format("User with id %d is blocked", user.getUserId()));
-        }
-    }
-
     public void checkTitleNotExist(String title, Long articleId) {
         String prepTitle = title.trim().toLowerCase();
         Article article = articleRepository.findArticlesByTitleIgnoreCase(prepTitle);
@@ -89,13 +90,25 @@ public class Validations {
         }
     }
 
-    public void checkUserIsAuthor(Article article, long userId) {
-        if (article.getAuthor().getUserId() != userId) {
-            log.error("Article with id {} is not belongs to user with id {}", article.getArticleId(), userId);
-            throw new ActionForbiddenException(String.format(
-                    "Article with id %d is not belongs to user with id %d. Action is forbidden",
-                    article.getArticleId(), userId));
+    public void isTagExists(Long tagId) {
+        if (!tagRepository.existsById(tagId)) {
+            throw new ResourceNotFoundException("Tag with given ID = " + tagId + " not found");
         }
     }
 
+    public Comment isCommentExists(Long commentId) {
+        Optional<Comment> comment = commentRepository.findById(commentId);
+        if (comment.isEmpty()) {
+            log.info("ResourceNotFoundException. Comment with given Id = " + commentId + " not found");
+            throw new ResourceNotFoundException("Comment with given Id = " + commentId + " not found");
+        }
+        return comment.get();
+    }
+
+    public void checkUserIsCommentAuthor(User user, Comment comment) {
+        if (!user.getUserId().equals(comment.getCommentAuthor().getUserId())) {
+            log.info("ActionForbiddenException. Action forbidden for given user");
+            throw new ActionForbiddenException("Action forbidden for given user");
+        }
+    }
 }

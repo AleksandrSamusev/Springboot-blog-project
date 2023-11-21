@@ -8,7 +8,6 @@ import dev.practice.mainApp.models.ArticleStatus;
 import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
-import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticlePrivateService;
 import dev.practice.mainApp.services.impl.ArticleAdminServiceImpl;
 import dev.practice.mainApp.utils.Validations;
@@ -32,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ArticleAdminServiceImplUnitTest {
     @Mock
     private ArticleRepository articleRepository;
-
-    @Mock
-    private UserRepository userRepository;
 
     @Mock
     private ArticlePrivateService articlePrivateService;
