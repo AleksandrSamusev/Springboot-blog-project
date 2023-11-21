@@ -11,6 +11,7 @@ import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticleAdminService;
 import dev.practice.mainApp.services.ArticlePrivateService;
+import dev.practice.mainApp.utils.Validations;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,20 +25,20 @@ import java.util.Optional;
 @Slf4j
 public class ArticleAdminServiceImpl implements ArticleAdminService {
     private final ArticleRepository articleRepository;
-    private final UserRepository userRepository;
     private final ArticlePrivateService articleService;
+    private final Validations validations;
 
     @Override
     public List<ArticleFullDto> getAllArticlesByUserId(Long userId, Long authorId, Integer from,
                                                        Integer size, String status) {
-        checkUserIsAdmin(userId);
+        validations.checkUserIsAdmin(userId);
         return articleService.getAllArticlesByUserId(authorId, from, size, status);
     }
 
     @Override
     public ArticleFullDto publishArticle(Long userId, Long articleId, boolean publish) {
-        checkUserIsAdmin(userId);
-        Article article = checkArticleExist(articleId);
+        validations.checkUserIsAdmin(userId);
+        Article article = validations.checkArticleExist(articleId);
 
         if (publish) {
             article.setPublished(LocalDateTime.now());
@@ -52,22 +53,4 @@ public class ArticleAdminServiceImpl implements ArticleAdminService {
         log.info("Article with id {} was REJECTED. Admin id is {}", articleId, userId);
         return ArticleMapper.toArticleFullDto(articleRepository.save(article));
     }
-
-    private void checkUserIsAdmin(Long userId) {
-        if (userRepository.findById(userId).get().getRole() != Role.ADMIN) {
-            log.error("User with id {} is not ADMIN", userId);
-            throw new ActionForbiddenException(String.format(
-                    "User with id %d is not ADMIN. Access is forbidden", userId));
-        }
-    }
-
-    private Article checkArticleExist(Long articleId) {
-        Optional<Article> article = articleRepository.findById(articleId);
-        if (article.isEmpty()) {
-            log.error("Article with id {} wasn't found", articleId);
-            throw new ResourceNotFoundException(String.format("Article with id %d wasn't found", articleId));
-        }
-        return article.get();
-    }
-
 }

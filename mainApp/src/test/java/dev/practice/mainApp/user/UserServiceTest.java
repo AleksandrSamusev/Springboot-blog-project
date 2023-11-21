@@ -62,7 +62,6 @@ public class UserServiceTest {
             LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
 
 
-
     User admin = new User(1L, "Sam", "Samson",
             "samSamson", "samSamson@test.test",
             LocalDate.of(1980, 1, 1), Role.ADMIN, "Hi! I'm Sam", false,
@@ -283,7 +282,7 @@ public class UserServiceTest {
 
         UserFullDto result = userService.banUser(2L, 1L);
 
-        assertEquals(result.getUserId() ,noAdmin.getUserId());
+        assertEquals(result.getUserId(), noAdmin.getUserId());
         assertEquals(result.getFirstName(), noAdmin.getFirstName());
         assertEquals(result.getLastName(), noAdmin.getLastName());
         assertEquals(result.getIsBanned(), Boolean.TRUE);
@@ -298,7 +297,7 @@ public class UserServiceTest {
 
         UserFullDto result = userService.unbanUser(2L, 1L);
 
-        assertEquals(result.getUserId() ,noAdmin.getUserId());
+        assertEquals(result.getUserId(), noAdmin.getUserId());
         assertEquals(result.getFirstName(), noAdmin.getFirstName());
         assertEquals(result.getLastName(), noAdmin.getLastName());
         assertEquals(result.getIsBanned(), Boolean.FALSE);
@@ -309,7 +308,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(2L)).thenThrow(new ResourceNotFoundException(
                 "User with given ID = 2 not found"
         ));
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 userService.banUser(2L, 1L));
         assertEquals("User with given ID = 2 not found", ex.getMessage());
     }
@@ -320,7 +319,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(1L)).thenThrow(new ResourceNotFoundException(
                 "User with given ID = 1 not found"
         ));
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 userService.banUser(2L, 1L));
         assertEquals("User with given ID = 1 not found", ex.getMessage());
     }
@@ -331,7 +330,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(1L)).thenThrow(new ActionForbiddenException(
                 "Action forbidden for current user"
         ));
-        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, ()->
+        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
                 userService.banUser(2L, 1L));
         assertEquals("Action forbidden for current user", ex.getMessage());
     }
@@ -341,7 +340,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(2L)).thenThrow(new ResourceNotFoundException(
                 "User with given ID = 2 not found"
         ));
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 userService.unbanUser(2L, 1L));
         assertEquals("User with given ID = 2 not found", ex.getMessage());
     }
@@ -352,7 +351,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(1L)).thenThrow(new ResourceNotFoundException(
                 "User with given ID = 1 not found"
         ));
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 userService.unbanUser(2L, 1L));
         assertEquals("User with given ID = 1 not found", ex.getMessage());
     }
@@ -363,7 +362,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(1L)).thenThrow(new ActionForbiddenException(
                 "Action forbidden for current user"
         ));
-        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, ()->
+        ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
                 userService.unbanUser(2L, 1L));
         assertEquals("Action forbidden for current user", ex.getMessage());
     }

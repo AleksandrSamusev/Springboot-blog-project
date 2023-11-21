@@ -10,6 +10,7 @@ import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.impl.ArticlePrivateServiceImpl;
+import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,6 +33,9 @@ public class ArticlePrivateServiceImplUnitTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private Validations validations;
 
     @InjectMocks
     private ArticlePrivateServiceImpl articleService;
@@ -59,8 +62,8 @@ public class ArticlePrivateServiceImplUnitTest {
     @Test
     void article_test_1_Given_validArticleWithoutTagsAndUser_When_createArticle_Then_articleSaved() {
         Mockito
-                .when(userRepository.findById(0L))
-                .thenReturn(Optional.of(author));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author);
         Mockito
                 .when(articleRepository.save(Mockito.any(Article.class)))
                 .thenReturn(savedArticle);
@@ -81,8 +84,11 @@ public class ArticlePrivateServiceImplUnitTest {
     void article_test_6_Given_bannedUser_When_createArticle_Then_throwException() {
         author.setIsBanned(true);
         Mockito
-                .when(userRepository.findById(0L))
-                .thenReturn(Optional.of(author));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author);
+        Mockito
+                .doCallRealMethod()
+                .when(validations).checkUserIsNotBanned(Mockito.any());
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
                 () -> articleService.createArticle(0L, newArticle));
@@ -94,6 +100,10 @@ public class ArticlePrivateServiceImplUnitTest {
 
     @Test
     void article_test_7_Given_NotExistingUser_When_createArticle_Then_throwException() {
+        Mockito
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenThrow(new ResourceNotFoundException("User with id 1 wasn't found"));
+
         final ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
                 () -> articleService.createArticle(1L, newArticle));
         assertEquals("User with id 1 wasn't found", exception.getMessage(),
@@ -105,8 +115,8 @@ public class ArticlePrivateServiceImplUnitTest {
     @Test
     void article_test_12_Given_notExistingArticle_When_updateArticle_Then_throwException() {
         Mockito
-                .when(userRepository.findById(0L))
-                .thenReturn(Optional.of(author));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenThrow(new ResourceNotFoundException("Article with id 1000 wasn't found"));
 
         final ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
                 () -> articleService.updateArticle(0L, 1000L, Mockito.any()));
@@ -119,11 +129,14 @@ public class ArticlePrivateServiceImplUnitTest {
     @Test
     void article_test_13_Given_userIsNotAuthor_When_updateArticle_Then_throwException() {
         Mockito
-                .when(userRepository.findById(1L))
-                .thenReturn(Optional.of(author2));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author2);
         Mockito
-                .when(articleRepository.findById(0L))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(savedArticle);
+        Mockito
+                .doCallRealMethod()
+                .when(validations).checkUserIsAuthor(Mockito.any(), Mockito.anyLong());
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
                 () -> articleService.updateArticle(1L, 0L, Mockito.any()));
@@ -138,11 +151,11 @@ public class ArticlePrivateServiceImplUnitTest {
         savedArticle.setStatus(ArticleStatus.PUBLISHED);
         savedArticle.setPublished(LocalDateTime.now());
         Mockito
-                .when(articleRepository.findById(0L))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(savedArticle);
         Mockito
-                .when(userRepository.findById(1L))
-                .thenReturn(Optional.of(author2));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author2);
 
         ArticleShortDto result = (ArticleShortDto) articleService.getArticleById(1L, 0L).get();
 
@@ -156,11 +169,11 @@ public class ArticlePrivateServiceImplUnitTest {
         savedArticle.setStatus(ArticleStatus.PUBLISHED);
         savedArticle.setPublished(LocalDateTime.now());
         Mockito
-                .when(articleRepository.findById(0L))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(savedArticle);
         Mockito
-                .when(userRepository.findById(0L))
-                .thenReturn(Optional.of(author));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author);
 
         ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(0L, 0L).get();
 
@@ -176,11 +189,11 @@ public class ArticlePrivateServiceImplUnitTest {
         savedArticle.setPublished(LocalDateTime.now());
         author2.setRole(Role.ADMIN);
         Mockito
-                .when(articleRepository.findById(0L))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(savedArticle);
         Mockito
-                .when(userRepository.findById(1L))
-                .thenReturn(Optional.of(author2));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author2);
 
         ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(1L, 0L).get();
 
@@ -195,11 +208,11 @@ public class ArticlePrivateServiceImplUnitTest {
         savedArticle.setStatus(ArticleStatus.REJECTED);
         author2.setRole(Role.ADMIN);
         Mockito
-                .when(articleRepository.findById(0L))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(savedArticle);
         Mockito
-                .when(userRepository.findById(1L))
-                .thenReturn(Optional.of(author2));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author2);
 
         ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(1L, 0L).get();
 
@@ -213,11 +226,11 @@ public class ArticlePrivateServiceImplUnitTest {
     void article_test_20_Given_authorArticleModerating_When_getArticleById_Then_returnedArticleFullDto() {
         savedArticle.setStatus(ArticleStatus.MODERATING);
         Mockito
-                .when(articleRepository.findById(0L))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(savedArticle);
         Mockito
-                .when(userRepository.findById(0L))
-                .thenReturn(Optional.of(author));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author2);
 
         ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(0L, 0L).get();
 
@@ -231,11 +244,11 @@ public class ArticlePrivateServiceImplUnitTest {
     void article_test_21_Given_authorizedUserArticleNotPublished_When_getArticleById_Then_throwException() {
         savedArticle.setStatus(ArticleStatus.MODERATING);
         Mockito
-                .when(articleRepository.findById(0L))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(savedArticle);
         Mockito
-                .when(userRepository.findById(1L))
-                .thenReturn(Optional.of(author2));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author2);
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
                 () -> articleService.getArticleById(1L, 0L));
@@ -244,14 +257,18 @@ public class ArticlePrivateServiceImplUnitTest {
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
 
+
     @Test
     void article_test_26_Given_userNotAuthor_When_deleteArticle_Then_throwException() {
         Mockito
-                .when(articleRepository.findById(0L))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(savedArticle);
         Mockito
-                .when(userRepository.findById(1L))
-                .thenReturn(Optional.of(author2));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author2);
+        Mockito
+                .doCallRealMethod()
+                .when(validations).checkUserIsAuthor(Mockito.any(), Mockito.anyLong());
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
                 () -> articleService.deleteArticle(1L, 0L));
@@ -263,11 +280,11 @@ public class ArticlePrivateServiceImplUnitTest {
     @Test
     void article_test_37_Given_articleCreated_When_publishArticle_Then_returnArticle() {
         Mockito
-                .when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(author));
+                .when(validations.checkUserExist(Mockito.anyLong()))
+                .thenReturn(author);
         Mockito
-                .when(articleRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(savedArticle);
         Mockito
                 .when(articleRepository.save(Mockito.any()))
                 .thenReturn(savedArticle);
@@ -277,6 +294,4 @@ public class ArticlePrivateServiceImplUnitTest {
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(ArticleStatus.MODERATING);
     }
-
-
 }
