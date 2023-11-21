@@ -6,6 +6,7 @@ import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.MessageRepository;
+import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.impl.MessageServiceImpl;
 import dev.practice.mainApp.utils.Validations;
 import org.junit.Test;
@@ -27,6 +28,8 @@ public class MessageServiceTest {
 
     @Mock
     private MessageRepository messageRepositoryMock;
+    @Mock
+    private UserRepository userRepository; // DO NOT DELETE! TEST 1 WILL FALL
     @Mock
     private Validations validations;
     @InjectMocks

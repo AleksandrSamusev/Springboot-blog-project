@@ -166,7 +166,7 @@ public class TagServiceTest {
     @Test
     public void tag_test12_Given_UserIsNotAdmin_When_DeleteTag_Then_ActionForbidden() {
         doThrow(new ActionForbiddenException(
-                "User with id 5 is not ADMIN. Access is forbidden")).when(validations).checkUserIsAdmin(anyLong());
+                "User with id 5 is not ADMIN. Access is forbidden")).when(validations).checkUserIsAdmin(any());
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
                 tagService.deleteTag(1L, notAdmin.getUserId()));

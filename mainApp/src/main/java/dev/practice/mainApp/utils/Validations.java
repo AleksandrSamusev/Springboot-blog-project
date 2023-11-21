@@ -37,11 +37,11 @@ public class Validations {
         }
     }
 
-    public void checkUserIsAdmin(Long userId) {
-        if (userRepository.findById(userId).get().getRole() != Role.ADMIN) {
-            log.error("User with id {} is not ADMIN", userId);
+    public void checkUserIsAdmin(User user) {
+        if (user.getRole() != Role.ADMIN) {
+            log.error("User with id {} is not ADMIN", user.getUserId());
             throw new ActionForbiddenException(String.format(
-                    "User with id %d is not ADMIN. Access is forbidden", userId));
+                    "User with id %d is not ADMIN. Access is forbidden", user.getUserId()));
         }
     }
 
@@ -51,6 +51,14 @@ public class Validations {
             throw new ActionForbiddenException(String.format(
                     "Article with id %d is not belongs to user with id %d. Action is forbidden",
                     article.getArticleId(), userId));
+        }
+    }
+
+    public void isUserAuthorized(Long userId, User currentUser) {
+        String role = currentUser.getRole().name();
+        if (!role.equals("ADMIN") && !userId.equals(currentUser.getUserId())) {
+            log.info("ActionForbiddenException. Action forbidden for current user");
+            throw new ActionForbiddenException("Action forbidden for current user");
         }
     }
 

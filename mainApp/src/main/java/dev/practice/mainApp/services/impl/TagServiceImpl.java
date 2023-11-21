@@ -8,6 +8,7 @@ import dev.practice.mainApp.mappers.ArticleMapper;
 import dev.practice.mainApp.mappers.TagMapper;
 import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.Tag;
+import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.services.TagService;
@@ -50,8 +51,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public void deleteTag(Long tagId, Long userId) {
-        validations.checkUserExist(userId);
-        validations.checkUserIsAdmin(userId);
+        User user = validations.checkUserExist(userId);
+        validations.checkUserIsAdmin(user);
         validations.isTagExists(tagId);
         tagRepository.deleteById(tagId);
         log.info("Tag with ID = " + tagId + " successfully deleted");

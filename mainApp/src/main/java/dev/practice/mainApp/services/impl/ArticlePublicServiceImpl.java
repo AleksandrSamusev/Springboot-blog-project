@@ -1,27 +1,21 @@
 package dev.practice.mainApp.services.impl;
 
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
-import dev.practice.mainApp.exceptions.ActionForbiddenException;
-import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.mappers.ArticleMapper;
 import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.ArticleStatus;
-import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.TagRepository;
-import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticlePublicService;
 import dev.practice.mainApp.utils.Validations;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,7 +68,7 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
         validations.isTagExists(tagId);
         return tagRepository.getReferenceById(tagId).getArticles()
                 .stream()
-                .filter((x)-> x.getPublished() != null)
+                .filter((x) -> x.getPublished() != null)
                 .map(ArticleMapper::toArticleShortDto)
                 .sorted(Comparator.comparing(ArticleShortDto::getPublished))
                 .collect(Collectors.toList());

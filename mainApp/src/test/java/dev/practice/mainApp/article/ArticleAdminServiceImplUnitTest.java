@@ -73,7 +73,7 @@ public class ArticleAdminServiceImplUnitTest {
     void article_test_5_Given_notAdminUserExist_When_getAllArticlesByUserId_Then_throwException() {
         Mockito
                 .doThrow(new ActionForbiddenException("User with id 0 is not ADMIN. Access is forbidden"))
-                .when(validations).checkUserIsAdmin(Mockito.anyLong());
+                .when(validations).checkUserIsAdmin(Mockito.any());
 
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,

@@ -22,7 +22,7 @@ public class UserAdminController {
 
     @PatchMapping("/{userId}/unban")
     public ResponseEntity<UserFullDto> unbanUser(@PathVariable Long userId,
-                                                @RequestHeader("X-Current-User-Id") Long currentUserId) {
+                                                 @RequestHeader("X-Current-User-Id") Long currentUserId) {
         return new ResponseEntity<>(userService.unbanUser(userId, currentUserId), HttpStatus.OK);
     }
 }

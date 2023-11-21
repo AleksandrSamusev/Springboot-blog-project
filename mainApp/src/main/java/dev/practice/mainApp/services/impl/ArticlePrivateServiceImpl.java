@@ -5,7 +5,6 @@ import dev.practice.mainApp.dtos.article.ArticleNewDto;
 import dev.practice.mainApp.dtos.article.ArticleUpdateDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
-import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.mappers.ArticleMapper;
 import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.ArticleRepository;
