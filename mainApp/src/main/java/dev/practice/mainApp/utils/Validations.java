@@ -4,10 +4,7 @@ import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.models.*;
-import dev.practice.mainApp.repositories.ArticleRepository;
-import dev.practice.mainApp.repositories.CommentRepository;
-import dev.practice.mainApp.repositories.TagRepository;
-import dev.practice.mainApp.repositories.UserRepository;
+import dev.practice.mainApp.repositories.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,6 +19,7 @@ public class Validations {
     private final ArticleRepository articleRepository;
     private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
+    private final MessageRepository messageRepository;
 
     public User checkUserExist(Long userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -109,6 +107,22 @@ public class Validations {
         if (!user.getUserId().equals(comment.getCommentAuthor().getUserId())) {
             log.info("ActionForbiddenException. Action forbidden for given user");
             throw new ActionForbiddenException("Action forbidden for given user");
+        }
+    }
+
+    public Message checkIfMessageExists(Long id) {
+        Optional<Message> message = messageRepository.findById(id);
+        if (message.isEmpty()) {
+            log.info("ResourceNotFoundException. Message with given ID = " + id + " not found");
+            throw new ResourceNotFoundException("Message with given ID = " + id + " not found");
+        }
+        return message.get();
+    }
+
+    public void checkSenderIsNotRecipient(Long recipientId, Long currentUserId) {
+        if (recipientId.equals(currentUserId)) {
+            log.info("ActionForbiddenException. Action forbidden for current user");
+            throw new ActionForbiddenException("Action forbidden for current user");
         }
     }
 }

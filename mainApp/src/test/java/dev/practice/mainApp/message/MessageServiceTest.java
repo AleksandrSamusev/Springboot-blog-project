@@ -8,6 +8,7 @@ import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.MessageRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.impl.MessageServiceImpl;
+import dev.practice.mainApp.utils.Validations;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -27,12 +28,11 @@ import static org.mockito.Mockito.*;
 public class MessageServiceTest {
 
     @Mock
-    MessageRepository messageRepositoryMock;
+    private MessageRepository messageRepositoryMock;
     @Mock
-    UserRepository userRepositoryMock;
-
+    private Validations validations;
     @InjectMocks
-    MessageServiceImpl messageService;
+    private MessageServiceImpl messageService;
 
     private final User user1 = new User(1L, "John", "Doe",
             "johnDoe", "johnDoe@test.test",
@@ -52,9 +52,8 @@ public class MessageServiceTest {
 
     @Test
     public void message_test1_Given_ValidIdsAndDto_When_CreateMessage_Then_MessageCreated() {
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
-        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(user1));
-        when(userRepositoryMock.findById(2L)).thenReturn(Optional.of(user2));
+        when(validations.checkUserExist(1L)).thenReturn(user1);
+        when(validations.checkUserExist(2L)).thenReturn(user2);
         when(messageRepositoryMock.save(any())).thenReturn(fromUser1toUser2);
 
         MessageFullDto messageFullDto = messageService.createMessage(2L, 1L, newMessage);
@@ -68,26 +67,29 @@ public class MessageServiceTest {
 
     @Test
     public void message_test2_Given_SenderIdNotExist_When_CreateMessage_Then_ResourceNotFoundException() {
-        when(userRepositoryMock.existsById(1L)).thenReturn(false);
+        doThrow(new ResourceNotFoundException(
+                "User with id 1 wasn't found")).when(validations).checkUserExist(anyLong());
 
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
                 messageService.createMessage(1L, 2L, newMessage));
-        assertEquals("User with given ID = 1 not found", thrown.getMessage());
+        assertEquals("User with id 1 wasn't found", thrown.getMessage());
     }
 
     @Test
     public void message_test3_Given_ReceiverIdNotExist_When_CreateMessage_Then_ResourceNotFoundException() {
-        when(userRepositoryMock.existsById(1L)).thenReturn(true);
-        when(userRepositoryMock.existsById(2L)).thenReturn(false);
+        doThrow(new ResourceNotFoundException(
+                "User with id 2 wasn't found")).when(validations).checkUserExist(anyLong());
 
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
                 messageService.createMessage(1L, 2L, newMessage));
-        assertEquals("User with given ID = 2 not found", thrown.getMessage());
+        assertEquals("User with id 2 wasn't found", thrown.getMessage());
     }
 
     @Test
     public void message_test4_Given_SenderIdEqualsReceiverId_When_CreateMessage_Then_ActionForbiddenException() {
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
+        when(validations.checkUserExist(anyLong())).thenReturn(user1);
+        doThrow(new ActionForbiddenException(
+                "Action forbidden for current user")).when(validations).checkSenderIsNotRecipient(anyLong(), anyLong());
 
         ActionForbiddenException thrown = assertThrows(ActionForbiddenException.class, () ->
                 messageService.createMessage(1L, 1L, newMessage));
@@ -97,9 +99,7 @@ public class MessageServiceTest {
 
     @Test
     public void message_test5_Given_ExistingMessageId_When_findMessageById_Then_MessageReturn() {
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
-        when(messageRepositoryMock.existsById(anyLong())).thenReturn(true);
-        when(messageRepositoryMock.findById(anyLong())).thenReturn(Optional.of(fromUser1toUser2));
+        when(validations.checkIfMessageExists(anyLong())).thenReturn(fromUser1toUser2);
 
         MessageFullDto messageFullDto = messageService.findMessageById(1L, 1L);
 
@@ -109,7 +109,9 @@ public class MessageServiceTest {
 
     @Test
     public void message_test6_Given_NotExistingMessageId_When_findMessageById_Then_ResourceNotFoundException() {
-        when(messageRepositoryMock.existsById(anyLong())).thenReturn(false);
+        doThrow(new ResourceNotFoundException(
+                "Message with given ID = 1 not found")).when(validations).checkIfMessageExists(anyLong());
+
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
                 messageService.findMessageById(1L, 1L));
         assertEquals("Message with given ID = 1 not found", thrown.getMessage());
@@ -117,17 +119,19 @@ public class MessageServiceTest {
 
     @Test
     public void message_test7_Given_NotExistingUserId_When_findMessageById_Then_ResourceNotFoundException() {
-        when(messageRepositoryMock.existsById(anyLong())).thenReturn(true);
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(false);
+        doThrow(new ResourceNotFoundException(
+                "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
+
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
                 messageService.findMessageById(1L, 1L));
-        assertEquals("User with given ID = 1 not found", thrown.getMessage());
+        assertEquals("User with id 1 wasn't found", thrown.getMessage());
     }
 
     @Test
     public void message_test8_Given_InvalidMessageId_When_deleteMessage_Then_ResourceNotFoundException() {
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(true);
-        when(messageRepositoryMock.existsById(anyLong())).thenReturn(false);
+        doThrow(new ResourceNotFoundException(
+                "Message with given ID = 1 not found")).when(validations).checkIfMessageExists(anyLong());
+
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 messageService.deleteMessage(1L, 1L));
         assertEquals("Message with given ID = 1 not found", ex.getMessage());
@@ -135,11 +139,11 @@ public class MessageServiceTest {
 
     @Test
     public void message_test9_Given_InvalidUserId_When_deleteMessage_Then_ResourceNotFoundException() {
-        when(userRepositoryMock.existsById(anyLong())).thenReturn(false);
+        doThrow(new ResourceNotFoundException(
+                "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
+
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 messageService.deleteMessage(1L, 1L));
-        assertEquals("User with given ID = 1 not found", ex.getMessage());
+        assertEquals("User with id 1 wasn't found", ex.getMessage());
     }
-
-
 }
