@@ -3,14 +3,14 @@ package dev.practice.mainApp.services.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.practice.mainApp.client.StatsClient;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
-import dev.practice.mainApp.exceptions.ActionForbiddenException;
-import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.mappers.ArticleMapper;
-import dev.practice.mainApp.models.*;
+import dev.practice.mainApp.models.Article;
+import dev.practice.mainApp.models.ArticleStatus;
+import dev.practice.mainApp.models.StatisticRecord;
 import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.TagRepository;
-import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticlePublicService;
+import dev.practice.mainApp.utils.Validations;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +33,8 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
 
     @Override
     public ArticleShortDto getArticleById(Long articleId, HttpServletRequest request) {
-
-        Article article = checkArticleExist(articleId);
-        checkArticleIsPublished(article);
+        Article article = validations.checkArticleExist(articleId);
+        validations.checkArticleIsPublished(article);
 
         createRecordAndSave(request);
 
@@ -44,9 +43,6 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
                         articleId)));
 
         Article savedArticle = setViewsToArticleAndSave(responses, article);
-    public ArticleShortDto getArticleById(Long articleId) {
-        Article article = validations.checkArticleExist(articleId);
-        validations.checkArticleIsPublished(article);
         log.info("Return article with ID = " + articleId);
 
         return ArticleMapper.toArticleShortDto(savedArticle);
@@ -98,10 +94,6 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
     @Override
     public List<ArticleShortDto> getAllArticlesByTag(Long tagId) {
         validations.isTagExists(tagId);
-        return tagRepository.getReferenceById(tagId).getArticles()
-                .stream()
-                .filter((x) -> x.getPublished() != null)
-        isTagExists(tagId);
 
         List<Article> articles = tagRepository.getReferenceById(tagId).getArticles()
                 .stream().filter((x) -> x.getPublished() != null).toList();
@@ -114,39 +106,6 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
                 .map(ArticleMapper::toArticleShortDto)
                 .sorted(Comparator.comparing(ArticleShortDto::getPublished))
                 .collect(Collectors.toList());
-    }
-
-    private Article checkArticleExist(Long articleId) {
-        Optional<Article> article = articleRepository.findById(articleId);
-        if (article.isEmpty()) {
-            log.error("Article with id {} wasn't found", articleId);
-            throw new ResourceNotFoundException(String.format("Article with id %d wasn't found", articleId));
-        }
-        return article.get();
-    }
-
-    private void checkArticleIsPublished(Article article) {
-        if (article.getStatus() != ArticleStatus.PUBLISHED) {
-            log.error("Article with id {} is not published yet. Current status is {}", article.getArticleId(),
-                    article.getStatus());
-            throw new ActionForbiddenException(String.format("Article with id %d is not published yet",
-                    article.getArticleId()));
-        }
-    }
-
-    private void isTagExists(Long tagId) {
-        if (!tagRepository.existsById(tagId)) {
-            throw new ResourceNotFoundException("Tag with given ID = " + tagId + " not found");
-        }
-    }
-
-    private User checkUserExist(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            log.error("User with id {} wasn't found", userId);
-            throw new ResourceNotFoundException(String.format("User with id %d wasn't found", userId));
-        }
-        return user.get();
     }
 
     private void createRecordAndSave(HttpServletRequest request) {
