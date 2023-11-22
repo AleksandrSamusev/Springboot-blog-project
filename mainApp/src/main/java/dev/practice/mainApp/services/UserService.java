@@ -4,6 +4,7 @@ import dev.practice.mainApp.dtos.user.UserFullDto;
 import dev.practice.mainApp.dtos.user.UserNewDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.dtos.user.UserUpdateDto;
+import dev.practice.mainApp.models.Role;
 
 import java.util.List;
 
@@ -25,4 +26,6 @@ public interface UserService {
     UserFullDto banUser(Long userId, Long currentUserId);
 
     UserFullDto unbanUser(Long userId, Long currentUserId);
+
+    UserFullDto changeRole(Long userId, String role);
 }

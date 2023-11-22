@@ -43,10 +43,10 @@ public class ArticlePublicControllerTest {
 
     private final UserShortDto author = new UserShortDto(1L, "Harry");
     private final ArticleShortDto articleShort = new ArticleShortDto(1L, "The empty pot",
-            "Very interesting information", author, LocalDateTime.now(), 0L, new HashSet<>(),
+            "Very interesting information", author, LocalDateTime.now(), 0L, 0L, new HashSet<>(),
             new HashSet<>());
     private final ArticleShortDto articleShort2 = new ArticleShortDto(2L, "The pretty pot",
-            "Very interesting information", author, LocalDateTime.now().minusDays(2), 0L, new HashSet<>(),
+            "Very interesting information", author, LocalDateTime.now().minusDays(2), 0L, 0L, new HashSet<>(),
             new HashSet<>());
     private final List<ArticleShortDto> list = List.of(articleShort, articleShort2);
 

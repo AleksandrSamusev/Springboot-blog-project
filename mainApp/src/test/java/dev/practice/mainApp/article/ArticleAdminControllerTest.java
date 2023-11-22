@@ -40,7 +40,7 @@ public class ArticleAdminControllerTest {
 
     private final UserShortDto author = new UserShortDto(1L, "Harry");
     private final ArticleFullDto articleFull = new ArticleFullDto(1L, "The empty pot",
-            "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED,
+            "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED, 0L,
             0L, new HashSet<>(), new HashSet<>());
 
     @Test

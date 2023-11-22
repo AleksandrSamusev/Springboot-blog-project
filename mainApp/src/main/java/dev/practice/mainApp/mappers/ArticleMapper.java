@@ -20,6 +20,7 @@ public class ArticleMapper {
         article.setContent(dto.getContent());
         article.setAuthor(user);
         article.setLikes(0L);
+        article.setViews(0L);
         article.setComments(new HashSet<>());
         article.setTags(new HashSet<>());
         return article;
@@ -35,6 +36,7 @@ public class ArticleMapper {
                 article.getPublished(),
                 article.getStatus(),
                 article.getLikes(),
+                article.getViews(),
                 article.getComments().stream().map(CommentMapper::toCommentFullDto).collect(Collectors.toSet()),
                 article.getTags().stream().map(TagMapper::toTagShortDto).collect(Collectors.toSet())
         );
@@ -47,6 +49,7 @@ public class ArticleMapper {
                 UserMapper.toUserShortDto(article.getAuthor()),
                 article.getPublished(),
                 article.getLikes(),
+                article.getViews(),
                 article.getComments().stream().map(CommentMapper::toCommentShortDto).collect(Collectors.toSet()),
                 article.getTags().stream().map(TagMapper::toTagShortDto).collect(Collectors.toSet()));
     }

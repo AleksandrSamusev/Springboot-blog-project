@@ -50,10 +50,10 @@ public class ArticleAdminServiceImplUnitTest {
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final ArticleFullDto fullArticle = new ArticleFullDto(0L, "The empty pot",
             "Very interesting information", UserMapper.toUserShortDto(author), LocalDateTime.now(), LocalDateTime.now(),
-            ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
     private final Article article = new Article(0L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
-            ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 0L, 0L,  new HashSet<>(), new HashSet<>());
 
     @Test
     void article_test_1_Given_adminAndExistUser_When_getAllArticlesByUserId_Then_returnAllUserArticles() {

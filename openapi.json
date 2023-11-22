@@ -290,6 +290,49 @@
         }
       }
     },
+    "/admin/users/{userId}": {
+      "patch": {
+        "tags": [
+          "Admin User Controller"
+        ],
+        "summary": "Change users role",
+        "description": "Change users role\n",
+        "operationId": "changeRole",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "user ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserFullDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/admin/users/{userId}/ban": {
       "patch": {
         "tags": [
