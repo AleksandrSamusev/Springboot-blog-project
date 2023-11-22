@@ -160,8 +160,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserFullDto changeRole(Long userId, String role) {
-        isUserExists(userId);
-        User user = userRepository.getReferenceById(userId);
+        User user = validations.checkUserExist(userId);
         if(role.equals("ADMIN")) {
             user.setRole(Role.ADMIN);
         } else {
@@ -170,32 +169,5 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
         log.info("The role of the user with ID = {} has changed to ADMIN", userId);
         return UserMapper.toUserFullDto(savedUser);
-    }
-
-
-    private void isUserExists(Long userId) {
-        if (userRepository.findById(userId).isEmpty()) {
-            log.info("ResourceNotFoundException. User with given ID = " + userId + " not found");
-            throw new ResourceNotFoundException("User with given ID = " + userId + " not found");
-        }
-    }
-
-    private void isUserAuthorized(Long userId, Long currentUserId) {
-        if (userRepository.findById(currentUserId).isPresent()) {
-            String role = userRepository.findById(currentUserId).get().getRole().name();
-            if (!role.equals("ADMIN") && !userId.equals(currentUserId)) {
-                log.info("ActionForbiddenException. Action forbidden for current user");
-                throw new ActionForbiddenException("Action forbidden for current user");
-            }
-        }
-    }
-
-    private void isAdmin(Long userId) {
-        if (userRepository.findById(userId).isPresent()) {
-            String role = userRepository.findById(userId).get().getRole().name();
-            if (!role.equals("ADMIN")) {
-                throw new ActionForbiddenException("Action forbidden for current user");
-            }
-        }
     }
 }
