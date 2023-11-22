@@ -20,6 +20,7 @@ public class ArticleMapper {
         article.setContent(dto.getContent());
         article.setAuthor(user);
         article.setLikes(0L);
+        article.setViews(0L);
         article.setComments(new HashSet<>());
         article.setTags(new HashSet<>());
         return article;

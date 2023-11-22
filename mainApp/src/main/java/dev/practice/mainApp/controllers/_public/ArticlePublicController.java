@@ -1,5 +1,6 @@
 package dev.practice.mainApp.controllers._public;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.services.ArticlePublicService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +19,7 @@ public class ArticlePublicController {
 
     @GetMapping("/{articleId}")
     public ResponseEntity<ArticleShortDto> getArticleById(@PathVariable("articleId") Long articleId,
-                                                          HttpServletRequest request) {
+                                                          HttpServletRequest request) throws JsonProcessingException {
         return new ResponseEntity<>(articleService.getArticleById(articleId, request), HttpStatus.OK);
     }
 

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StatisticRecord {
-    private Long statsId;
+    private Long statisticRecordId;
     @NotBlank(message = "Service name cannot be blank")
     private String serviceName = "mainApp";
     @NotBlank(message = "ip address cannot be blank")

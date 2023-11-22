@@ -17,14 +17,11 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public StatisticRecord addStats(StatisticRecord statisticRecord) {
-       return statsRepository.save(statisticRecord);
+        return statsRepository.save(statisticRecord);
     }
 
     @Override
-    public List<StatisticResponse> getStats(LocalDateTime start,
-                                            LocalDateTime end,
-                                            List<String> uris,
-                                            Boolean unique) {
-        return null;
+    public List<StatisticRecord> getStats(LocalDateTime start,LocalDateTime end, List<String> uris) {
+        return statsRepository.getStatsByStartEndNoUrisNotUnique(start, end, uris);
     }
 }

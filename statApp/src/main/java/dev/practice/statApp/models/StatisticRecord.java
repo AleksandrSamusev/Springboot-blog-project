@@ -1,6 +1,5 @@
 package dev.practice.statApp.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -37,6 +36,5 @@ public class StatisticRecord {
 
     @Column(name = "timestamp", nullable = false)
     @NotNull(message = "Timestamp cannot be null")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 }
