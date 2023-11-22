@@ -3,11 +3,13 @@ package dev.practice.mainApp.article;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
-import dev.practice.mainApp.models.*;
+import dev.practice.mainApp.models.Article;
+import dev.practice.mainApp.models.ArticleStatus;
+import dev.practice.mainApp.models.Role;
+import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
-import dev.practice.mainApp.repositories.TagRepository;
-import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.impl.ArticlePublicServiceImpl;
+import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +23,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -31,10 +32,7 @@ public class ArticlePublicServiceImplUnitTest {
     private ArticleRepository articleRepository;
 
     @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private TagRepository tagRepository;
+    private Validations validations;
 
     @InjectMocks
     private ArticlePublicServiceImpl articleService;
@@ -56,11 +54,11 @@ public class ArticlePublicServiceImplUnitTest {
             ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
 
 
-
     @Test
     void article_test_1_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticles() {
         Mockito
-                .when(articleRepository.findAllByStatusOrderByPublishedDesc(ArticleStatus.PUBLISHED, PageRequest.of(0, 10)))
+                .when(articleRepository.findAllByStatusOrderByPublishedDesc(ArticleStatus.PUBLISHED,
+                        PageRequest.of(0, 10)))
                 .thenReturn(List.of(savedArticle2, savedArticle));
 
         List<ArticleShortDto> result = articleService.getAllArticles(0, 10);
@@ -71,20 +69,16 @@ public class ArticlePublicServiceImplUnitTest {
     @Test
     void article_test_4_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() {
         Mockito
-                .when(articleRepository.findById(0L))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.any()))
+                .thenReturn(savedArticle);
 
-        ArticleShortDto result = articleService.getArticleById(0L);
+        ArticleShortDto result = articleService.getArticleById(0L, null);
 
         assertThat(result.getArticleId()).isEqualTo(0);
     }
 
     @Test
     void article_test_9_Given_anyUserAuthorExist_When_getAllArticlesByUserId_Then_returnArticles() {
-        Mockito
-                .when(userRepository.findById(0L))
-                .thenReturn(Optional.of(author));
-
         Mockito
                 .when(articleRepository.findAllByAuthorUserIdAndStatus(Mockito.anyLong(), Mockito.any(), Mockito.any()))
                 .thenReturn(List.of(savedArticle2));
@@ -99,13 +93,11 @@ public class ArticlePublicServiceImplUnitTest {
     @Test
     void article_test_12_Given_ExistingArticle_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
         Mockito
-                .when(articleRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(savedArticle));
-        Mockito
-                .when(articleRepository.getReferenceById(Mockito.anyLong()))
+                .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
         Mockito
-                .when(articleRepository.save(Mockito.any())).thenReturn(afterLike);
+                .when(articleRepository.save(Mockito.any()))
+                .thenReturn(afterLike);
 
         ArticleShortDto result = articleService.likeArticle(0L);
 
@@ -116,10 +108,10 @@ public class ArticlePublicServiceImplUnitTest {
     @Test
     void article_test_13_Given_ArticleNotExists_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
         Mockito
-                .when(articleRepository.findById(0L))
+                .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenThrow(new ResourceNotFoundException("Article with id 0 wasn't found"));
 
-        ResourceNotFoundException ex = Assertions.assertThrows(ResourceNotFoundException.class, ()->
+        ResourceNotFoundException ex = Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 articleService.likeArticle(0L));
         Assertions.assertEquals("Article with id 0 wasn't found", ex.getMessage());
     }
@@ -127,14 +119,13 @@ public class ArticlePublicServiceImplUnitTest {
     @Test
     void article_test_14_Given_ArticleNotPublished_When_likeArticle_Then_ActionForbidden() {
         Mockito
-                .when(articleRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(savedArticle));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(savedArticle);
         Mockito
-                .when(articleRepository.getReferenceById(Mockito.anyLong()))
-                .thenThrow(new ActionForbiddenException("Article with id %d is not published yet"));
+                .doThrow(new ActionForbiddenException("Article with id %d is not published yet"))
+                .when(validations).checkArticleIsPublished(Mockito.any());
 
-
-        ActionForbiddenException ex = Assertions.assertThrows(ActionForbiddenException.class, ()->
+        ActionForbiddenException ex = Assertions.assertThrows(ActionForbiddenException.class, () ->
                 articleService.likeArticle(0L));
         Assertions.assertEquals("Article with id %d is not published yet", ex.getMessage());
     }

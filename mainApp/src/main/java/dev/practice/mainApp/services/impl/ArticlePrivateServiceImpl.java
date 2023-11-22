@@ -5,7 +5,6 @@ import dev.practice.mainApp.dtos.article.ArticleNewDto;
 import dev.practice.mainApp.dtos.article.ArticleUpdateDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
-import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.mappers.ArticleMapper;
 import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.ArticleRepository;
@@ -14,6 +13,7 @@ import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticlePrivateService;
 import dev.practice.mainApp.services.TagService;
+import dev.practice.mainApp.utils.Validations;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -32,12 +32,13 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     private final TagRepository tagRepository;
     private final TagService tagService;
     private final CommentRepository commentRepository;
+    private final Validations validations;
 
     @Override
     public ArticleFullDto createArticle(long userId, ArticleNewDto newArticle) {
-        User user = checkUserExist(userId);
-        checkUserIsNotBanned(user);
-        checkTitleNotExist(newArticle.getTitle(), null);
+        User user = validations.checkUserExist(userId);
+        validations.checkUserIsNotBanned(user);
+        validations.checkTitleNotExist(newArticle.getTitle(), null);
 
         Article savedArticle = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, user));
         if (newArticle.getTags() != null && !newArticle.getTags().isEmpty()) {
@@ -60,11 +61,11 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
     @Override
     public ArticleFullDto updateArticle(Long userId, Long articleId, ArticleUpdateDto updateArticle) {
-        checkUserExist(userId);
-        Article article = checkArticleExist(articleId);
-        checkUserIsAuthor(article, userId);
+        validations.checkUserExist(userId);
+        Article article = validations.checkArticleExist(articleId);
+        validations.checkUserIsAuthor(article, userId);
         if (updateArticle.getTitle() != null && !updateArticle.getTitle().trim().isBlank()) {
-            checkTitleNotExist(updateArticle.getTitle(), articleId);
+            validations.checkTitleNotExist(updateArticle.getTitle(), articleId);
         }
         if (!article.getComments().isEmpty()) {
             commentRepository.deleteAll(article.getComments());
@@ -77,8 +78,8 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
     @Override
     public Optional<?> getArticleById(Long userId, Long articleId) {
-        Article article = checkArticleExist(articleId);
-        User user = checkUserExist(userId);
+        Article article = validations.checkArticleExist(articleId);
+        User user = validations.checkUserExist(userId);
 
         if (!article.getAuthor().getUserId().equals(userId) && user.getRole().equals(Role.USER)) {
             if (article.getStatus() != ArticleStatus.PUBLISHED) {
@@ -93,7 +94,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
     @Override
     public List<ArticleFullDto> getAllArticlesByUserId(Long userId, Integer from, Integer size, String status) {
-        checkUserExist(userId);
+        validations.checkUserExist(userId);
         PageRequest pageable = PageRequest.of(from / size, size);
 
         return switch (status) {
@@ -132,16 +133,17 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
     @Override
     public void deleteArticle(long userId, long articleId) {
-        Article article = checkArticleExist(articleId);
-        User user = checkUserExist(userId);
+        Article article = validations.checkArticleExist(articleId);
+        User user = validations.checkUserExist(userId);
 
         if (user.getRole() != Role.ADMIN) {
-            checkUserIsAuthor(article, userId);
+            validations.checkUserIsAuthor(article, userId);
         }
 
         if (!article.getTags().isEmpty()) {
             for (Tag tag : article.getTags()) {
-                removeArticleFromTag(tag, article);
+                tag.getArticles().remove(article);
+                tagRepository.save(tag);
             }
         }
 
@@ -151,70 +153,13 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
 
     @Override
     public ArticleFullDto publishArticle(Long userId, Long articleId) {
-        User user = checkUserExist(userId);
-        checkUserIsNotBanned(user);
-        Article article = checkArticleExist(articleId);
-        checkUserIsAuthor(article, userId);
+        User user = validations.checkUserExist(userId);
+        validations.checkUserIsNotBanned(user);
+        Article article = validations.checkArticleExist(articleId);
+        validations.checkUserIsAuthor(article, userId);
         article.setStatus(ArticleStatus.MODERATING);
 
         log.info("Article with id {} was sent to moderation", articleId);
         return ArticleMapper.toArticleFullDto(articleRepository.save(article));
     }
-
-
-    private User checkUserExist(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            log.error("User with id {} wasn't found", userId);
-            throw new ResourceNotFoundException(String.format("User with id %d wasn't found", userId));
-        }
-        return user.get();
-    }
-
-    private void checkUserIsNotBanned(User user) {
-        if (user.getIsBanned()) {
-            log.error("User with id {} is blocked", user.getUserId());
-            throw new ActionForbiddenException(String.format("User with id %d is blocked", user.getUserId()));
-        }
-    }
-
-    private void checkTitleNotExist(String title, Long articleId) {
-        String prepTitle = title.trim().toLowerCase();
-        Article article = articleRepository.findArticlesByTitleIgnoreCase(prepTitle);
-        if (articleId == null) {
-            if (article != null) {
-                log.error("Article with title {} already exist", title);
-                throw new InvalidParameterException(String.format("Article with title %s already exist", title));
-            }
-        } else {
-            if (article != null && !article.getArticleId().equals(articleId)) {
-                log.error("Article with title {} already exist", title);
-                throw new InvalidParameterException(String.format("Article with title %s already exist", title));
-            }
-        }
-    }
-
-    private Article checkArticleExist(Long articleId) {
-        Optional<Article> article = articleRepository.findById(articleId);
-        if (article.isEmpty()) {
-            log.error("Article with id {} wasn't found", articleId);
-            throw new ResourceNotFoundException(String.format("Article with id %d wasn't found", articleId));
-        }
-        return article.get();
-    }
-
-    private void checkUserIsAuthor(Article article, long userId) {
-        if (article.getAuthor().getUserId() != userId) {
-            log.error("Article with id {} is not belongs to user with id {}", article.getArticleId(), userId);
-            throw new ActionForbiddenException(String.format(
-                    "Article with id %d is not belongs to user with id %d. Action is forbidden",
-                    article.getArticleId(), userId));
-        }
-    }
-
-    private void removeArticleFromTag(Tag tag, Article article) {
-        tag.getArticles().remove(article);
-        tagRepository.save(tag);
-    }
-
 }

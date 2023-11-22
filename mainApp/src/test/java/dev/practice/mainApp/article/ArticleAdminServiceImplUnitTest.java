@@ -8,9 +8,9 @@ import dev.practice.mainApp.models.ArticleStatus;
 import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
-import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticlePrivateService;
 import dev.practice.mainApp.services.impl.ArticleAdminServiceImpl;
+import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,10 +33,10 @@ public class ArticleAdminServiceImplUnitTest {
     private ArticleRepository articleRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private ArticlePrivateService articlePrivateService;
 
     @Mock
-    private ArticlePrivateService articlePrivateService;
+    private Validations validations;
 
     @InjectMocks
     private ArticleAdminServiceImpl articleService;
@@ -58,9 +57,6 @@ public class ArticleAdminServiceImplUnitTest {
     @Test
     void article_test_1_Given_adminAndExistUser_When_getAllArticlesByUserId_Then_returnAllUserArticles() {
         Mockito
-                .when(userRepository.findById(1L))
-                .thenReturn(Optional.of(admin));
-        Mockito
                 .when(articlePrivateService.getAllArticlesByUserId(
                         Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(List.of(fullArticle));
@@ -76,8 +72,9 @@ public class ArticleAdminServiceImplUnitTest {
     @Test
     void article_test_5_Given_notAdminUserExist_When_getAllArticlesByUserId_Then_throwException() {
         Mockito
-                .when(userRepository.findById(0L))
-                .thenReturn(Optional.of(author));
+                .doThrow(new ActionForbiddenException("User with id 0 is not ADMIN. Access is forbidden"))
+                .when(validations).checkUserIsAdmin(Mockito.any());
+
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
                 () -> articleService.getAllArticlesByUserId(0L, 0L, 0, 10, "ALL"));
@@ -93,11 +90,8 @@ public class ArticleAdminServiceImplUnitTest {
         article.setPublished(null);
         article.setStatus(ArticleStatus.CREATED);
         Mockito
-                .when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(admin));
-        Mockito
-                .when(articleRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(article));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(article);
         Mockito
                 .when(articleRepository.save(Mockito.any()))
                 .thenReturn(article);
@@ -113,11 +107,8 @@ public class ArticleAdminServiceImplUnitTest {
         article.setPublished(null);
         article.setStatus(ArticleStatus.CREATED);
         Mockito
-                .when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(admin));
-        Mockito
-                .when(articleRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(article));
+                .when(validations.checkArticleExist(Mockito.anyLong()))
+                .thenReturn(article);
         Mockito
                 .when(articleRepository.save(Mockito.any()))
                 .thenReturn(article);

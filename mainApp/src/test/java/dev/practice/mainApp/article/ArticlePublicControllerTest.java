@@ -71,7 +71,7 @@ public class ArticlePublicControllerTest {
     @Test
     void article_test_8_Given_anyUserArticleExist_When_getArticleById_Then_returnArticleStatusOk() throws Exception {
         Mockito
-                .when(articleService.getArticleById(Mockito.anyLong()))
+                .when(articleService.getArticleById(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(articleShort);
 
         mvc.perform(get("/api/v1/public/articles/{articleId}", 1L)
@@ -91,7 +91,8 @@ public class ArticlePublicControllerTest {
                 .andExpect(jsonPath("$.comments").isEmpty())
                 .andExpect(jsonPath("$.tags").isEmpty());
 
-        Mockito.verify(articleService, Mockito.times(1)).getArticleById(1L);
+        Mockito.verify(articleService, Mockito.times(1)).getArticleById(Mockito.anyLong()
+                , Mockito.any());
     }
 
     @Test

@@ -1,16 +1,21 @@
 package dev.practice.mainApp.article;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.dtos.tag.TagFullDto;
 import dev.practice.mainApp.dtos.tag.TagNewDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
-import dev.practice.mainApp.models.*;
+import dev.practice.mainApp.models.Article;
+import dev.practice.mainApp.models.ArticleStatus;
+import dev.practice.mainApp.models.Role;
+import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticlePublicService;
 import dev.practice.mainApp.services.TagService;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
@@ -81,12 +86,12 @@ public class ArticlePublicServiceImplIntTest {
     }
 
     @Test
-    void article_test_5_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() {
+    void article_test_5_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() throws JsonProcessingException {
         dropDB();
         userRepository.save(user);
         Article saved = articleRepository.save(article);
 
-        ArticleShortDto result = articleService.getArticleById(saved.getArticleId());
+        ArticleShortDto result = articleService.getArticleById(saved.getArticleId(), null);
 
         assertThat(result.getArticleId()).isEqualTo(saved.getArticleId());
         assertThat(result).isInstanceOf(ArticleShortDto.class);
@@ -97,7 +102,7 @@ public class ArticlePublicServiceImplIntTest {
         dropDB();
 
         final ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> articleService.getArticleById(Long.MAX_VALUE));
+                () -> articleService.getArticleById(Long.MAX_VALUE, null));
         assertEquals(String.format("Article with id %d wasn't found", Long.MAX_VALUE), exception.getMessage(),
                 "Incorrect message");
         assertThat(exception).isInstanceOf(ResourceNotFoundException.class);
@@ -110,7 +115,7 @@ public class ArticlePublicServiceImplIntTest {
         Article saved = articleRepository.save(article3);
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
-                () -> articleService.getArticleById(saved.getArticleId()));
+                () -> articleService.getArticleById(saved.getArticleId(), null));
         assertEquals(String.format("Article with id %d is not published yet", saved.getArticleId()),
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
