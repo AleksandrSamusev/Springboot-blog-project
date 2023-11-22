@@ -40,6 +40,7 @@ public class ArticleFullDto {
     @Enumerated(EnumType.STRING)
     private ArticleStatus status;
     private Long likes;
+    private Long views;
     private Set<CommentFullDto> comments;
     private Set<TagShortDto> tags;
 

@@ -45,6 +45,9 @@ public class Article {
     @Column(name = "likes")
     private Long likes;
 
+    @Column(name = "views")
+    private Long views;
+
     @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
     private Set<Comment> comments;
 

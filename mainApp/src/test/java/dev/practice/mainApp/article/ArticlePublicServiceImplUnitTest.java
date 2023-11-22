@@ -45,13 +45,13 @@ public class ArticlePublicServiceImplUnitTest {
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final Article savedArticle = new Article(0L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
-            ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
     private final Article afterLike = new Article(0L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
-            ArticleStatus.PUBLISHED, 1L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 1L, 0L, new HashSet<>(), new HashSet<>());
     private final Article savedArticle2 = new Article(1L, "A pretty cat",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
-            ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
 
 
     @Test

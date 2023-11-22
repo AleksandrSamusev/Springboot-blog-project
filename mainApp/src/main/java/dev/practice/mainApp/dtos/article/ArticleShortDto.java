@@ -32,6 +32,7 @@ public class ArticleShortDto {
     private UserShortDto author;
     private LocalDateTime published;
     private Long likes;
+    private Long views;
     private Set<CommentShortDto> comments;
     private Set<TagShortDto> tags;
 

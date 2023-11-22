@@ -61,11 +61,11 @@ public class CommentServiceTest {
 
     private final Article article = new Article(1L, "Potions",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
-            ArticleStatus.PUBLISHED, 1450L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 1450L, 0L, new HashSet<>(), new HashSet<>());
 
     private final Article unpublishedArticle = new Article(1L, "Potions",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
-            ArticleStatus.CREATED, 1450L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.CREATED, 1450L, 0L, new HashSet<>(), new HashSet<>());
 
     private final Comment comment = new Comment(1L,
             "I found this article very interesting!!!", LocalDateTime.now(),
@@ -250,7 +250,7 @@ public class CommentServiceTest {
         Set<Comment> comments = new HashSet<>();
         Article someArticle = new Article(1L, "Potions",
                 "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
-                ArticleStatus.PUBLISHED, 1450L, comments, new HashSet<>());
+                ArticleStatus.PUBLISHED, 1450L, 0L, comments, new HashSet<>());
         Comment comment1 = new Comment(5L,
                 "I found this article very interesting!!!", LocalDateTime.now(), someArticle, commentAuthor);
         Comment comment2 = new Comment(6L,

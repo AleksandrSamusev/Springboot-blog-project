@@ -51,21 +51,21 @@ public class ArticlePublicServiceImplIntTest {
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final Article article = new Article(null, "The empty pot",
             "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now(),
-            ArticleStatus.PUBLISHED, 1450L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 1450L, 0L, new HashSet<>(), new HashSet<>());
     private final Article article2 = new Article(null, "A pretty cat",
             "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
-            ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
     private final Article article3 = new Article(null, "The title",
             "Very interesting information", user, LocalDateTime.now(), null, ArticleStatus.CREATED,
-            0L, new HashSet<>(), new HashSet<>());
+            0L, 0L, new HashSet<>(), new HashSet<>());
 
     private final Article articleWithTags1 = new Article(1L, "A pretty cat",
             "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
-            ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
 
     private final Article articleWithTags2 = new Article(2L, "A pretty cat",
             "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
-            ArticleStatus.PUBLISHED, 0L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
 
     @Test
     void article_test_2_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticlesNewFirst() {
@@ -125,16 +125,16 @@ public class ArticlePublicServiceImplIntTest {
         User author = userRepository.save(user);
         for (int i = 0; i < 20; i++) {
             articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
-                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, new HashSet<>(),
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L, new HashSet<>(),
                     new HashSet<>()));
         }
         for (int i = 0; i < 5; i++) {
             articleRepository.save(new Article(null, String.valueOf(20 + i), "some information", author,
-                    LocalDateTime.now(), LocalDateTime.now(), ArticleStatus.PUBLISHED, 0L, new HashSet<>(),
+                    LocalDateTime.now(), LocalDateTime.now(), ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(),
                     new HashSet<>()));
         }
         articleRepository.save(new Article(null, "r", "some information", author,
-                LocalDateTime.now(), null, ArticleStatus.MODERATING, 0L, new HashSet<>(),
+                LocalDateTime.now(), null, ArticleStatus.MODERATING, 0L, 0L, new HashSet<>(),
                 new HashSet<>()));
 
         List<ArticleShortDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10);
@@ -150,7 +150,7 @@ public class ArticlePublicServiceImplIntTest {
         dropDB();
         Article article2 = new Article(null, "A pretty cat",
                 "Very interesting information", user, LocalDateTime.now().minusDays(2),
-                LocalDateTime.now().minusDays(1), ArticleStatus.PUBLISHED, 0L,
+                LocalDateTime.now().minusDays(1), ArticleStatus.PUBLISHED, 0L, 0L,
                 new HashSet<>(), new HashSet<>());
 
         User savedUser = userRepository.save(user);

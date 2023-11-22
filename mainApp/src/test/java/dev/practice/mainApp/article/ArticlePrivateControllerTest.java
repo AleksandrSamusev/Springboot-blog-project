@@ -44,9 +44,9 @@ public class ArticlePrivateControllerTest {
     private final UserShortDto author = new UserShortDto(1L, "Harry");
     private final ArticleFullDto articleFull = new ArticleFullDto(1L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED,
-            0L, new HashSet<>(), new HashSet<>());
+            0L, 0L,  new HashSet<>(), new HashSet<>());
     private final ArticleShortDto articleShort = new ArticleShortDto(1L, "The empty pot",
-            "Very interesting information", author, LocalDateTime.now(), 0L, new HashSet<>(),
+            "Very interesting information", author, LocalDateTime.now(), 0L, 0L, new HashSet<>(),
             new HashSet<>());
     private final ArticleNewDto articleNew = new ArticleNewDto("The empty pot",
             "Very interesting information", null);

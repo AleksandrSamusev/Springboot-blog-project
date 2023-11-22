@@ -51,10 +51,10 @@ public class ArticlePrivateServiceImplUnitTest {
             "Very interesting information", new HashSet<>());
     private final Article savedArticle = new Article(0L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED,
-            0L, new HashSet<>(), new HashSet<>());
+            0L, 0L, new HashSet<>(), new HashSet<>());
     private final Article savedArticle2 = new Article(1L, "A pretty cat",
             "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED,
-            0L, new HashSet<>(), new HashSet<>());
+            0L, 0L, new HashSet<>(), new HashSet<>());
     private final ArticleUpdateDto update = new ArticleUpdateDto();
     private final Tag tag1 = new Tag(0L, "Potions", new HashSet<>());
 

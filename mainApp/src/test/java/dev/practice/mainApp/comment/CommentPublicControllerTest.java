@@ -46,7 +46,7 @@ public class CommentPublicControllerTest {
 
     private final Article article = new Article(1L, "Potions",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
-            ArticleStatus.PUBLISHED, 1450L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 1450L, 0L, new HashSet<>(), new HashSet<>());
 
     private final CommentFullDto fullComment = new CommentFullDto(1L,
             "I found this article very interesting!!!", LocalDateTime.now(),
