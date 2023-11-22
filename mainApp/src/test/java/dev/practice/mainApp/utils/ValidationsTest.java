@@ -44,7 +44,7 @@ public class ValidationsTest {
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final Article savedArticle = new Article(0L, "A pretty cat",
             "Very interesting information", user, LocalDateTime.now(), null, ArticleStatus.CREATED,
-            0L, new HashSet<>(), new HashSet<>());
+            0L, 0L, new HashSet<>(), new HashSet<>());
     private final Tag tag = new Tag(0L, "Potions", new HashSet<>());
     private final Comment comment = new Comment(0L, "I found this article very interesting!!!",
             LocalDateTime.now(), savedArticle, user);

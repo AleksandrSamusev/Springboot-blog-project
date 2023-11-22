@@ -72,7 +72,7 @@ public class ArticlePublicServiceImplUnitTest {
                 .when(validations.checkArticleExist(Mockito.any()))
                 .thenReturn(savedArticle);
 
-        ArticleShortDto result = articleService.getArticleById(0L);
+        ArticleShortDto result = articleService.getArticleById(0L, null);
 
         assertThat(result.getArticleId()).isEqualTo(0);
     }
