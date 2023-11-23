@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  blog-db:
+    image: postgres:14-alpine
+    container_name: blog-db
+    ports:
+      - "7777:5432"
+    volumes:
+      - /var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: "blog"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "zyxel-592-atq"
+
+  stats-db:
+    image: postgres:14-alpine
+    container_name: stats-db
+    ports:
+      - "8888:5432"
+    volumes:
+      - /var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: "blogstats"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "zyxel-592-atq"
+
+  statsapp:
+    build: ./statsapp
+    container_name: statsapp
+    ports:
+      - "9090:9090"
+    depends_on:
+      - stats-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/blogstats
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=zyxel-592-atq
+
+  mainapp:
+    build: ./mainapp
+    container_name: mainapp
+    ports:
+      - "8080:8080"
+    depends_on:
+      - blog-db
+      - statsapp
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://blog-db:5432/blog
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=zyxel-592-atq
+      - STATS_SERVER_URL=http://statsapp:9090
