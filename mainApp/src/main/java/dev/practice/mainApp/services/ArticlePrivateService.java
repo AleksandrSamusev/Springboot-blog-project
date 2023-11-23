@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ArticlePrivateService {
-    ArticleFullDto createArticle(long userId, ArticleNewDto newArticle);
+    ArticleFullDto createArticle(String username, ArticleNewDto newArticle);
 
     ArticleFullDto updateArticle(Long userId, Long articleId, ArticleUpdateDto updateArticle);
 

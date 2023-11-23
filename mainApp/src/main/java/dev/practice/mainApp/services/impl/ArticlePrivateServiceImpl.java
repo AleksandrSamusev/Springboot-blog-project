@@ -35,27 +35,28 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     private final Validations validations;
 
     @Override
-    public ArticleFullDto createArticle(long userId, ArticleNewDto newArticle) {
-        User user = validations.checkUserExist(userId);
+    public ArticleFullDto createArticle(String username, ArticleNewDto newArticle) {
+        User user = userRepository.findByUsername(username);
+        //User user = validations.checkUserExist(userId);
         validations.checkUserIsNotBanned(user);
         validations.checkTitleNotExist(newArticle.getTitle(), null);
 
         Article savedArticle = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, user));
         if (newArticle.getTags() != null && !newArticle.getTags().isEmpty()) {
             ArticleFullDto articleWithTags = tagService.addTagsToArticle(
-                    userId, savedArticle.getArticleId(), newArticle.getTags().stream().toList());
+                    user.getUserId(), savedArticle.getArticleId(), newArticle.getTags().stream().toList());
 
             user.getArticles().add(savedArticle);
             userRepository.save(user);
 
-            log.info("Article with id {} was created by user with id {}", articleWithTags.getArticleId(), userId);
+            log.info("Article with id {} was created by user with id {}", articleWithTags.getArticleId(), user.getUserId());
             return articleWithTags;
         }
 
         user.getArticles().add(savedArticle);
         userRepository.save(user);
 
-        log.info("Article with id {} was created by user with id {}", savedArticle.getArticleId(), userId);
+        log.info("Article with id {} was created by user with id {}", savedArticle.getArticleId(), user.getUserId());
         return ArticleMapper.toArticleFullDto(savedArticle);
     }
 
