@@ -26,6 +26,4 @@ public interface UserService {
     UserFullDto banUser(Long userId, Long currentUserId);
 
     UserFullDto unbanUser(Long userId, Long currentUserId);
-
-    UserFullDto changeRole(Long userId, String role);
 }

@@ -34,7 +34,6 @@ public class UserServiceImpl implements UserService {
 
     public List<UserFullDto> getAllUsers(Long currentUserId) {
         User currentUser = validations.checkUserExist(currentUserId);
-        validations.checkUserIsAdmin(currentUser);
         log.info("Returned the List of all UserFullDto users by Admin request");
         return userRepository.findAll().stream().map(UserMapper::toUserFullDto)
                 .collect(Collectors.toList());
@@ -50,9 +49,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserFullDto getUserById(Long userId, Long currentUserId) {
         User user = validations.checkUserExist(userId);
-        User currentUser = validations.checkUserExist(currentUserId);
-        String role = currentUser.getRole().name();
-        if (userId.equals(currentUserId) || role.equals("ADMIN")) {
+        if (userId.equals(currentUserId)) {
             log.info("Returned user with id = " + userId + " by Admin request");
             return UserMapper.toUserFullDto(user);
         } else {
@@ -140,7 +137,6 @@ public class UserServiceImpl implements UserService {
     public UserFullDto banUser(Long userId, Long currentUserId) {
         User user = validations.checkUserExist(userId);
         User currentUser = validations.checkUserExist(currentUserId);
-        validations.checkUserIsAdmin(currentUser);
         user.setIsBanned(Boolean.TRUE);
         User savedUser = userRepository.save(user);
         log.info("User with ID = " + userId + " was banned by admin with ID = " + currentUserId);
@@ -151,23 +147,10 @@ public class UserServiceImpl implements UserService {
     public UserFullDto unbanUser(Long userId, Long currentUserId) {
         User user = validations.checkUserExist(userId);
         User currentUser = validations.checkUserExist(currentUserId);
-        validations.checkUserIsAdmin(currentUser);
         user.setIsBanned(Boolean.FALSE);
         User savedUser = userRepository.save(user);
         log.info("User with ID = " + userId + " was unbanned by admin with ID = " + currentUserId);
         return UserMapper.toUserFullDto(savedUser);
     }
 
-    @Override
-    public UserFullDto changeRole(Long userId, String role) {
-        User user = validations.checkUserExist(userId);
-        if(role.equals("ADMIN")) {
-            user.setRole(Role.ADMIN);
-        } else {
-            user.setRole(Role.USER);
-        }
-        User savedUser = userRepository.save(user);
-        log.info("The role of the user with ID = {} has changed to ADMIN", userId);
-        return UserMapper.toUserFullDto(savedUser);
-    }
 }

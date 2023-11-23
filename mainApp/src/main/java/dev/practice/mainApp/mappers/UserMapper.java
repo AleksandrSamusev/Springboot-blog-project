@@ -20,7 +20,7 @@ public class UserMapper {
         dto.setEmail(user.getEmail());
         dto.setUsername(user.getUsername());
         dto.setBirthDate(user.getBirthDate());
-        dto.setRole(user.getRole());
+        dto.setRoles(user.getRoles());
         dto.setIsBanned(user.getIsBanned());
         dto.setComments(user.getComments().stream().map(CommentMapper::toCommentShortDto).collect(Collectors.toSet()));
         dto.setSentMessages(user.getSentMessages().stream().map(MessageMapper::toMessageFullDto)

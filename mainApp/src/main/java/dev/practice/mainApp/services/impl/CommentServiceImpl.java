@@ -51,8 +51,7 @@ public class CommentServiceImpl implements CommentService {
     public void deleteComment(Long commentId, Long userId) {
         Comment comment = validations.isCommentExists(commentId);
         User user = validations.checkUserExist(userId);
-        if (userId.equals(comment.getCommentAuthor().getUserId())
-                || user.getRole().name().equals("ADMIN")) {
+        if (userId.equals(comment.getCommentAuthor().getUserId())) {
             log.info("Comment with ID = " + commentId + " deleted");
             commentRepository.deleteById(commentId);
         } else {

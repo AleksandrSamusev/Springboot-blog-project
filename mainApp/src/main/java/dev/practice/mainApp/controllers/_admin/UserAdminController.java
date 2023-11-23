@@ -26,10 +26,4 @@ public class UserAdminController {
                                                  @RequestHeader("X-Current-User-Id") Long currentUserId) {
         return new ResponseEntity<>(userService.unbanUser(userId, currentUserId), HttpStatus.OK);
     }
-
-    @PatchMapping("/{userId}")
-    public ResponseEntity<UserFullDto> changeRole(@PathVariable Long userId,
-                                                  @RequestParam String role) {
-        return new ResponseEntity<>(userService.changeRole(userId, role), HttpStatus.OK);
-    }
 }

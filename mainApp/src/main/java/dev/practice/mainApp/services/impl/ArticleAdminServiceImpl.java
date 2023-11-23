@@ -28,14 +28,12 @@ public class ArticleAdminServiceImpl implements ArticleAdminService {
     public List<ArticleFullDto> getAllArticlesByUserId(Long userId, Long authorId, Integer from,
                                                        Integer size, String status) {
         User user = validations.checkUserExist(userId);
-        validations.checkUserIsAdmin(user);
         return articleService.getAllArticlesByUserId(authorId, from, size, status);
     }
 
     @Override
     public ArticleFullDto publishArticle(Long userId, Long articleId, boolean publish) {
         User user = validations.checkUserExist(userId);
-        validations.checkUserIsAdmin(user);
         Article article = validations.checkArticleExist(articleId);
 
         if (publish) {
