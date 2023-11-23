@@ -81,7 +81,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         Article article = validations.checkArticleExist(articleId);
         User user = validations.checkUserExist(userId);
 
-        if (!article.getAuthor().getUserId().equals(userId) && user.getRole().equals(Role.USER)) {
+        if (!article.getAuthor().getUserId().equals(userId)) {
             if (article.getStatus() != ArticleStatus.PUBLISHED) {
                 log.error("Article with id {} is not published yet. Current status is {}", articleId,
                         article.getStatus());
@@ -135,11 +135,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     public void deleteArticle(long userId, long articleId) {
         Article article = validations.checkArticleExist(articleId);
         User user = validations.checkUserExist(userId);
-
-        if (user.getRole() != Role.ADMIN) {
-            validations.checkUserIsAuthor(article, userId);
-        }
-
+        validations.checkUserIsAuthor(article, userId);
         if (!article.getTags().isEmpty()) {
             for (Tag tag : article.getTags()) {
                 tag.getArticles().remove(article);

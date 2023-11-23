@@ -52,7 +52,6 @@ public class TagServiceImpl implements TagService {
     @Override
     public void deleteTag(Long tagId, Long userId) {
         User user = validations.checkUserExist(userId);
-        validations.checkUserIsAdmin(user);
         validations.isTagExists(tagId);
         tagRepository.deleteById(tagId);
         log.info("Tag with ID = " + tagId + " successfully deleted");

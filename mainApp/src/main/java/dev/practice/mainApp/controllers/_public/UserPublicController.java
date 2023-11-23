@@ -29,9 +29,4 @@ public class UserPublicController {
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
-    @PostMapping("/users")
-    public ResponseEntity<UserFullDto> createUser(@Valid @RequestBody UserNewDto dto) {
-        return new ResponseEntity<>(userService.createUser(dto), HttpStatus.CREATED);
-    }
-
 }

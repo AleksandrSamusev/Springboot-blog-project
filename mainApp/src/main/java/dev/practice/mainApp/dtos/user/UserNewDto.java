@@ -30,6 +30,9 @@ public class UserNewDto {
     @Length(max = 50, message = "Username should be 50 chars max")
     private String username;
 
+    @NotBlank(message = "Password cannot be blank")
+    private String password;
+
     @NotBlank(message = "User email cannot be blank")
     @Length(max = 50, message = "Email length should be 50 chars max")
     @Email(message = "Incorrect email format")

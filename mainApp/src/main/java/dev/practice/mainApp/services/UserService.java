@@ -17,15 +17,9 @@ public interface UserService {
 
     UserFullDto getUserById(Long userId, Long id);
 
-    UserFullDto createUser(UserNewDto dto);
-
-    UserFullDto updateUser(Long userId, Long currentUserId, UserUpdateDto dto);
-
     void deleteUser(Long userId, Long currentUserId);
 
     UserFullDto banUser(Long userId, Long currentUserId);
 
     UserFullDto unbanUser(Long userId, Long currentUserId);
-
-    UserFullDto changeRole(Long userId, String role);
 }

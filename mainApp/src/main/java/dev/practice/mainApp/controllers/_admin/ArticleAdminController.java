@@ -5,6 +5,7 @@ import dev.practice.mainApp.services.ArticleAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 public class ArticleAdminController {
     private final ArticleAdminService articleService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("users/{authorId}")
     public ResponseEntity<List<ArticleFullDto>> getAllArticlesByUserId(
             @RequestHeader("X-Current-User-Id") Long userId,
@@ -26,6 +28,7 @@ public class ArticleAdminController {
                 HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("{articleId}/publish")
     public ResponseEntity<ArticleFullDto> publishArticle(@RequestHeader("X-Current-User-Id") Long userId,
                                                          @PathVariable("articleId") Long articleId,
