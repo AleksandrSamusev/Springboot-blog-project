@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,12 +19,14 @@ import java.util.List;
 public class ArticlePrivateController {
     private final ArticlePrivateService articleService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping
     public ResponseEntity<ArticleFullDto> createArticle(@RequestHeader("X-Current-User-Id") Long userId,
                                                         @Valid @RequestBody ArticleNewDto newArticle) {
         return new ResponseEntity<>(articleService.createArticle(userId, newArticle), HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PatchMapping("/{articleId}")
     public ResponseEntity<ArticleFullDto> updateArticle(@RequestHeader("X-Current-User-Id") Long userId,
                                                         @PathVariable("articleId") Long articleId,
@@ -31,12 +34,14 @@ public class ArticlePrivateController {
         return new ResponseEntity<>(articleService.updateArticle(userId, articleId, updateArticle), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/{articleId}")
     public ResponseEntity<Object> getArticleById(@RequestHeader("X-Current-User-Id") Long userId,
                                                  @PathVariable("articleId") Long articleId) {
         return new ResponseEntity<>(articleService.getArticleById(userId, articleId).get(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping()
     public ResponseEntity<List<ArticleFullDto>> getAllArticlesByUserId(
             @RequestHeader("X-Current-User-Id") Long userId,
@@ -46,6 +51,7 @@ public class ArticlePrivateController {
         return new ResponseEntity<>(articleService.getAllArticlesByUserId(userId, from, size, status), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @DeleteMapping("/{articleId}")
     public ResponseEntity<HttpStatus> deleteArticle(@RequestHeader("X-Current-User-Id") Long userId,
                                                     @PathVariable("articleId") Long articleId) {
@@ -53,6 +59,7 @@ public class ArticlePrivateController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PatchMapping("/{articleId}/publish")
     public ResponseEntity<ArticleFullDto> publishArticle(@RequestHeader("X-Current-User-Id") Long userId,
                                                          @PathVariable("articleId") Long articleId) {

@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class TagPrivateController {
     private final TagService tagService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping("/articles/{articleId}")
     public ResponseEntity<TagFullDto> createTag(@Valid @RequestBody TagNewDto dto,
                                                 @PathVariable Long articleId,
@@ -25,6 +27,7 @@ public class TagPrivateController {
         return new ResponseEntity<>(tagService.createTag(dto, articleId), HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PatchMapping("/articles/{articleId}/add")
     public ResponseEntity<ArticleFullDto> addTagsToArticle(@RequestHeader("X-Current-User-Id") Long userId,
                                                            @PathVariable Long articleId,
@@ -32,6 +35,7 @@ public class TagPrivateController {
         return new ResponseEntity<>(tagService.addTagsToArticle(userId, articleId, tags), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PatchMapping("/articles/{articleId}/remove")
     public ResponseEntity<ArticleFullDto> removeTagsFromArticle(@RequestHeader("X-Current-User-Id") Long userId,
                                                                 @PathVariable Long articleId,

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,18 +18,21 @@ import java.util.List;
 public class UserPrivateController {
     private final UserService userService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/users")
     public ResponseEntity<List<UserFullDto>> getAllUsers(
             @RequestHeader("X-Current-User-Id") Long currentUserId) {
         return new ResponseEntity<>(userService.getAllUsers(currentUserId), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserFullDto> getUserById(@PathVariable Long userId,
                                                    @RequestHeader("X-Current-User-Id") Long currentUserId) {
         return new ResponseEntity<>(userService.getUserById(userId, currentUserId), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable Long userId,
                                                  @RequestHeader("X-Current-User-Id") Long currentUserId) {
