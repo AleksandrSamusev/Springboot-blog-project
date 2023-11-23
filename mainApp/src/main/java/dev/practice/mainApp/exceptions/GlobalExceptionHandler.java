@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -18,43 +19,42 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.time.LocalDateTime;
 import java.util.List;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({ResourceNotFoundException.class})
+    @ExceptionHandler()
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleResourceNotFoundException(HttpServletRequest req, RuntimeException ex) {
+    public ErrorResponse handleResourceNotFoundException(HttpServletRequest req, final ResourceNotFoundException ex) {
         ErrorResponse error = new ErrorResponse();
         error.setTimestamp(LocalDateTime.now());
         error.setStatus(HttpStatus.NOT_FOUND.value());
-        error.addError(HttpStatus.NOT_FOUND.getReasonPhrase());
+        error.addError(ex.getMessage());
         error.setPath(req.getServletPath());
 
         log.info(ex.getMessage(), ex);
         return error;
     }
 
-    @ExceptionHandler({InvalidParameterException.class})
+    @ExceptionHandler()
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleInvalidParameterException(HttpServletRequest req, RuntimeException ex) {
+    public ErrorResponse handleInvalidParameterException(HttpServletRequest req, final InvalidParameterException ex) {
         ErrorResponse error = new ErrorResponse();
         error.setTimestamp(LocalDateTime.now());
         error.setStatus(HttpStatus.BAD_REQUEST.value());
-        error.addError(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        error.addError(ex.getMessage());
         error.setPath(req.getServletPath());
-
         log.info(ex.getMessage(), ex);
         return error;
     }
 
-    @ExceptionHandler({ActionForbiddenException.class})
+    @ExceptionHandler()
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleActionForbiddenException(HttpServletRequest req, RuntimeException ex) {
+    public ErrorResponse handleActionForbiddenException(HttpServletRequest req, final ActionForbiddenException ex) {
         ErrorResponse error = new ErrorResponse();
         error.setTimestamp(LocalDateTime.now());
         error.setStatus(HttpStatus.FORBIDDEN.value());
-        error.addError(HttpStatus.FORBIDDEN.getReasonPhrase());
+        error.addError(ex.getMessage());
         error.setPath(req.getServletPath());
 
         log.info(ex.getMessage(), ex);
