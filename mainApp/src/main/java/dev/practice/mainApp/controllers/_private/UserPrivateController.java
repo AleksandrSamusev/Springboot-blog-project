@@ -29,13 +29,6 @@ public class UserPrivateController {
         return new ResponseEntity<>(userService.getUserById(userId, currentUserId), HttpStatus.OK);
     }
 
-    @PatchMapping("/users/{userId}")
-    public ResponseEntity<UserFullDto> updateUser(@PathVariable Long userId,
-                                                  @RequestHeader("X-Current-User-Id") Long currentUserId,
-                                                  @Valid @RequestBody UserUpdateDto dto) {
-        return new ResponseEntity<>(userService.updateUser(userId, currentUserId, dto), HttpStatus.OK);
-    }
-
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable Long userId,
                                                  @RequestHeader("X-Current-User-Id") Long currentUserId) {

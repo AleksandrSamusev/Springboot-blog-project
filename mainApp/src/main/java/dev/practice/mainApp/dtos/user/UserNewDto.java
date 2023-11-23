@@ -31,7 +31,6 @@ public class UserNewDto {
     private String username;
 
     @NotBlank(message = "Password cannot be blank")
-    @Length(max = 50, message = "Password should be 50 chars max")
     private String password;
 
     @NotBlank(message = "User email cannot be blank")

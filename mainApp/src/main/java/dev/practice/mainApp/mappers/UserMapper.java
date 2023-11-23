@@ -5,10 +5,13 @@ import dev.practice.mainApp.dtos.user.UserFullDto;
 import dev.practice.mainApp.dtos.user.UserNewDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.models.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+@Component
 public class UserMapper {
 
     public static UserFullDto toUserFullDto(User user) {
@@ -19,6 +22,7 @@ public class UserMapper {
         dto.setAbout(user.getAbout());
         dto.setEmail(user.getEmail());
         dto.setUsername(user.getUsername());
+        dto.setPassword(user.getPassword());
         dto.setBirthDate(user.getBirthDate());
         dto.setRoles(user.getRoles());
         dto.setIsBanned(user.getIsBanned());

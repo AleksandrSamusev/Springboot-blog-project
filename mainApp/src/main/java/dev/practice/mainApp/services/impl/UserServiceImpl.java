@@ -1,13 +1,9 @@
 package dev.practice.mainApp.services.impl;
 
 import dev.practice.mainApp.dtos.user.UserFullDto;
-import dev.practice.mainApp.dtos.user.UserNewDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
-import dev.practice.mainApp.dtos.user.UserUpdateDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
-import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.mappers.UserMapper;
-import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.UserService;
@@ -58,71 +54,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public UserFullDto createUser(UserNewDto dto) {
-        String username = dto.getUsername().replaceAll("\\s+", "");
-        String email = dto.getEmail().toLowerCase();
-        dto.setUsername(username);
-        dto.setEmail(email);
-        if (userRepository.findByUsernameOrEmail(dto.getUsername(), dto.getEmail()) != null) {
-            if (dto.getUsername().trim().equalsIgnoreCase(userRepository
-                    .findByUsernameOrEmail(dto.getUsername(),
-                            dto.getEmail()).getUsername()
-                    .trim())) {
-                log.info("InvalidParameterException. User with given Username = " +
-                        dto.getUsername() + "already exists");
-                throw new InvalidParameterException("User with given Username already exists");
-            } else {
-                log.info("InvalidParameterException. User with given email = " +
-                        dto.getEmail() + "already exists");
-                throw new InvalidParameterException("User with given email already exists");
-            }
-        }
-        User user = UserMapper.toUser(dto);
-        User savedUser = userRepository.save(user);
-        log.info("User with id = " + savedUser.getUserId() + " created");
-        return UserMapper.toUserFullDto(savedUser);
-    }
-
-    @Override
-    public UserFullDto updateUser(Long userId, Long currentUserId, UserUpdateDto dto) {
-        User userFromBd = validations.checkUserExist(userId);
-        User currentUser = validations.checkUserExist(currentUserId);
-        if (!userFromBd.getUserId().equals(currentUser.getUserId())) {
-            log.info("ActionForbiddenException. Action forbidden for current user");
-            throw new ActionForbiddenException("Action forbidden for current user");
-        }
-        if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
-            userFromBd.setFirstName(dto.getFirstName());
-        }
-        if (dto.getLastName() != null && !dto.getLastName().isBlank()) {
-            userFromBd.setLastName(dto.getLastName());
-        }
-        if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
-            String uName = dto.getUsername().replaceAll("\\s+", "");
-            if (uName.equalsIgnoreCase(userFromBd.getUsername())) { // check logic
-                throw new ActionForbiddenException("User with given Username already exists");
-            }
-            userFromBd.setUsername(uName);
-        }
-        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
-            if (userRepository.findByEmail(dto.getEmail()
-                    .replaceAll("\\s+", "").toLowerCase()).isPresent()) {
-                throw new ActionForbiddenException("User with given email already exists");
-            }
-            userFromBd.setEmail(dto.getEmail());
-        }
-        if (dto.getBirthDate() != null) {
-            userFromBd.setBirthDate(dto.getBirthDate());
-        }
-        if (dto.getAbout() != null && !dto.getAbout().isBlank()) {
-            userFromBd.setAbout(dto.getAbout());
-        }
-
-        User savedUser = userRepository.save(userFromBd);
-        log.info("User with ID = " + savedUser.getUserId() + " updated");
-        return UserMapper.toUserFullDto(savedUser);
-    }
 
     @Override
     public void deleteUser(Long userId, Long currentUserId) {

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users
     first_name VARCHAR(50) NOT NULL,
     last_name  VARCHAR(50) NOT NULL,
     username   VARCHAR(50) NOT NULL UNIQUE,
-    password   VARCHAR(50) NOT NULL,
+    password   TEXT NOT NULL,
     email      VARCHAR(50) NOT NULL UNIQUE,
     birthdate  DATE        NOT NULL,
     about      TEXT CHECK (char_length(about) <= 1000),
