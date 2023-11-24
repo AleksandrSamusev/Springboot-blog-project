@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +23,8 @@ public class ArticlePrivateController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping
-    public ResponseEntity<ArticleFullDto> createArticle(@Valid @RequestBody ArticleNewDto newArticle) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<ArticleFullDto> createArticle(@AuthenticationPrincipal UserDetails userDetails,
+                                                        @Valid @RequestBody ArticleNewDto newArticle) {
 
         return new ResponseEntity<>(articleService.createArticle(userDetails.getUsername(), newArticle),
                 HttpStatus.CREATED);
