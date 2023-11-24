@@ -3,10 +3,12 @@ package dev.practice.mainApp.utils;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
+import dev.practice.mainApp.exceptions.TodoAPIException;
 import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -139,5 +141,17 @@ public class Validations {
             return true;
         }
         return false;
+    }
+
+    public Boolean isUserExistsByUsername(String username) {
+        if(userRepository.existsByUsername(username)) {
+            return true;
+        } else {
+            throw new TodoAPIException(HttpStatus.BAD_REQUEST, "Username already exists");
+        }
+    }
+
+    public Boolean isUserExistsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }
