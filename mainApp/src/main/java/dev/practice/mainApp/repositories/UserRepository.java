@@ -1,5 +1,6 @@
 package dev.practice.mainApp.repositories;
 
+import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,4 +12,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByUsername(String username);
     Optional<User>findByUsernameOrEmail(String username, String email);
     User findByUsername(String username);
+
 }

@@ -4,14 +4,19 @@ import dev.practice.mainApp.dtos.user.UserFullDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.mappers.UserMapper;
+import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.models.User;
+import dev.practice.mainApp.repositories.RoleRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.UserService;
 import dev.practice.mainApp.utils.Validations;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,8 +33,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().map(UserMapper::toUserShortDto).collect(Collectors.toList());
     }
 
-    public List<UserFullDto> getAllUsers(Long currentUserId) {
-        User currentUser = validations.checkUserExist(currentUserId);
+    public List<UserFullDto> getAllUsers(String username) {
+        User user = userRepository.findByUsername(username);
         log.info("Returned the List of all UserFullDto users by Admin request");
         return userRepository.findAll().stream().map(UserMapper::toUserFullDto)
                 .collect(Collectors.toList());
@@ -43,9 +48,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserFullDto getUserById(Long userId, Long currentUserId) {
+    public UserFullDto getUserById(Long userId, String username) {
         User user = validations.checkUserExist(userId);
-        if (userId.equals(currentUserId)) {
+        if (userId.equals(userRepository.findByUsername(username).getUserId()) || validations.isAdmin(username)) {
             log.info("Returned user with id = " + userId + " by Admin request");
             return UserMapper.toUserFullDto(user);
         } else {
@@ -83,5 +88,4 @@ public class UserServiceImpl implements UserService {
         log.info("User with ID = " + userId + " was unbanned by admin with ID = " + currentUserId);
         return UserMapper.toUserFullDto(savedUser);
     }
-
 }

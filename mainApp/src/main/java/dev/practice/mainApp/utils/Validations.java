@@ -7,6 +7,8 @@ import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -20,6 +22,7 @@ public class Validations {
     private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
     private final MessageRepository messageRepository;
+    private final UserDetailsService userDetailsService;
 
     public User checkUserExist(Long userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -127,5 +130,14 @@ public class Validations {
             log.info("ActionForbiddenException. Action forbidden for current user");
             throw new ActionForbiddenException("Action forbidden for current user");
         }
+    }
+
+    public Boolean isAdmin(String username) {
+        UserDetails details = userDetailsService.loadUserByUsername(username);
+        if (details != null && details.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            return true;
+        }
+        return false;
     }
 }

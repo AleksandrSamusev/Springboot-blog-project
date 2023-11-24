@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,15 +23,15 @@ public class UserPrivateController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/users")
     public ResponseEntity<List<UserFullDto>> getAllUsers(
-            @RequestHeader("X-Current-User-Id") Long currentUserId) {
-        return new ResponseEntity<>(userService.getAllUsers(currentUserId), HttpStatus.OK);
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return new ResponseEntity<>(userService.getAllUsers(userDetails.getUsername()), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserFullDto> getUserById(@PathVariable Long userId,
-                                                   @RequestHeader("X-Current-User-Id") Long currentUserId) {
-        return new ResponseEntity<>(userService.getUserById(userId, currentUserId), HttpStatus.OK);
+                                                   @AuthenticationPrincipal UserDetails userDetails) {
+        return new ResponseEntity<>(userService.getUserById(userId, userDetails.getUsername()), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
