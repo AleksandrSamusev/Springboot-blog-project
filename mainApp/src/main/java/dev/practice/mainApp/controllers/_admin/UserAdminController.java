@@ -29,4 +29,11 @@ public class UserAdminController {
                                                  @RequestHeader("X-Current-User-Id") Long currentUserId) {
         return new ResponseEntity<>(userService.unbanUser(userId, currentUserId), HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{userId}/role")
+    public ResponseEntity<UserFullDto> addRole(@PathVariable Long userId,
+                                               @RequestParam String role) {
+        return new ResponseEntity<>(userService.addRole(userId, role), HttpStatus.OK);
+    }
 }

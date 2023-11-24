@@ -21,9 +21,15 @@ public class AuthController {
     private final AuthService authService;
 
     // Build register REST API
-    @PostMapping("/register")
+    @PostMapping("/register/user")
     public ResponseEntity<String> register(@Valid @RequestBody UserNewDto userNewDto) {
         String response = authService.register(userNewDto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/register/admin")
+    public ResponseEntity<String> registerAdmin(@Valid @RequestBody UserNewDto userNewDto) {
+        String response = authService.registerAdmin(userNewDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 

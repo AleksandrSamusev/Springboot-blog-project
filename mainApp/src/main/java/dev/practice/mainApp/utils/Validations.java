@@ -135,7 +135,7 @@ public class Validations {
     public Boolean isAdmin(String username) {
         UserDetails details = userDetailsService.loadUserByUsername(username);
         if (details != null && details.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                .anyMatch(a -> a.getAuthority().equals("ADMIN"))) {
             return true;
         }
         return false;

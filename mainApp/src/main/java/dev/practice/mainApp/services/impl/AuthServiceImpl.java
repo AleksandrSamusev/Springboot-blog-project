@@ -49,12 +49,35 @@ public class AuthServiceImpl implements AuthService {
         User user = UserMapper.toUser(userNewDto);
         user.setPassword(passwordEncoder.encode(userNewDto.getPassword()));
         Set<Role> roles = new HashSet<>();
-        Role userRole = roleRepository.findByName("ROLE_USER");
+        Role userRole = roleRepository.findByName("USER");
         roles.add(userRole);
         user.setRoles(roles);
 
         userRepository.save(user);
         return "User registered successfully";
+    }
+
+    @Override
+    public String registerAdmin(UserNewDto userNewDto) {
+
+        // check if username is already exists in DB
+        if(userRepository.existsByUsername(userNewDto.getUsername())) {
+            throw new TodoAPIException(HttpStatus.BAD_REQUEST, "Username already exists");
+        }
+        // check if email is already exists in DB
+        if(userRepository.existsByEmail(userNewDto.getEmail())) {
+            throw new TodoAPIException(HttpStatus.BAD_REQUEST, "Email already exists");
+        }
+
+        User user = UserMapper.toUser(userNewDto);
+        user.setPassword(passwordEncoder.encode(userNewDto.getPassword()));
+        Set<Role> roles = new HashSet<>();
+        Role userRole = roleRepository.findByName("ADMIN");
+        roles.add(userRole);
+        user.setRoles(roles);
+
+        userRepository.save(user);
+        return "Admin registered successfully";
     }
 
     @Override

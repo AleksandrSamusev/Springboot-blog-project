@@ -12,12 +12,9 @@ import dev.practice.mainApp.services.UserService;
 import dev.practice.mainApp.utils.Validations;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final Validations validations;
 
     @Override
@@ -69,6 +67,8 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
+
+
     @Override
     public UserFullDto banUser(Long userId, Long currentUserId) {
         User user = validations.checkUserExist(userId);
@@ -86,6 +86,16 @@ public class UserServiceImpl implements UserService {
         user.setIsBanned(Boolean.FALSE);
         User savedUser = userRepository.save(user);
         log.info("User with ID = " + userId + " was unbanned by admin with ID = " + currentUserId);
+        return UserMapper.toUserFullDto(savedUser);
+    }
+
+    @Override
+    public UserFullDto addRole(Long userId, String roleName) {
+        User user = validations.checkUserExist(userId);
+        Role role = roleRepository.findByName(roleName);
+        Set<Role> roles = user.getRoles();
+        roles.add(role);user.setRoles(roles);
+        User savedUser = userRepository.save(user);
         return UserMapper.toUserFullDto(savedUser);
     }
 }
