@@ -69,8 +69,8 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
         PageRequest pageable = PageRequest.of(
                 from / size, size, Sort.by("published").descending());
 
-        List<Article> articles = articleRepository.findAllByAuthorUserIdAndStatus(
-                userId, ArticleStatus.PUBLISHED, pageable);
+        List<Article> articles = articleRepository.findAllByAuthorUsernameAndStatus(
+                String.valueOf(userId), ArticleStatus.PUBLISHED, pageable);
 
         List<String> uris = createListOfUris(articles);
         List<StatisticRecord> responses = sendRequestToStatistic(statsClient, uris);

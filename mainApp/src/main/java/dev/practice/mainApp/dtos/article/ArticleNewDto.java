@@ -23,6 +23,6 @@ public class ArticleNewDto {
     @NotBlank(message = "Content cannot be blank")
     @Length(max = 30000, message = "Content length should be 30000 chars max")
     private String content;
-    private Set<TagNewDto> tags;
 
+    private Set<TagNewDto> tags;
 }

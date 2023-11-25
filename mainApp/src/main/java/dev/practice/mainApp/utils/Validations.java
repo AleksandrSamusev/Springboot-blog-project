@@ -41,12 +41,12 @@ public class Validations {
     }
 
 
-    public void checkUserIsAuthor(Article article, long userId) {
-        if (article.getAuthor().getUserId() != userId) {
-            log.error("Article with id {} is not belongs to user with id {}", article.getArticleId(), userId);
+    public void checkUserIsAuthor(Article article, String username) {
+        if (!article.getAuthor().getUsername().equals(username)) {
+            log.error("Article with id {} is not belongs to user with username {}", article.getArticleId(), username);
             throw new ActionForbiddenException(String.format(
-                    "Article with id %d is not belongs to user with id %d. Action is forbidden",
-                    article.getArticleId(), userId));
+                    "Article with id %d is not belongs to user with username %s. Action is forbidden",
+                    article.getArticleId(), username));
         }
     }
 

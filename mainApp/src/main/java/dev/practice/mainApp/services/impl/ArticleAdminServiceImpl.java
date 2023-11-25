@@ -28,7 +28,7 @@ public class ArticleAdminServiceImpl implements ArticleAdminService {
     public List<ArticleFullDto> getAllArticlesByUserId(Long userId, Long authorId, Integer from,
                                                        Integer size, String status) {
         User user = validations.checkUserExist(userId);
-        return articleService.getAllArticlesByUserId(authorId, from, size, status);
+        return articleService.getAllArticlesByUserId(String.valueOf(authorId), from, size, status);
     }
 
     @Override
