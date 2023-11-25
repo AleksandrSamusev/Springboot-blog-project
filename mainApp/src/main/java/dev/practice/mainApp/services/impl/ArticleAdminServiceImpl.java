@@ -25,28 +25,27 @@ public class ArticleAdminServiceImpl implements ArticleAdminService {
     private final Validations validations;
 
     @Override
-    public List<ArticleFullDto> getAllArticlesByUserId(Long userId, Long authorId, Integer from,
+    public List<ArticleFullDto> getAllArticlesByUserId(Long authorId, Integer from,
                                                        Integer size, String status) {
-        User user = validations.checkUserExist(userId);
-        return articleService.getAllArticlesByUserId(String.valueOf(authorId), from, size, status);
+        User author = validations.checkUserExist(authorId);
+        return articleService.getAllArticlesByUserId(author.getUsername(), from, size, status);
     }
 
     @Override
-    public ArticleFullDto publishArticle(Long userId, Long articleId, boolean publish) {
-        User user = validations.checkUserExist(userId);
+    public ArticleFullDto publishArticle(String username, Long articleId, boolean publish) {
         Article article = validations.checkArticleExist(articleId);
 
         if (publish) {
             article.setPublished(LocalDateTime.now());
             article.setStatus(ArticleStatus.PUBLISHED);
 
-            log.info("Article with id {} was published at {}. Admin id is {}",
-                    articleId, article.getPublished(), userId);
+            log.info("Article with id {} was published at {}. Admin username is {}",
+                    articleId, article.getPublished(), username);
             return ArticleMapper.toArticleFullDto(articleRepository.save(article));
         }
 
         article.setStatus(ArticleStatus.REJECTED);
-        log.info("Article with id {} was REJECTED. Admin id is {}", articleId, userId);
+        log.info("Article with id {} was REJECTED. Admin username is {}", articleId, username);
         return ArticleMapper.toArticleFullDto(articleRepository.save(article));
     }
 }
