@@ -1,7 +1,6 @@
 package dev.practice.mainApp.controllers._admin;
 
 import dev.practice.mainApp.dtos.user.UserFullDto;
-import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

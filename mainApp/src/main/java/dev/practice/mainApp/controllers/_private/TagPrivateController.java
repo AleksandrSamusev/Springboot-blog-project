@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,25 +24,26 @@ public class TagPrivateController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping("/articles/{articleId}")
     public ResponseEntity<TagFullDto> createTag(@Valid @RequestBody TagNewDto dto,
-                                                @PathVariable Long articleId,
-                                                @RequestHeader("X-Current-User-Id") Long userId) {
+                                                @PathVariable Long articleId) {
         return new ResponseEntity<>(tagService.createTag(dto, articleId), HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PatchMapping("/articles/{articleId}/add")
-    public ResponseEntity<ArticleFullDto> addTagsToArticle(@RequestHeader("X-Current-User-Id") Long userId,
+    public ResponseEntity<ArticleFullDto> addTagsToArticle(@AuthenticationPrincipal UserDetails userDetails,
                                                            @PathVariable Long articleId,
                                                            @RequestParam List<TagNewDto> tags) {
-        return new ResponseEntity<>(tagService.addTagsToArticle(userId, articleId, tags), HttpStatus.OK);
+        return new ResponseEntity<>(tagService.addTagsToArticle(
+                userDetails.getUsername(), articleId, tags), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PatchMapping("/articles/{articleId}/remove")
-    public ResponseEntity<ArticleFullDto> removeTagsFromArticle(@RequestHeader("X-Current-User-Id") Long userId,
+    public ResponseEntity<ArticleFullDto> removeTagsFromArticle(@AuthenticationPrincipal UserDetails userDetails,
                                                                 @PathVariable Long articleId,
                                                                 @RequestParam List<Long> tags) {
-        return new ResponseEntity<>(tagService.removeTagsFromArticle(userId, articleId, tags), HttpStatus.OK);
+        return new ResponseEntity<>(tagService.removeTagsFromArticle(
+                userDetails.getUsername(), articleId, tags), HttpStatus.OK);
     }
 
 

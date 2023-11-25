@@ -4,19 +4,14 @@ import dev.practice.mainApp.dtos.user.UserFullDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.mappers.UserMapper;
-import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.models.User;
-import dev.practice.mainApp.repositories.RoleRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.UserService;
 import dev.practice.mainApp.utils.Validations;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

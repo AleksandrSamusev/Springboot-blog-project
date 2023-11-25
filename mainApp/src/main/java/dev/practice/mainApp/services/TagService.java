@@ -9,13 +9,13 @@ import java.util.List;
 public interface TagService {
     TagFullDto createTag(TagNewDto dto, Long articleId);
 
-    void deleteTag(Long tagId, Long userId);
+    void deleteTag(Long tagId, String username);
 
     List<TagFullDto> getAllArticleTags(Long articleId);
 
     TagFullDto getTagById(Long tagId);
 
-    ArticleFullDto addTagsToArticle(Long userId, Long articleId, List<TagNewDto> tags);
+    ArticleFullDto addTagsToArticle(String username, Long articleId, List<TagNewDto> tags);
 
-    ArticleFullDto removeTagsFromArticle(Long userId, Long articleId, List<Long> tags);
+    ArticleFullDto removeTagsFromArticle(String username, Long articleId, List<Long> tags);
 }

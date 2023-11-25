@@ -1,11 +1,14 @@
 package dev.practice.mainApp.mappers;
 
+import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.message.MessageFullDto;
 import dev.practice.mainApp.dtos.message.MessageNewDto;
+import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.Message;
 import dev.practice.mainApp.models.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class MessageMapper {
 
@@ -28,5 +31,9 @@ public class MessageMapper {
         message.setSender(currentUser);
         message.setRecipient(recipient);
         return message;
+    }
+
+    public static List<MessageFullDto> toListMessageFull(List<Message> messages) {
+        return messages.stream().map(MessageMapper::toMessageFullDto).toList();
     }
 }
