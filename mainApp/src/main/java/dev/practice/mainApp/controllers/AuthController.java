@@ -20,18 +20,15 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // Build register REST API
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody UserNewDto userNewDto) {
         String response = authService.register(userNewDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // Build login REST API
     @PostMapping("/login")
     public ResponseEntity<JWTAuthResponse> login(@RequestBody LoginDto loginDto) {
         JWTAuthResponse jwtAuthResponse = authService.login(loginDto);
         return new ResponseEntity<>(jwtAuthResponse, HttpStatus.OK);
     }
-    //change
 }
