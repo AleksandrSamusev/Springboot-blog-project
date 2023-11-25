@@ -4,18 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.practice.mainApp.client.StatsClient;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.mappers.ArticleMapper;
-import dev.practice.mainApp.models.Article;
-import dev.practice.mainApp.models.ArticleStatus;
-import dev.practice.mainApp.models.StatisticRecord;
+import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.ArticleRepository;
-import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.services.ArticlePublicService;
 import dev.practice.mainApp.utils.Validations;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,7 +23,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ArticlePublicServiceImpl implements ArticlePublicService {
     private final ArticleRepository articleRepository;
-    private final TagRepository tagRepository;
     private final StatsClient statsClient;
     private final Validations validations;
 
@@ -65,16 +60,19 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
 
     @Override
     public List<ArticleShortDto> getAllArticlesByUserId(Long userId, Integer from, Integer size) {
-        validations.checkUserExist(userId);
-        PageRequest pageable = PageRequest.of(
-                from / size, size, Sort.by("published").descending());
+        User user = validations.checkUserExist(userId);
 
-        List<Article> articles = articleRepository.findAllByAuthorUserIdAndStatus(
-                userId, ArticleStatus.PUBLISHED, pageable);
+        List<Article> articles = user.getArticles()
+                .stream()
+                .filter(a -> a.getStatus() == ArticleStatus.PUBLISHED)
+                .sorted(Comparator.comparing(Article::getPublished))
+                .toList();
 
-        List<String> uris = createListOfUris(articles);
+        List<Article> articlesPageable = articles.subList(from * size, from * size + size);
+
+        List<String> uris = createListOfUris(articlesPageable);
         List<StatisticRecord> responses = sendRequestToStatistic(statsClient, uris);
-        List<Article> savedArticles = setViewsToArticlesAndSave(responses, articles);
+        List<Article> savedArticles = setViewsToArticlesAndSave(responses, articlesPageable);
 
         return ArticleMapper.toListArticleShort(savedArticles);
     }
@@ -93,10 +91,9 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
 
     @Override
     public List<ArticleShortDto> getAllArticlesByTag(Long tagId) {
-        validations.isTagExists(tagId);
+        Tag tag = validations.isTagExists(tagId);
 
-        List<Article> articles = tagRepository.getReferenceById(tagId).getArticles()
-                .stream().filter((x) -> x.getPublished() != null).toList();
+        List<Article> articles = tag.getArticles().stream().filter((x) -> x.getPublished() != null).toList();
 
         List<String> uris = createListOfUris(articles);
         List<StatisticRecord> responses = sendRequestToStatistic(statsClient, uris);

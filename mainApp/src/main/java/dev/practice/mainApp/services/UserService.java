@@ -1,11 +1,13 @@
 package dev.practice.mainApp.services;
 
 import dev.practice.mainApp.dtos.user.UserFullDto;
-import dev.practice.mainApp.dtos.user.UserNewDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
+<<<<<<< HEAD
 import dev.practice.mainApp.dtos.user.UserUpdateDto;
 import dev.practice.mainApp.models.Role;
 import org.springframework.http.HttpStatusCode;
+=======
+>>>>>>> development
 
 import java.util.List;
 

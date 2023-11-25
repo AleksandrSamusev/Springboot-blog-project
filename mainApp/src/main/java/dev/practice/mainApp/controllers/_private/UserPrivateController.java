@@ -1,9 +1,7 @@
 package dev.practice.mainApp.controllers._private;
 
 import dev.practice.mainApp.dtos.user.UserFullDto;
-import dev.practice.mainApp.dtos.user.UserUpdateDto;
 import dev.practice.mainApp.services.UserService;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

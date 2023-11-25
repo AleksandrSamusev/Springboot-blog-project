@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StatisticResponse {
-private String app;
-private String uri;
-private Long numberOfRecords;
+    private String app;
+    private String uri;
+    private Long numberOfRecords;
 }

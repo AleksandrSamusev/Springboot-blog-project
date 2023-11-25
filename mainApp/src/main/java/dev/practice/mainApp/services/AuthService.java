@@ -6,5 +6,6 @@ import dev.practice.mainApp.dtos.user.UserNewDto;
 
 public interface AuthService {
     String register(UserNewDto userNewDto);
+
     JWTAuthResponse login(LoginDto loginDto);
 }

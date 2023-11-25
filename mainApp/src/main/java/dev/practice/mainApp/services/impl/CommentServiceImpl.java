@@ -8,6 +8,7 @@ import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.Comment;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.CommentRepository;
+import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.CommentService;
 import dev.practice.mainApp.utils.Validations;
 import lombok.AllArgsConstructor;
@@ -22,11 +23,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
     private final Validations validations;
 
     @Override
-    public CommentFullDto createComment(Long articleId, CommentNewDto dto, Long userId) {
-        User user = validations.checkUserExist(userId);
+    public CommentFullDto createComment(Long articleId, CommentNewDto dto, String username) {
+        User user = userRepository.findByUsername(username);
         validations.checkUserIsNotBanned(user);
         Article article = validations.checkArticleExist(articleId);
         validations.checkArticleIsPublished(article);
@@ -37,9 +39,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentFullDto updateComment(CommentNewDto dto, Long commentId, Long userId) {
+    public CommentFullDto updateComment(CommentNewDto dto, Long commentId, String username) {
         Comment comment = validations.isCommentExists(commentId);
-        User user = validations.checkUserExist(userId);
+        User user = userRepository.findByUsername(username);
         validations.checkUserIsCommentAuthor(user, comment);
         comment.setComment(dto.getComment());
         Comment updatedComment = commentRepository.save(comment);
@@ -48,10 +50,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(Long commentId, Long userId) {
+    public void deleteComment(Long commentId, String username) {
         Comment comment = validations.isCommentExists(commentId);
-        User user = validations.checkUserExist(userId);
-        if (userId.equals(comment.getCommentAuthor().getUserId())) {
+        if (username.equals(comment.getCommentAuthor().getUsername())) {
             log.info("Comment with ID = " + commentId + " deleted");
             commentRepository.deleteById(commentId);
         } else {

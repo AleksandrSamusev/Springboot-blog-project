@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,20 +21,19 @@ public class ArticleAdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("users/{authorId}")
     public ResponseEntity<List<ArticleFullDto>> getAllArticlesByUserId(
-            @RequestHeader("X-Current-User-Id") Long userId,
             @PathVariable("authorId") Long authorId,
             @RequestParam(defaultValue = "0") Integer from,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "ALL", required = false) String status) {
-        return new ResponseEntity<>(articleService.getAllArticlesByUserId(userId, authorId, from, size, status),
-                HttpStatus.OK);
+        return new ResponseEntity<>(articleService.getAllArticlesByUserId(authorId, from, size, status), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("{articleId}/publish")
-    public ResponseEntity<ArticleFullDto> publishArticle(@RequestHeader("X-Current-User-Id") Long userId,
+    public ResponseEntity<ArticleFullDto> publishArticle(@AuthenticationPrincipal UserDetails userDetails,
                                                          @PathVariable("articleId") Long articleId,
                                                          @RequestParam boolean publish) {
-        return new ResponseEntity<>(articleService.publishArticle(userId, articleId, publish), HttpStatus.OK);
+        return new ResponseEntity<>(articleService.publishArticle(userDetails.getUsername(), articleId, publish),
+                HttpStatus.OK);
     }
 }

@@ -25,9 +25,9 @@ public class MessageServiceImpl implements MessageService {
     private final Validations validations;
 
     @Override
-    public MessageFullDto createMessage(Long recipientId, Long currentUserId, MessageNewDto dto) {
+    public MessageFullDto createMessage(Long recipientId, String currentUsername, MessageNewDto dto) {
         User recipient = validations.checkUserExist(recipientId);
-        User sender = validations.checkUserExist(currentUserId);
+        User sender = userRepository.findByUsername(currentUsername);
         validations.checkSenderIsNotRecipient(recipient.getUserId(), sender.getUserId());
 
         Message message = MessageMapper.toMessage(dto, recipient, sender);
@@ -38,33 +38,36 @@ public class MessageServiceImpl implements MessageService {
         recipient.getReceivedMessages().add(savedMessage);
         userRepository.save(recipient);
         log.info("Message with ID = " + savedMessage.getMessageId() +
-                " was sent by user with ID = " + currentUserId +
+                " was sent by user with ID = " + sender.getUserId() +
                 " to user with ID = " + recipientId);
         return MessageMapper.toMessageFullDto(savedMessage);
     }
 
     @Override
-    public List<MessageFullDto> findAllSentMessages(Long currentUserId) {
-        User currentUser = validations.checkUserExist(currentUserId);
-        log.info("Returned all sent messages of user with ID = " + currentUserId);
-        return currentUser.getSentMessages().stream().map(MessageMapper::toMessageFullDto).toList();
+    public List<MessageFullDto> findAllSentMessages(String currentUsername) {
+        User currentUser = userRepository.findByUsername(currentUsername);
+        log.info("Returned all sent messages of user with ID = " + currentUser.getUserId());
+        return MessageMapper.toListMessageFull(currentUser.getSentMessages().stream().toList());
     }
 
     @Override
-    public List<MessageFullDto> findAllReceivedMessages(Long currentUserId) {
-        User currentUser = validations.checkUserExist(currentUserId);
-        log.info("Returned all received messages of user with ID = " + currentUserId);
-        return currentUser.getReceivedMessages().stream().map(MessageMapper::toMessageFullDto).toList();
+    public List<MessageFullDto> findAllReceivedMessages(String currentUsername) {
+        User currentUser = userRepository.findByUsername(currentUsername);
+        List<Message> filteredMessage = currentUser.getReceivedMessages()
+                .stream()
+                .filter(message -> !message.getIsDeleted())
+                .toList();
+
+        log.info("Returned all received messages of user with ID = " + currentUser.getUserId());
+        return MessageMapper.toListMessageFull(filteredMessage);
     }
 
     @Override
-    public MessageFullDto findMessageById(Long messageId, Long currentUserId) {
+    public MessageFullDto findMessageById(Long messageId, String currentUsername) {
         Message message = validations.checkIfMessageExists(messageId);
-        validations.checkUserExist(currentUserId);
-
-        if (message.getSender().getUserId().equals(currentUserId) ||
-                message.getRecipient().getUserId().equals(currentUserId)) {
-            log.info("Return message with ID = " + messageId + " to user with ID = " + currentUserId);
+        if (message.getSender().getUsername().equals(currentUsername) ||
+                message.getRecipient().getUsername().equals(currentUsername)) {
+            log.info("Return message with ID = " + messageId + " to user with username = " + currentUsername);
             return MessageMapper.toMessageFullDto(message);
         } else {
             log.info("ActionForbiddenException. Action forbidden for current user");
@@ -73,13 +76,13 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void deleteMessage(Long messageId, Long currentUserId) {
-        validations.checkUserExist(currentUserId);
+    public void deleteMessage(Long messageId, String currentUsername) {
         Message message = validations.checkIfMessageExists(messageId);
-        if (message.getRecipient().getUserId().equals(currentUserId)) {
+        if (message.getRecipient().getUsername().equals(currentUsername)) {
             message.setIsDeleted(Boolean.TRUE);
             messageRepository.save(message);
-            log.info("Message with ID = " + messageId + " marked as deleted by user with ID = " + currentUserId);
+            log.info("Message with ID = " + messageId + " marked as deleted by user with username = "
+                    + currentUsername);
         } else {
             log.info("ActionForbiddenException. Action forbidden for current user");
             throw new ActionForbiddenException("Action forbidden for current user");

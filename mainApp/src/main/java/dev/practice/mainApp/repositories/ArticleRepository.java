@@ -12,7 +12,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     List<Article> findAllByStatusOrderByPublishedDesc(ArticleStatus status, PageRequest pageable);
 
-    List<Article> findAllByAuthorUserIdAndStatus(Long userId, ArticleStatus status, PageRequest pageable);
+    List<Article> findAllByAuthorUsernameAndStatus(String username, ArticleStatus status, PageRequest pageable);
 
-    List<Article> findAllByAuthorUserId(Long userId, PageRequest pageable);
+    List<Article> findAllByAuthorUsername(String username, PageRequest pageable);
 }

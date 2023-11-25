@@ -1,14 +1,14 @@
 package dev.practice.mainApp.controllers._public;
 
-import dev.practice.mainApp.dtos.user.UserFullDto;
-import dev.practice.mainApp.dtos.user.UserNewDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.services.UserService;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 

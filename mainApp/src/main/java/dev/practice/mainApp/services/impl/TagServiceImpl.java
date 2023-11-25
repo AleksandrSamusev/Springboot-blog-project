@@ -3,12 +3,12 @@ package dev.practice.mainApp.services.impl;
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.tag.TagFullDto;
 import dev.practice.mainApp.dtos.tag.TagNewDto;
+import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.mappers.ArticleMapper;
 import dev.practice.mainApp.mappers.TagMapper;
 import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.Tag;
-import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.services.TagService;
@@ -50,8 +50,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void deleteTag(Long tagId, Long userId) {
-        User user = validations.checkUserExist(userId);
+    public void deleteTag(Long tagId, String username) {
+        if (validations.isAdmin(username)) {
+            log.error("Only admin can delete tag. User with username {} is not admin", username);
+            throw new ActionForbiddenException("Action forbidden for current user. Only admin can delete tag");
+        }
         validations.isTagExists(tagId);
         tagRepository.deleteById(tagId);
         log.info("Tag with ID = " + tagId + " successfully deleted");
@@ -72,10 +75,9 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public ArticleFullDto addTagsToArticle(Long userId, Long articleId, List<TagNewDto> tags) {
-        validations.checkUserExist(userId);
+    public ArticleFullDto addTagsToArticle(String username, Long articleId, List<TagNewDto> tags) {
         Article article = validations.checkArticleExist(articleId);
-        validations.checkUserIsAuthor(article, userId);
+        validations.checkUserIsAuthor(article, username);
 
         if (tags.isEmpty()) {
             log.info("Tags connected to article with id {} wasn't changed. New tags list was empty", articleId);
@@ -104,10 +106,9 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public ArticleFullDto removeTagsFromArticle(Long userId, Long articleId, List<Long> tags) {
-        validations.checkUserExist(userId);
+    public ArticleFullDto removeTagsFromArticle(String username, Long articleId, List<Long> tags) {
         Article article = validations.checkArticleExist(articleId);
-        validations.checkUserIsAuthor(article, userId);
+        validations.checkUserIsAuthor(article, String.valueOf(username));
 
         if (tags.isEmpty()) {
             log.info("Tags connected to article with id {} wasn't changed. Tags list was empty", articleId);

@@ -10,13 +10,13 @@ import java.util.Optional;
 public interface ArticlePrivateService {
     ArticleFullDto createArticle(String username, ArticleNewDto newArticle);
 
-    ArticleFullDto updateArticle(Long userId, Long articleId, ArticleUpdateDto updateArticle);
+    ArticleFullDto updateArticle(String username, Long articleId, ArticleUpdateDto updateArticle);
 
-    Optional<?> getArticleById(Long userId, Long articleId);
+    Optional<?> getArticleById(String username, Long articleId);
 
-    void deleteArticle(long userId, long articleId);
+    void deleteArticle(String username, Long articleId);
 
-    List<ArticleFullDto> getAllArticlesByUserId(Long userId, Integer from, Integer size, String status);
+    List<ArticleFullDto> getAllArticlesByUserId(String username, Integer from, Integer size, String status);
 
-    ArticleFullDto publishArticle(Long userId, Long articleId);
+    ArticleFullDto publishArticle(String username, Long articleId);
 }

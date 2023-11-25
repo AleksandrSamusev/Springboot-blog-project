@@ -38,11 +38,11 @@ public class AuthServiceImpl implements AuthService {
     public String register(UserNewDto userNewDto) {
 
         // check if username is already exists in DB
-        if(userRepository.existsByUsername(userNewDto.getUsername())) {
+        if (userRepository.existsByUsername(userNewDto.getUsername())) {
             throw new TodoAPIException(HttpStatus.BAD_REQUEST, "Username already exists");
         }
         // check if email is already exists in DB
-        if(userRepository.existsByEmail(userNewDto.getEmail())) {
+        if (userRepository.existsByEmail(userNewDto.getEmail())) {
             throw new TodoAPIException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
 
@@ -74,10 +74,10 @@ public class AuthServiceImpl implements AuthService {
 
         String role = null;
 
-        if(userOptional.isPresent()) {
+        if (userOptional.isPresent()) {
             User loggedInUser = userOptional.get();
             Optional<Role> optionalRole = loggedInUser.getRoles().stream().findFirst();
-            if(optionalRole.isPresent()) {
+            if (optionalRole.isPresent()) {
                 Role userRole = optionalRole.get();
                 role = userRole.getName();
             }
