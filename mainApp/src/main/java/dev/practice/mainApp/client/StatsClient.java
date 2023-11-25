@@ -15,6 +15,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 @Component
 @Slf4j
 public class StatsClient {
@@ -35,8 +36,8 @@ public class StatsClient {
     }
 
     public List<StatisticRecord> getStats(LocalDateTime start,
-                                            LocalDateTime end,
-                                            List<String> uris) throws JsonProcessingException {
+                                          LocalDateTime end,
+                                          List<String> uris) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());

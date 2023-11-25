@@ -9,7 +9,6 @@ import dev.practice.mainApp.mappers.ArticleMapper;
 import dev.practice.mainApp.mappers.TagMapper;
 import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.Tag;
-import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.services.TagService;

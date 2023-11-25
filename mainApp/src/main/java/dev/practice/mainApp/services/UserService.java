@@ -1,10 +1,7 @@
 package dev.practice.mainApp.services;
 
 import dev.practice.mainApp.dtos.user.UserFullDto;
-import dev.practice.mainApp.dtos.user.UserNewDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
-import dev.practice.mainApp.dtos.user.UserUpdateDto;
-import dev.practice.mainApp.models.Role;
 
 import java.util.List;
 

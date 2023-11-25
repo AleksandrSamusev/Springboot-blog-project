@@ -4,7 +4,6 @@ import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.dtos.comment.CommentShortDto;
 import dev.practice.mainApp.dtos.message.MessageFullDto;
 import dev.practice.mainApp.models.Role;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
