@@ -3,6 +3,7 @@ package dev.practice.mainApp.services.impl;
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.tag.TagFullDto;
 import dev.practice.mainApp.dtos.tag.TagNewDto;
+import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.mappers.ArticleMapper;
 import dev.practice.mainApp.mappers.TagMapper;
@@ -50,8 +51,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void deleteTag(Long tagId, Long userId) {
-        User user = validations.checkUserExist(userId);
+    public void deleteTag(Long tagId, String username) {
+        if (validations.isAdmin(username)) {
+            log.error("Only admin can delete tag. User with username {} is not admin", username);
+            throw new ActionForbiddenException("Action forbidden for current user. Only admin can delete tag");
+        }
         validations.isTagExists(tagId);
         tagRepository.deleteById(tagId);
         log.info("Tag with ID = " + tagId + " successfully deleted");

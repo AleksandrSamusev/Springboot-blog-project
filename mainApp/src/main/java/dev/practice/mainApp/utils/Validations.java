@@ -51,7 +51,7 @@ public class Validations {
 
     public void isUserAuthorized(Long userId, User currentUser) {
         if (!userId.equals(currentUser.getUserId())) {
-            log.info("ActionForbiddenException. Action forbidden for current user");
+            log.error("ActionForbiddenException. Action forbidden for current user");
             throw new ActionForbiddenException("Action forbidden for current user");
         }
     }
@@ -102,7 +102,7 @@ public class Validations {
     public Comment isCommentExists(Long commentId) {
         Optional<Comment> comment = commentRepository.findById(commentId);
         if (comment.isEmpty()) {
-            log.info("ResourceNotFoundException. Comment with given Id = " + commentId + " not found");
+            log.error("ResourceNotFoundException. Comment with given Id = " + commentId + " not found");
             throw new ResourceNotFoundException("Comment with given Id = " + commentId + " not found");
         }
         return comment.get();
@@ -110,7 +110,7 @@ public class Validations {
 
     public void checkUserIsCommentAuthor(User user, Comment comment) {
         if (!user.getUserId().equals(comment.getCommentAuthor().getUserId())) {
-            log.info("ActionForbiddenException. Action forbidden for given user");
+            log.error("ActionForbiddenException. Action forbidden for given user");
             throw new ActionForbiddenException("Action forbidden for given user");
         }
     }
@@ -118,7 +118,7 @@ public class Validations {
     public Message checkIfMessageExists(Long id) {
         Optional<Message> message = messageRepository.findById(id);
         if (message.isEmpty()) {
-            log.info("ResourceNotFoundException. Message with given ID = " + id + " not found");
+            log.error("ResourceNotFoundException. Message with given ID = " + id + " not found");
             throw new ResourceNotFoundException("Message with given ID = " + id + " not found");
         }
         return message.get();
@@ -126,7 +126,7 @@ public class Validations {
 
     public void checkSenderIsNotRecipient(Long recipientId, Long currentUserId) {
         if (recipientId.equals(currentUserId)) {
-            log.info("ActionForbiddenException. Action forbidden for current user");
+            log.error("ActionForbiddenException. Action forbidden for current user");
             throw new ActionForbiddenException("Action forbidden for current user");
         }
     }

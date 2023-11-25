@@ -9,7 +9,7 @@ import java.util.List;
 public interface TagService {
     TagFullDto createTag(TagNewDto dto, Long articleId);
 
-    void deleteTag(Long tagId, Long userId);
+    void deleteTag(Long tagId, String username);
 
     List<TagFullDto> getAllArticleTags(Long articleId);
 
