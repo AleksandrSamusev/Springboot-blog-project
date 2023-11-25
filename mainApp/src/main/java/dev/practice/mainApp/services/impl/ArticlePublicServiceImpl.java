@@ -6,14 +6,12 @@ import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.mappers.ArticleMapper;
 import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.ArticleRepository;
-import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.services.ArticlePublicService;
 import dev.practice.mainApp.utils.Validations;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,7 +23,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ArticlePublicServiceImpl implements ArticlePublicService {
     private final ArticleRepository articleRepository;
-    private final TagRepository tagRepository;
     private final StatsClient statsClient;
     private final Validations validations;
 

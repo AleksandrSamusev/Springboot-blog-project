@@ -40,7 +40,6 @@ public class Validations {
         }
     }
 
-
     public void checkUserIsAuthor(Article article, String username) {
         if (!article.getAuthor().getUsername().equals(username)) {
             log.error("Article with id {} is not belongs to user with username {}", article.getArticleId(), username);

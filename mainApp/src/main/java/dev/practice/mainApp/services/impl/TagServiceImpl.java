@@ -72,10 +72,9 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public ArticleFullDto addTagsToArticle(Long userId, Long articleId, List<TagNewDto> tags) {
-        User user = validations.checkUserExist(userId);
+    public ArticleFullDto addTagsToArticle(String username, Long articleId, List<TagNewDto> tags) {
         Article article = validations.checkArticleExist(articleId);
-        validations.checkUserIsAuthor(article, String.valueOf(userId));
+        validations.checkUserIsAuthor(article, username);
 
         if (tags.isEmpty()) {
             log.info("Tags connected to article with id {} wasn't changed. New tags list was empty", articleId);
@@ -104,10 +103,9 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public ArticleFullDto removeTagsFromArticle(Long userId, Long articleId, List<Long> tags) {
-        User user = validations.checkUserExist(userId);
+    public ArticleFullDto removeTagsFromArticle(String username, Long articleId, List<Long> tags) {
         Article article = validations.checkArticleExist(articleId);
-        validations.checkUserIsAuthor(article, String.valueOf(userId));
+        validations.checkUserIsAuthor(article, String.valueOf(username));
 
         if (tags.isEmpty()) {
             log.info("Tags connected to article with id {} wasn't changed. Tags list was empty", articleId);
