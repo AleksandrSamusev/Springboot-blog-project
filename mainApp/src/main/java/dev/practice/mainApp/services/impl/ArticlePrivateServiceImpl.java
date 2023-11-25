@@ -46,7 +46,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         Article savedArticle = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, user));
         if (newArticle.getTags() != null && !newArticle.getTags().isEmpty()) {
             ArticleFullDto articleWithTags = tagService.addTagsToArticle(
-                    user.getUserId(), savedArticle.getArticleId(), newArticle.getTags().stream().toList());
+                    username, savedArticle.getArticleId(), newArticle.getTags().stream().toList());
 
             user.getArticles().add(savedArticle);
             userRepository.save(user);
