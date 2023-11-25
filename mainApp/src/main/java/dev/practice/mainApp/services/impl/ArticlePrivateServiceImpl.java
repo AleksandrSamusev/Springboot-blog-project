@@ -131,7 +131,6 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
         };
     }
 
-
     @Override
     public void deleteArticle(String username, Long articleId) {
         Article article = validations.checkArticleExist(articleId);
