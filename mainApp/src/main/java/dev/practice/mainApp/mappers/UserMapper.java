@@ -21,7 +21,6 @@ public class UserMapper {
         dto.setAbout(user.getAbout());
         dto.setEmail(user.getEmail());
         dto.setUsername(user.getUsername());
-        dto.setPassword(user.getPassword());
         dto.setBirthDate(user.getBirthDate());
         dto.setRoles(user.getRoles());
         dto.setIsBanned(user.getIsBanned());

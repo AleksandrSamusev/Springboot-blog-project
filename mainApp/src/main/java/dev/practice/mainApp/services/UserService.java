@@ -2,6 +2,12 @@ package dev.practice.mainApp.services;
 
 import dev.practice.mainApp.dtos.user.UserFullDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
+<<<<<<< HEAD
+import dev.practice.mainApp.dtos.user.UserUpdateDto;
+import dev.practice.mainApp.models.Role;
+import org.springframework.http.HttpStatusCode;
+=======
+>>>>>>> development
 
 import java.util.List;
 
@@ -19,4 +25,6 @@ public interface UserService {
     UserFullDto banUser(Long userId, Long currentUserId);
 
     UserFullDto unbanUser(Long userId, Long currentUserId);
+
+    UserFullDto updateUser(Long userId, UserUpdateDto dto, String username);
 }

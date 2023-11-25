@@ -33,6 +33,16 @@ public class Validations {
         return user.get();
     }
 
+    public User checkUserExistsByUsernameOrEmail(String usernameOrEmail) {
+        Optional<User> user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+        if (user.isEmpty()) {
+            log.error("User with username or email {} wasn't found", usernameOrEmail);
+            throw new ResourceNotFoundException(String.format("User with username or email %s wasn't found",
+                    usernameOrEmail));
+        }
+        return user.get();
+    }
+
     public void checkUserIsNotBanned(User user) {
         if (user.getIsBanned()) {
             log.error("User with id {} is blocked", user.getUserId());
@@ -135,5 +145,11 @@ public class Validations {
         UserDetails details = userDetailsService.loadUserByUsername(username);
         return details != null && details.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    public Boolean usernameAlreadyExists(String username) {
+        String formattedUsername = username.trim().replaceAll("\\s+", "").toLowerCase();
+        return userRepository.findAll().stream()
+                .anyMatch(n -> n.getUsername().toLowerCase().equals(formattedUsername));
     }
 }

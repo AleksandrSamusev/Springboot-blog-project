@@ -25,6 +25,8 @@ public class UserUpdateDto {
     @Length(max = 50)
     String username;
 
+    String password;
+
     @Email
     @Length(max = 50)
     String email;

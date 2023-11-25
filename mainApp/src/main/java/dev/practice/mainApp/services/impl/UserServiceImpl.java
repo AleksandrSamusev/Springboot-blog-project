@@ -2,7 +2,9 @@ package dev.practice.mainApp.services.impl;
 
 import dev.practice.mainApp.dtos.user.UserFullDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
+import dev.practice.mainApp.dtos.user.UserUpdateDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
+import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.mappers.UserMapper;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.UserRepository;
@@ -81,6 +83,44 @@ public class UserServiceImpl implements UserService {
         user.setIsBanned(Boolean.FALSE);
         User savedUser = userRepository.save(user);
         log.info("User with ID = " + userId + " was unbanned by admin with ID = " + currentUserId);
+        return UserMapper.toUserFullDto(savedUser);
+    }
+
+    @Override
+    public UserFullDto updateUser(Long userId, UserUpdateDto dto, String username) {
+
+        User requester = validations.checkUserExistsByUsernameOrEmail(username);
+        User user = validations.checkUserExist(userId);
+
+        if (userId.equals(requester.getUserId()) || validations.isAdmin(username)) {
+            if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
+                user.setFirstName(dto.getFirstName());
+            }
+            if (dto.getLastName() != null && !dto.getLastName().isBlank()) {
+                user.setLastName(dto.getLastName());
+            }
+            if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
+                if (validations.usernameAlreadyExists(dto.getUsername())) {
+                    throw new InvalidParameterException(
+                            "User with given username " + dto.getUsername() + " already exists");
+                } else {
+                    user.setUsername(dto.getUsername().trim().replaceAll("\\s+",""));
+                }
+            }
+            if(dto.getPassword() != null && !dto.getPassword().isBlank()) {
+                user.setPassword(dto.getPassword());
+            }
+            if(dto.getBirthDate() != null) {
+                user.setBirthDate(dto.getBirthDate());
+            }
+            if (dto.getAbout() != null && !dto.getAbout().isBlank()) {
+                user.setAbout(dto.getAbout());
+            }
+        } else {
+            throw new ActionForbiddenException("Action forbidden for current user");
+        }
+        User savedUser = userRepository.save(user);
+        log.info("User with ID = {} was successfully updated", savedUser.getUserId());
         return UserMapper.toUserFullDto(savedUser);
     }
 }
