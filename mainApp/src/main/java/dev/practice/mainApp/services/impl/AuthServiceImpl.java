@@ -3,6 +3,7 @@ package dev.practice.mainApp.services.impl;
 import dev.practice.mainApp.dtos.JWTAuthResponse;
 import dev.practice.mainApp.dtos.user.LoginDto;
 import dev.practice.mainApp.dtos.user.UserNewDto;
+import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.exceptions.TodoAPIException;
 import dev.practice.mainApp.mappers.UserMapper;
 import dev.practice.mainApp.models.Role;
@@ -11,7 +12,9 @@ import dev.practice.mainApp.repositories.RoleRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.security.JWTTokenProvider;
 import dev.practice.mainApp.services.AuthService;
+import dev.practice.mainApp.utils.Validations;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +28,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
@@ -33,17 +37,18 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JWTTokenProvider jwtTokenProvider;
+    private final Validations validations;
 
     @Override
     public String register(UserNewDto userNewDto) {
 
-        // check if username is already exists in DB
-        if (userRepository.existsByUsername(userNewDto.getUsername())) {
-            throw new TodoAPIException(HttpStatus.BAD_REQUEST, "Username already exists");
+        if (validations.usernameAlreadyExists(userNewDto.getUsername())) {
+            throw new InvalidParameterException(
+                    "User with given username = '" + userNewDto.getUsername() + "' already exists");
         }
-        // check if email is already exists in DB
-        if (userRepository.existsByEmail(userNewDto.getEmail())) {
-            throw new TodoAPIException(HttpStatus.BAD_REQUEST, "Email already exists");
+        if (validations.isExistsByEmail(userNewDto.getEmail())) {
+            throw new InvalidParameterException(
+                    "User with given email = '" + userNewDto.getEmail() +"' already exists");
         }
 
         User user = UserMapper.toUser(userNewDto);
@@ -53,8 +58,9 @@ public class AuthServiceImpl implements AuthService {
         roles.add(userRole);
         user.setRoles(roles);
 
-        userRepository.save(user);
-        return "User registered successfully";
+        User savedUser = userRepository.save(user);
+        log.info("New user with ID = {} successfully registered", savedUser.getUserId());
+        return "New user with ID = " + savedUser.getUserId() + " successfully registered";
     }
 
     @Override

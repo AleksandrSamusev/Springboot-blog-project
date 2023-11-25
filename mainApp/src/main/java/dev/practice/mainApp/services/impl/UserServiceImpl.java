@@ -12,6 +12,7 @@ import dev.practice.mainApp.services.UserService;
 import dev.practice.mainApp.utils.Validations;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final Validations validations;
+    private final BCryptPasswordEncoder encoder;
 
     @Override
     public List<UserShortDto> getAllUsers() {
@@ -108,7 +110,7 @@ public class UserServiceImpl implements UserService {
                 }
             }
             if(dto.getPassword() != null && !dto.getPassword().isBlank()) {
-                user.setPassword(dto.getPassword());
+                user.setPassword(encoder.encode(dto.getPassword()));
             }
             if(dto.getBirthDate() != null) {
                 user.setBirthDate(dto.getBirthDate());

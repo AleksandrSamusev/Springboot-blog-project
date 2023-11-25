@@ -43,6 +43,14 @@ public class Validations {
         return user.get();
     }
 
+    public Boolean isExistsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public Boolean isExistsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
     public void checkUserIsNotBanned(User user) {
         if (user.getIsBanned()) {
             log.error("User with id {} is blocked", user.getUserId());
