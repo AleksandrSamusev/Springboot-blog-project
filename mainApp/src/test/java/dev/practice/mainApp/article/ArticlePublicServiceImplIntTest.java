@@ -45,11 +45,11 @@ public class ArticlePublicServiceImplIntTest {
     private final TagService tagService;
 
 
-    private final User user = new User(null, "Harry", "Potter", "HP",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
+    private final User user = new User(null, "Harry", "Potter", "HP", "password",
+            "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final User user2 = new User(null, "Admin", "Admin", "ADMIN",
-            "admin@gmail.com", LocalDate.of(1990, 9, 10), Role.USER, null,
+    private final User user2 = new User(null, "Admin", "Admin", "ADMIN", "password",
+            "admin@gmail.com", LocalDate.of(1990, 9, 10), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final Article article = new Article(null, "The empty pot",
             "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now(),

@@ -41,11 +41,11 @@ public class ArticleAdminServiceImplUnitTest {
     @InjectMocks
     private ArticleAdminServiceImpl articleService;
 
-    private final User author = new User(0L, "Harry", "Potter", "HP",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
+    private final User author = new User(0L, "Harry", "Potter", "author", "user-password",
+            "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final User admin = new User(1L, "Ron", "Weasley", "RW",
-            "rw@gmail.com", LocalDate.of(1981, 9, 16), Role.ADMIN, null,
+    private final User admin = new User(1L, "Ron", "Weasley", "admin", "admin-password",
+            "rw@gmail.com", LocalDate.of(1981, 9, 16), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final ArticleFullDto fullArticle = new ArticleFullDto(0L, "The empty pot",
             "Very interesting information", UserMapper.toUserShortDto(author), LocalDateTime.now(), LocalDateTime.now(),
@@ -58,12 +58,12 @@ public class ArticleAdminServiceImplUnitTest {
     void article_test_1_Given_adminAndExistUser_When_getAllArticlesByUserId_Then_returnAllUserArticles() {
         Mockito
                 .when(articlePrivateService.getAllArticlesByUserId(
-                        Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any()))
+                        Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(List.of(fullArticle));
 
 
         List<ArticleFullDto> result = articleService.getAllArticlesByUserId(
-                1L, 0L, 0, 10, "ALL");
+                1L, 0, 0, "ALL");
 
         assertThat(result.get(0)).isInstanceOf(ArticleFullDto.class);
         assertThat(result.size()).isEqualTo(1);
@@ -71,18 +71,18 @@ public class ArticleAdminServiceImplUnitTest {
 
     @Test
     void article_test_5_Given_notAdminUserExist_When_getAllArticlesByUserId_Then_throwException() {
-        Mockito
+/*        Mockito
                 .doThrow(new ActionForbiddenException("User with id 0 is not ADMIN. Access is forbidden"))
-                .when(validations).checkUserIsAdmin(Mockito.any());
+                .when(validations).checkUserIsAdmin(Mockito.any());*/
 
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
-                () -> articleService.getAllArticlesByUserId(0L, 0L, 0, 10, "ALL"));
+                () -> articleService.getAllArticlesByUserId(0L, 0, 0,  "ALL"));
         assertEquals("User with id 0 is not ADMIN. Access is forbidden", exception.getMessage(),
                 "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
         Mockito.verify(articlePrivateService, Mockito.times(0))
-                .getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any());
+                .getAllArticlesByUserId(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class ArticleAdminServiceImplUnitTest {
                 .when(articleRepository.save(Mockito.any()))
                 .thenReturn(article);
 
-        ArticleFullDto result = articleService.publishArticle(2L, 0L, true);
+        ArticleFullDto result = articleService.publishArticle("author", 0L, true);
 
         assertThat(result.getPublished()).isNotNull();
         assertThat(result.getStatus()).isEqualTo(ArticleStatus.PUBLISHED);
@@ -113,7 +113,7 @@ public class ArticleAdminServiceImplUnitTest {
                 .when(articleRepository.save(Mockito.any()))
                 .thenReturn(article);
 
-        ArticleFullDto result = articleService.publishArticle(2L, 0L, false);
+        ArticleFullDto result = articleService.publishArticle("author", 0L, false);
 
         assertThat(result.getPublished()).isNull();
         assertThat(result.getStatus()).isEqualTo(ArticleStatus.REJECTED);

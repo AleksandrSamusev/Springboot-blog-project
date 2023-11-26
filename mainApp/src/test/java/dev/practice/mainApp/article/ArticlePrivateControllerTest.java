@@ -56,7 +56,7 @@ public class ArticlePrivateControllerTest {
     @Test
     void article_test_8_Given_validArticleAndUser_When_createArticle_Then_articleSavedStatusCreated() throws Exception {
         Mockito
-                .when(articleService.createArticle(Mockito.anyLong(), Mockito.any()))
+                .when(articleService.createArticle(Mockito.anyString(), Mockito.any()))
                 .thenReturn(articleFull);
 
         mvc.perform(post("/api/v1/private/articles")
@@ -80,7 +80,7 @@ public class ArticlePrivateControllerTest {
 
 
         Mockito.verify(articleService, Mockito.times(1))
-                .createArticle(Mockito.anyLong(), Mockito.any());
+                .createArticle(Mockito.anyString(), Mockito.any());
     }
 
     @Test
@@ -88,7 +88,7 @@ public class ArticlePrivateControllerTest {
         update.setTitle("New title");
         articleFull.setTitle(update.getTitle());
         Mockito
-                .when(articleService.updateArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.any()))
+                .when(articleService.updateArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.any()))
                 .thenReturn(articleFull);
 
         mvc.perform(patch("/api/v1/private/articles/{articleId}", 1L)
@@ -111,7 +111,7 @@ public class ArticlePrivateControllerTest {
                 .andExpect(jsonPath("$.tags").isEmpty());
 
         Mockito.verify(articleService, Mockito.times(1))
-                .updateArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.any());
+                .updateArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.any());
     }
 
     @Test
@@ -119,7 +119,7 @@ public class ArticlePrivateControllerTest {
             throws Exception {
         articleFull.setStatus(ArticleStatus.MODERATING);
         Mockito
-                .when(articleService.getArticleById(Mockito.anyLong(), Mockito.anyLong()))
+                .when(articleService.getArticleById(Mockito.anyString(), Mockito.anyLong()))
                 .thenThrow(ActionForbiddenException.class);
 
         mvc.perform(get("/api/v1/private/articles/{articleId}", 1L)
@@ -135,7 +135,7 @@ public class ArticlePrivateControllerTest {
             throws Exception {
         articleFull.setStatus(ArticleStatus.MODERATING);
 
-        Mockito.<Optional<?>>when(articleService.getArticleById(Mockito.anyLong(), Mockito.anyLong()))
+        Mockito.<Optional<?>>when(articleService.getArticleById(Mockito.anyString(), Mockito.anyLong()))
                 .thenReturn(Optional.of(articleFull));
 
         mvc.perform(get("/api/v1/private/articles/{articleId}", 1L)
@@ -157,7 +157,7 @@ public class ArticlePrivateControllerTest {
                 .andExpect(jsonPath("$.tags").isEmpty());
 
         Mockito.verify(articleService, Mockito.times(1))
-                .getArticleById(Mockito.anyLong(), Mockito.anyLong());
+                .getArticleById(Mockito.anyString(), Mockito.anyLong());
     }
 
     @Test
@@ -165,7 +165,7 @@ public class ArticlePrivateControllerTest {
             throws Exception {
         articleFull.setPublished(LocalDateTime.now());
 
-        Mockito.<Optional<?>>when(articleService.getArticleById(Mockito.anyLong(), Mockito.anyLong()))
+        Mockito.<Optional<?>>when(articleService.getArticleById(Mockito.anyString(), Mockito.anyLong()))
                 .thenReturn(Optional.of(articleShort));
 
         mvc.perform(get("/api/v1/private/articles/{articleId}", 1L)
@@ -187,7 +187,7 @@ public class ArticlePrivateControllerTest {
                 .andExpect(jsonPath("$.tags").isEmpty());
 
         Mockito.verify(articleService, Mockito.times(1))
-                .getArticleById(Mockito.anyLong(), Mockito.anyLong());
+                .getArticleById(Mockito.anyString(), Mockito.anyLong());
     }
 
     @Test
@@ -195,7 +195,7 @@ public class ArticlePrivateControllerTest {
             throws Exception {
         Mockito
                 .doNothing()
-                .when(articleService).deleteArticle(Mockito.anyLong(), Mockito.anyLong());
+                .when(articleService).deleteArticle(Mockito.anyString(), Mockito.anyLong());
 
         mvc.perform(delete("/api/v1/private/articles/{articleId}", 0L)
                         .header("X-Current-User-Id", 0)
@@ -210,7 +210,7 @@ public class ArticlePrivateControllerTest {
             throws Exception {
         Mockito
                 .when(articleService.getAllArticlesByUserId(
-                        Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
+                        Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenReturn(List.of(articleFull));
 
         mvc.perform(get("/api/v1/private/articles")
@@ -222,7 +222,7 @@ public class ArticlePrivateControllerTest {
                 .andExpect(jsonPath("$[0].articleId").value(1));
 
         Mockito.verify(articleService, Mockito.times(1))
-                .getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString());
+                .getAllArticlesByUserId(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyString());
     }
 
     @Test
@@ -230,7 +230,7 @@ public class ArticlePrivateControllerTest {
             throws Exception {
         Mockito
                 .when(articleService.getAllArticlesByUserId(
-                        Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
+                        Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenReturn(List.of(articleFull));
 
         mvc.perform(get("/api/v1/private/articles")
@@ -245,14 +245,14 @@ public class ArticlePrivateControllerTest {
                 .andExpect(jsonPath("$[0].articleId").value(1));
 
         Mockito.verify(articleService, Mockito.times(1))
-                .getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString());
+                .getAllArticlesByUserId(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyString());
     }
 
     @Test
     void article_test_38_Given_articleCreated_When_publishArticle_Then_returnArticleStatusOk() throws Exception {
         articleFull.setStatus(ArticleStatus.MODERATING);
         Mockito
-                .when(articleService.publishArticle(Mockito.anyLong(), Mockito.anyLong()))
+                .when(articleService.publishArticle(Mockito.anyString(), Mockito.anyLong()))
                 .thenReturn(articleFull);
 
         mvc.perform(patch("/api/v1/private/articles/{articleId}/publish", 1L)
@@ -274,13 +274,13 @@ public class ArticlePrivateControllerTest {
                 .andExpect(jsonPath("$.tags").isEmpty());
 
         Mockito.verify(articleService, Mockito.times(1))
-                .publishArticle(Mockito.anyLong(), Mockito.anyLong());
+                .publishArticle(Mockito.anyString(), Mockito.anyLong());
     }
 
     @Test
     void article_test_39_Given_bannedUser_When_publishArticle_Then_throwExceptionStatusForbidden() throws Exception {
         Mockito
-                .when(articleService.publishArticle(Mockito.anyLong(), Mockito.anyLong()))
+                .when(articleService.publishArticle(Mockito.anyString(), Mockito.anyLong()))
                 .thenThrow(ActionForbiddenException.class);
 
         mvc.perform(patch("/api/v1/private/articles/{articleId}/publish", 1L)
@@ -291,7 +291,7 @@ public class ArticlePrivateControllerTest {
                 .andExpect(status().isForbidden());
 
         Mockito.verify(articleService, Mockito.times(1))
-                .publishArticle(Mockito.anyLong(), Mockito.anyLong());
+                .publishArticle(Mockito.anyString(), Mockito.anyLong());
     }
 
 

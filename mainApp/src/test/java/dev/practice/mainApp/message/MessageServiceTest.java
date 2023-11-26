@@ -36,13 +36,13 @@ public class MessageServiceTest {
     private MessageServiceImpl messageService;
 
     private final User user1 = new User(1L, "John", "Doe",
-            "johnDoe", "johnDoe@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", false,
+            "johnDoe", "password", "johnDoe@test.test",
+            LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
     private final User user2 = new User(2L, "Marry", "Dawson",
-            "marryDawson", "merryDawson@test.test",
-            LocalDate.of(1995, 6, 14), Role.USER, "Hi! I'm Marry", true,
+            "marryDawson","password", "merryDawson@test.test",
+            LocalDate.of(1995, 6, 14), new HashSet<>(), "Hi! I'm Marry", true,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
     private final Message fromUser1toUser2 = new Message(1L,
@@ -57,7 +57,7 @@ public class MessageServiceTest {
         when(validations.checkUserExist(2L)).thenReturn(user2);
         when(messageRepositoryMock.save(any())).thenReturn(fromUser1toUser2);
 
-        MessageFullDto messageFullDto = messageService.createMessage(2L, 1L, newMessage);
+        MessageFullDto messageFullDto = messageService.createMessage(2L, "johnDoe", newMessage);
 
         assertEquals(messageFullDto.getMessage(), newMessage.getMessage());
         assertEquals(messageFullDto.getSender().getUserId(), user1.getUserId());
@@ -72,7 +72,7 @@ public class MessageServiceTest {
                 "User with id 1 wasn't found")).when(validations).checkUserExist(anyLong());
 
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
-                messageService.createMessage(1L, 2L, newMessage));
+                messageService.createMessage(1L, "marryDawson", newMessage));
         assertEquals("User with id 1 wasn't found", thrown.getMessage());
     }
 
@@ -82,7 +82,7 @@ public class MessageServiceTest {
                 "User with id 2 wasn't found")).when(validations).checkUserExist(anyLong());
 
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
-                messageService.createMessage(1L, 2L, newMessage));
+                messageService.createMessage(1L, "marryDawson", newMessage));
         assertEquals("User with id 2 wasn't found", thrown.getMessage());
     }
 
@@ -93,7 +93,7 @@ public class MessageServiceTest {
                 "Action forbidden for current user")).when(validations).checkSenderIsNotRecipient(anyLong(), anyLong());
 
         ActionForbiddenException thrown = assertThrows(ActionForbiddenException.class, () ->
-                messageService.createMessage(1L, 1L, newMessage));
+                messageService.createMessage(1L, "johnDoe", newMessage));
         assertEquals("Action forbidden for current user", thrown.getMessage());
     }
 
@@ -102,7 +102,7 @@ public class MessageServiceTest {
     public void message_test5_Given_ExistingMessageId_When_findMessageById_Then_MessageReturn() {
         when(validations.checkIfMessageExists(anyLong())).thenReturn(fromUser1toUser2);
 
-        MessageFullDto messageFullDto = messageService.findMessageById(1L, 1L);
+        MessageFullDto messageFullDto = messageService.findMessageById(1L, "johnDoe");
 
         assertEquals(messageFullDto.getMessage(), fromUser1toUser2.getMessage());
         assertEquals(messageFullDto.getMessageId(), fromUser1toUser2.getMessageId());
@@ -114,7 +114,7 @@ public class MessageServiceTest {
                 "Message with given ID = 1 not found")).when(validations).checkIfMessageExists(anyLong());
 
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
-                messageService.findMessageById(1L, 1L));
+                messageService.findMessageById(1L, "johnDoe"));
         assertEquals("Message with given ID = 1 not found", thrown.getMessage());
     }
 
@@ -124,7 +124,7 @@ public class MessageServiceTest {
                 "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
 
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
-                messageService.findMessageById(1L, 1L));
+                messageService.findMessageById(1L, "johnDoe"));
         assertEquals("User with id 1 wasn't found", thrown.getMessage());
     }
 
@@ -134,7 +134,7 @@ public class MessageServiceTest {
                 "Message with given ID = 1 not found")).when(validations).checkIfMessageExists(anyLong());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                messageService.deleteMessage(1L, 1L));
+                messageService.deleteMessage(1L, "johnDoe"));
         assertEquals("Message with given ID = 1 not found", ex.getMessage());
     }
 
@@ -144,7 +144,7 @@ public class MessageServiceTest {
                 "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                messageService.deleteMessage(1L, 1L));
+                messageService.deleteMessage(1L, "johnDoe"));
         assertEquals("User with id 1 wasn't found", ex.getMessage());
     }
 }

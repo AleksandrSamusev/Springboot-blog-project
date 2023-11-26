@@ -37,11 +37,11 @@ public class ArticlePublicServiceImplUnitTest {
     @InjectMocks
     private ArticlePublicServiceImpl articleService;
 
-    private final User author = new User(0L, "Harry", "Potter", "HP",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
+    private final User author = new User(0L, "Harry", "Potter", "author", "password",
+            "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final User author2 = new User(1L, "Ron", "Weasley", "RW",
-            "rw@gmail.com", LocalDate.of(1981, 9, 16), Role.USER, null,
+    private final User author2 = new User(1L, "Ron", "Weasley", "author2", "password",
+            "rw@gmail.com", LocalDate.of(1981, 9, 16), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final Article savedArticle = new Article(0L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),

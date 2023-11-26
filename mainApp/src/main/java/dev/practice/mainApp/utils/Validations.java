@@ -37,9 +37,8 @@ public class Validations {
     public User checkUserExistsByUsernameOrEmail(String usernameOrEmail) {
         Optional<User> user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
         if (user.isEmpty()) {
-            log.error("User with username or email {} wasn't found", usernameOrEmail);
-            throw new ResourceNotFoundException(String.format("User with username or email %s wasn't found",
-                    usernameOrEmail));
+            log.error("User with given credentials not found");
+            throw new ResourceNotFoundException("User with given credentials not found");
         }
         return user.get();
     }
