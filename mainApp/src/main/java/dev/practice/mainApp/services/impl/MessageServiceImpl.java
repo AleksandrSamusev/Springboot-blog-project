@@ -66,7 +66,7 @@ public class MessageServiceImpl implements MessageService {
     public MessageFullDto findMessageById(Long messageId, String currentUsername) {
         User user = validations.checkUserExistsByUsernameOrEmail(currentUsername);
         Message message = validations.checkIfMessageExists(messageId);
-        if (!message.getSender().getUsername().equals(currentUsername) ||
+        if (!message.getSender().getUsername().equals(currentUsername) &&
                 !message.getRecipient().getUsername().equals(currentUsername)) {
             log.info("ActionForbiddenException. Action forbidden for current user");
             throw new ActionForbiddenException("Action forbidden for current user");

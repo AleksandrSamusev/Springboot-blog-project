@@ -41,7 +41,7 @@ public class MessageServiceTest {
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
     private final User user2 = new User(2L, "Marry", "Dawson",
-            "marryDawson","password", "merryDawson@test.test",
+            "marryDawson", "password", "merryDawson@test.test",
             LocalDate.of(1995, 6, 14), new HashSet<>(), "Hi! I'm Marry", true,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
@@ -101,6 +101,8 @@ public class MessageServiceTest {
 
     @Test
     public void message_test5_Given_ExistingMessageId_When_findMessageById_Then_MessageReturn() {
+
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user1);
         when(validations.checkIfMessageExists(anyLong())).thenReturn(fromUser1toUser2);
 
         MessageFullDto messageFullDto = messageService.findMessageById(1L, "johnDoe");
