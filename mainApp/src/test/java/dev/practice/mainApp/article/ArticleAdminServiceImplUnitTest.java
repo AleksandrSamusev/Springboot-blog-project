@@ -92,7 +92,7 @@ public class ArticleAdminServiceImplUnitTest {
     }
 
     @Test
-    void article_test_7_Given_adminPublishFalse_When_publishArticle_Then_returnArticleStatusRejected() {
+    void articleAd_test_3_Given_adminPublishFalse_When_publishArticle_Then_returnArticleStatusRejected() {
         article.setPublished(null);
         article.setStatus(ArticleStatus.CREATED);
         Mockito
