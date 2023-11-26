@@ -65,10 +65,11 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
         List<Article> articles = user.getArticles()
                 .stream()
                 .filter(a -> a.getStatus() == ArticleStatus.PUBLISHED)
-                .sorted(Comparator.comparing(Article::getPublished))
+                .sorted(Comparator.comparing(Article::getPublished).reversed())
                 .toList();
 
-        List<Article> articlesPageable = articles.subList(from * size, from * size + size);
+        List<Article> articlesPageable = articles.subList(
+                from * size, size > articles.size() ?  articles.size() : from * size + size);
 
         List<String> uris = createListOfUris(articlesPageable);
         List<StatisticRecord> responses = sendRequestToStatistic(statsClient, uris);

@@ -1,6 +1,5 @@
 package dev.practice.mainApp.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.practice.mainApp.controllers._public.UserPublicController;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
@@ -8,8 +7,6 @@ import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.Comment;
 import dev.practice.mainApp.models.Message;
 import dev.practice.mainApp.models.User;
-import dev.practice.mainApp.repositories.RoleRepository;
-import dev.practice.mainApp.security.JWTAuthenticationFilter;
 import dev.practice.mainApp.services.impl.UserServiceImpl;
 import dev.practice.mainApp.utils.Validations;
 import org.mockito.Mockito;

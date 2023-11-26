@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,12 +44,16 @@ public class ArticlePrivateServiceImplIntTest {
     private final CommentService commentService;
     private final CommentRepository commentRepository;
 
-    private final User user = new User(null, "Harry", "Potter", "HP", "password",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
-            false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final User user2 = new User(null, "Admin", "Admin", "ADMIN", "password",
-            "admin@gmail.com", LocalDate.of(1990, 9, 10), new HashSet<>(), null,
-            false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
+    private final Role roleAdmin = new Role(1L, "ROLE_ADMIN");
+    private final Role roleUser = new Role(2L, "ROLE_USER");
+    private final User user = new User(null, "Harry", "Potter", "HP",
+            "password", "hp@gmail.com", LocalDate.of(1981, 7, 31),
+            Set.of(roleUser), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            new HashSet<>());
+    private final User user2 = new User(null, "Admin", "Admin", "ADMIN",
+            "password", "admin@gmail.com", LocalDate.of(1990, 9, 10),
+            Set.of(roleAdmin), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            new HashSet<>());
     private final Tag tag1 = new Tag(null, "Potions", new HashSet<>());
     private final Tag tag2 = new Tag(null, "Cat", new HashSet<>());
     private final ArticleNewDto newArticle = new ArticleNewDto("The empty pot",
@@ -64,7 +69,7 @@ public class ArticlePrivateServiceImplIntTest {
 
 
     @Test
-    void article_test_2_Given_validArticleWithNewTags_When_createArticle_Then_articleSavedWithTag() {
+    void articlePr_test_13_Given_validArticleWithNewTags_When_createArticle_Then_articleSavedWithTag() {
         dropDB();
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         User author = userRepository.save(user);
