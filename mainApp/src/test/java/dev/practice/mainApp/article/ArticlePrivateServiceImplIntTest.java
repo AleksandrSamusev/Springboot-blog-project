@@ -1,6 +1,5 @@
-/*package dev.practice.mainApp.article;
+package dev.practice.mainApp.article;
 
-import dev.practice.mainApp.config.SecurityConfig;
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
 import dev.practice.mainApp.dtos.article.ArticleUpdateDto;
@@ -9,20 +8,20 @@ import dev.practice.mainApp.dtos.tag.TagNewDto;
 import dev.practice.mainApp.dtos.tag.TagShortDto;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.models.*;
-import dev.practice.mainApp.repositories.ArticleRepository;
-import dev.practice.mainApp.repositories.CommentRepository;
-import dev.practice.mainApp.repositories.TagRepository;
-import dev.practice.mainApp.repositories.UserRepository;
+import dev.practice.mainApp.repositories.*;
 import dev.practice.mainApp.services.ArticlePrivateService;
 import dev.practice.mainApp.services.CommentService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,6 +32,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 @Transactional
 @SpringBootTest(
@@ -46,16 +46,25 @@ public class ArticlePrivateServiceImplIntTest {
     private final ArticlePrivateService articleService;
     private final CommentService commentService;
     private final CommentRepository commentRepository;
+    private final RoleRepository roleRepository;
 
-    private final Role roleAdmin = new Role(1L, "ROLE_ADMIN");
-    private final Role roleUser = new Role(2L, "ROLE_USER");
+    @MockBean
+    protected AuthenticationConfiguration authenticationConfiguration;
+    @MockBean
+    protected AuthenticationManager authenticationManager;
+    @MockBean
+    protected HttpSecurity httpSecurity;
+    @MockBean
+    protected SecurityFilterChain securityFilterChain;
+
+
     private final User user = new User(null, "Harry", "Potter", "HP",
             "password", "hp@gmail.com", LocalDate.of(1981, 7, 31),
-            Set.of(roleUser), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            new HashSet<>(), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
             new HashSet<>());
     private final User user2 = new User(null, "Admin", "Admin", "ADMIN",
             "password", "admin@gmail.com", LocalDate.of(1990, 9, 10),
-            Set.of(roleAdmin), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            new HashSet<>(), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
             new HashSet<>());
     private final Tag tag1 = new Tag(null, "Potions", new HashSet<>());
     private final Tag tag2 = new Tag(null, "Cat", new HashSet<>());
@@ -68,11 +77,19 @@ public class ArticlePrivateServiceImplIntTest {
             ArticleStatus.PUBLISHED, 1450L, 0L, new HashSet<>(), new HashSet<>());
     private final Article article2 = new Article(null, "A pretty cat",
             "Very interesting information", user, LocalDateTime.now(), null, ArticleStatus.CREATED,
-            0L, 0L,  new HashSet<>(), new HashSet<>());
+            0L, 0L, new HashSet<>(), new HashSet<>());
 
+
+    void setRoles() {
+        Role roleAdmin = new Role(null, "ROLE_ADMIN");
+        Role roleUser = new Role(null, "ROLE_USER");
+        roleRepository.saveAll(Set.of(roleUser, roleAdmin));
+
+    }
 
     @Test
     void articlePr_test_13_Given_validArticleWithNewTags_When_createArticle_Then_articleSavedWithTag() {
+        setRoles();
         dropDB();
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         User author = userRepository.save(user);
@@ -279,7 +296,7 @@ public class ArticlePrivateServiceImplIntTest {
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         newArticle.getTags().add(new TagNewDto(tag2.getName()));
         User author = userRepository.save(user);
-        //user2.setRole(Role.ADMIN);
+        user2.setRoles(Set.of(roleRepository.findByName("ROLE_ADMIN").get()));
         User admin = userRepository.save(user2);
         ArticleFullDto articleSaved = articleService.createArticle(author.getUsername(), newArticle);
         Article dbArticle = articleRepository.getReferenceById(articleSaved.getArticleId());
@@ -302,7 +319,7 @@ public class ArticlePrivateServiceImplIntTest {
         User author = userRepository.save(user);
         for (int i = 0; i < 20; i++) {
             articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
-                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L,  new HashSet<>(),
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L, new HashSet<>(),
                     new HashSet<>()));
         }
 
@@ -320,7 +337,7 @@ public class ArticlePrivateServiceImplIntTest {
         User author = userRepository.save(user);
         for (int i = 0; i < 20; i++) {
             articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
-                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L,  new HashSet<>(),
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L, new HashSet<>(),
                     new HashSet<>()));
         }
 
@@ -340,7 +357,7 @@ public class ArticlePrivateServiceImplIntTest {
         User author = userRepository.save(user);
         for (int i = 0; i < 20; i++) {
             articleRepository.save(new Article(null, String.valueOf(i), "some information", author,
-                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L,  new HashSet<>(),
+                    LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L, new HashSet<>(),
                     new HashSet<>()));
         }
         for (int i = 0; i < 5; i++) {
@@ -513,4 +530,4 @@ public class ArticlePrivateServiceImplIntTest {
         commentRepository.deleteAll();
         userRepository.deleteAll();
     }
-}*/
+}
