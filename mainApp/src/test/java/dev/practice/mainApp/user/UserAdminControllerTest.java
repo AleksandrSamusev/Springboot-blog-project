@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -35,15 +36,16 @@ public class UserAdminControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
+    private final Role roleUser = new Role(1L, "ROLE_USER");
     private final UserFullDto bannedUser = new UserFullDto(1L, "John", "Doe",
-            "johnDoe", "johnDoe@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER,
+            "johnDoe", "password","johnDoe@test.test",
+            LocalDate.of(2000, 12, 27), Set.of(roleUser),
             "Hi! I'm John", true, new HashSet<>(), new HashSet<>(),
             new HashSet<>(), new HashSet<>());
 
     private final UserFullDto notBannedUser = new UserFullDto(1L, "John", "Doe",
-            "johnDoe", "johnDoe@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER,
+            "johnDoe", "password", "johnDoe@test.test",
+            LocalDate.of(2000, 12, 27), Set.of(roleUser),
             "Hi! I'm John", false, new HashSet<>(), new HashSet<>(),
             new HashSet<>(), new HashSet<>());
 

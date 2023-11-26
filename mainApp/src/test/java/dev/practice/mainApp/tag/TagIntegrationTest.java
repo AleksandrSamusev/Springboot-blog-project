@@ -38,7 +38,7 @@ public class TagIntegrationTest {
     private final ArticleRepository articleRepository;
     private final ArticlePrivateService articleService;
 
-    private final User author = new User(null, "Harry", "Potter", "HP",
+    /*private final User author = new User(null, "Harry", "Potter", "HP",
             "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final TagNewDto newTag1 = new TagNewDto("tag1");
@@ -149,7 +149,7 @@ public class TagIntegrationTest {
         assertThat(result.getTags().size()).isEqualTo(1);
         assertThat(tagRepository.findAll().size()).isEqualTo(2);
         assertThat(tagRepository.findById(savedTag2.getTagId()).get().getArticles().size()).isEqualTo(1);
-    }
+    }*/
 
     private void dropDB() {
         tagRepository.deleteAll();

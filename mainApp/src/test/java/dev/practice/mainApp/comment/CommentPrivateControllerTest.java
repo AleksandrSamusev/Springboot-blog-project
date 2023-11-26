@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,10 +41,13 @@ public class CommentPrivateControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
+
+    private final Role roleUser = new Role(1L, "ROLE_USER");
     private final User author = new User(1L, "Harry", "Potter",
-            "harryPotter", "harrypotter@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm Harry", false,
-            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+            "harryPotter", "password", "harrypotter@test.test",
+            LocalDate.of(2000, 12, 27), Set.of(roleUser), "Hi! I'm Harry",
+            false, new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(),
+            new HashSet<Comment>());
 
     private final UserShortDto shortUser = new UserShortDto(2L, "johnDoe");
 
@@ -64,7 +68,7 @@ public class CommentPrivateControllerTest {
 
     @Test
     public void comment_test28_CreateCommentTest() throws Exception {
-        when(commentService.createComment(anyLong(), any(), anyLong())).thenReturn(fullComment);
+        when(commentService.createComment(anyLong(), any(), any())).thenReturn(fullComment);
         mockMvc.perform(post("/api/v1/private/comments/article/1")
                         .header("X-Current-User-Id", 1)
                         .content(mapper.writeValueAsString(newDto))
@@ -80,7 +84,7 @@ public class CommentPrivateControllerTest {
 
     @Test
     public void comment_test29_UpdateCommentTest() throws Exception {
-        when(commentService.updateComment(any(), anyLong(), anyLong())).thenReturn(fullUpdatedComment);
+        when(commentService.updateComment(any(), anyLong(), any())).thenReturn(fullUpdatedComment);
         mockMvc.perform(patch("/api/v1/private/comments/1")
                         .header("X-Current-User-Id", 1)
                         .content(mapper.writeValueAsString(dtoForUpdate))
@@ -96,7 +100,7 @@ public class CommentPrivateControllerTest {
 
     @Test
     public void comment_test30_DeleteCommentTest() throws Exception {
-        doNothing().when(commentService).deleteComment(anyLong(), anyLong());
+        doNothing().when(commentService).deleteComment(anyLong(), any());
         mockMvc.perform(delete("/api/v1/private/comments/1")
                         .header("X-Current-User-Id", 1))
                 .andExpect(status().isOk());
@@ -106,7 +110,7 @@ public class CommentPrivateControllerTest {
     public void comment_test31_Given_MessageIsNull_When__CreateComment_Then_BadRequest() throws Exception {
 
         CommentNewDto dto = new CommentNewDto(null);
-        when(commentService.createComment(anyLong(), any(), anyLong())).thenReturn(fullComment);
+        when(commentService.createComment(anyLong(), any(), any())).thenReturn(fullComment);
         mockMvc.perform(post("/api/v1/private/comments/article/1")
                         .header("X-Current-User-Id", 1)
                         .content(mapper.writeValueAsString(dto))
@@ -127,7 +131,7 @@ public class CommentPrivateControllerTest {
                 "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
                 "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
 
-        when(commentService.createComment(anyLong(), any(), anyLong())).thenReturn(fullComment);
+        when(commentService.createComment(anyLong(), any(), any())).thenReturn(fullComment);
         mockMvc.perform(post("/api/v1/private/comments/article/1")
                         .header("X-Current-User-Id", 1)
                         .content(mapper.writeValueAsString(dto))

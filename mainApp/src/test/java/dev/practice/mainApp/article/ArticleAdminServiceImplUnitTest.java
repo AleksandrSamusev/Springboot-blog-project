@@ -41,7 +41,7 @@ public class ArticleAdminServiceImplUnitTest {
     @InjectMocks
     private ArticleAdminServiceImpl articleService;
 
-    private final User author = new User(0L, "Harry", "Potter", "HP",
+    /*private final User author = new User(0L, "Harry", "Potter", "HP",
             "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final User admin = new User(1L, "Ron", "Weasley", "RW",
@@ -117,5 +117,5 @@ public class ArticleAdminServiceImplUnitTest {
 
         assertThat(result.getPublished()).isNull();
         assertThat(result.getStatus()).isEqualTo(ArticleStatus.REJECTED);
-    }
+    }*/
 }

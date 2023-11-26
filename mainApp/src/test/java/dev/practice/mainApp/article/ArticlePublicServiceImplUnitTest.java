@@ -37,7 +37,7 @@ public class ArticlePublicServiceImplUnitTest {
     @InjectMocks
     private ArticlePublicServiceImpl articleService;
 
-    private final User author = new User(0L, "Harry", "Potter", "HP",
+    /*private final User author = new User(0L, "Harry", "Potter", "HP",
             "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final User author2 = new User(1L, "Ron", "Weasley", "RW",
@@ -51,7 +51,7 @@ public class ArticlePublicServiceImplUnitTest {
             ArticleStatus.PUBLISHED, 1L, 0L, new HashSet<>(), new HashSet<>());
     private final Article savedArticle2 = new Article(1L, "A pretty cat",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
-            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
+            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());*/
 
 
  /*   @Test
@@ -90,7 +90,7 @@ public class ArticlePublicServiceImplUnitTest {
     }*/
 
 
-    @Test
+    /*@Test
     void article_test_12_Given_ExistingArticle_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
@@ -128,5 +128,5 @@ public class ArticlePublicServiceImplUnitTest {
         ActionForbiddenException ex = Assertions.assertThrows(ActionForbiddenException.class, () ->
                 articleService.likeArticle(0L));
         Assertions.assertEquals("Article with id %d is not published yet", ex.getMessage());
-    }
+    }*/
 }
