@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,14 +36,14 @@ public class ValidationsTest {
     @InjectMocks
     private Validations validations;
 
-    private final Role roleUser = new Role(1L, "ROLE_USER");
-    private final Role roleAdmin = new Role(2L, "ROLE_ADMIN");
-    private final User user = new User(0L, "Harry", "Potter", "HP", "password",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), Set.of(roleUser), null,
-            false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final User admin = new User(1L, "Ron", "Weasley", "RW", "password",
-            "rw@gmail.com", LocalDate.of(1981, 9, 16), Set.of(roleAdmin), null,
-            false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
+    private final User user = new User(0L, "Harry", "Potter", "user",
+            "password","hp@gmail.com", LocalDate.of(1981, 7, 31),
+            new HashSet<>(), null,false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            new HashSet<>());
+    private final User admin = new User(1L, "Ron", "Weasley", "admin",
+            "password", "rw@gmail.com", LocalDate.of(1981, 9, 16),
+            new HashSet<>(), null,false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            new HashSet<>());
     private final Article savedArticle = new Article(0L, "A pretty cat",
             "Very interesting information", user, LocalDateTime.now(), null, ArticleStatus.CREATED,
             0L, 0L, new HashSet<>(), new HashSet<>());
@@ -93,33 +92,33 @@ public class ValidationsTest {
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
 
-    @Test
+/*    @Test
     public void val_test_5_Given_userIsAdmin_When_checkUserIsAdmin_Then_doNothing() {
-        /*user.setRole(Role.ADMIN);
-        validations.checkUserIsAdmin(user);*/
-    }
+        user.setRole(Role.ADMIN);
+        validations.checkUserIsAdmin(user);
+    }*/
 
-    @Test
+/*    @Test
     public void val_test_6_Given_userIsNotAdmin_When_checkUserIsAdmin_Then_throwException() {
-        /*final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
-                () -> validations.checkUserIsAdmin(user));*/
-        /*assertEquals("User with id 0 is not ADMIN. Access is forbidden", exception.getMessage(),
+        final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
+                () -> validations.checkUserIsAdmin(user));
+        assertEquals("User with id 0 is not ADMIN. Access is forbidden", exception.getMessage(),
                 "Incorrect message");
-        assertThat(exception).isInstanceOf(ActionForbiddenException.class);*/
-    }
+        assertThat(exception).isInstanceOf(ActionForbiddenException.class);
+    }*/
 
     @Test
     public void val_test_6_Given_userIsAuthor_When_checkUserIsAuthor_Then_doNothing() {
-        /*validations.checkUserIsAuthor(savedArticle, user.getUserId());*/
+        validations.checkUserIsAuthor(savedArticle, user.getUsername());
     }
 
     @Test
     public void val_test_7_Given_userIsNotAuthor_When_checkUserIsAuthor_Then_throwException() {
-       /* final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
-                () -> validations.checkUserIsAuthor(savedArticle, 105L));
+        final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
+                () -> validations.checkUserIsAuthor(savedArticle, "abc"));
         assertEquals("Article with id 0 is not belongs to user with id 105. Action is forbidden",
                 exception.getMessage(), "Incorrect message");
-        assertThat(exception).isInstanceOf(ActionForbiddenException.class);*/
+        assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
 
     @Test

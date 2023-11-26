@@ -20,9 +20,9 @@ public interface UserService {
 
     void deleteUser(Long userId, String username);
 
-    UserFullDto banUser(Long userId, Long currentUserId);
+    UserFullDto banUser(Long userId, String username);
 
-    UserFullDto unbanUser(Long userId, Long currentUserId);
+    UserFullDto unbanUser(Long userId, String username);
 
     UserFullDto updateUser(Long userId, UserUpdateDto dto, String username);
 }

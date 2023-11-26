@@ -37,9 +37,9 @@ public class TagServiceTest {
     @InjectMocks
     private TagServiceImpl tagService;
 
-    /*private final User author = new User(1L, "Harry", "Potter",
-            "harryPotter", "harrypotter@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm Harry", false,
+    private final User author = new User(1L, "Harry", "Potter",
+            "author", "password", "harrypotter@test.test",
+            LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm Harry", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
     private final Article article = new Article(1L, "Potions",
@@ -47,13 +47,13 @@ public class TagServiceTest {
             ArticleStatus.PUBLISHED, 1450L, 0L, new HashSet<>(), new HashSet<>());
 
     private final User admin = new User(10L, "Kirk", "Douglas",
-            "kirkDouglas", "kirkdouglas@test.test",
-            LocalDate.of(1955, 3, 9), Role.ADMIN, "Hi! I'm Admin", false,
+            "admin", "password", "kirkdouglas@test.test",
+            LocalDate.of(1955, 3, 9), new HashSet<>(), "Hi! I'm Admin", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
     private final User notAdmin = new User(5L, "Alex", "Ferguson",
-            "alexFerguson", "alexferguson@test.test",
-            LocalDate.of(1980, 6, 16), Role.USER, "Hi! I'm Alex", false,
+            "notAdmin", "password", "alexferguson@test.test",
+            LocalDate.of(1980, 6, 16), new HashSet<>(), "Hi! I'm Alex", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
 
@@ -158,18 +158,18 @@ public class TagServiceTest {
         when(validations.isTagExists(anyLong())).thenReturn(tag);
         doNothing().when(tagRepositoryMock).deleteById(1L);
 
-        tagService.deleteTag(1L, admin.getUserId());
+        tagService.deleteTag(1L, admin.getUsername());
 
         verify(tagRepositoryMock, times(1)).deleteById(1L);
     }
 
     @Test
     public void tag_test12_Given_UserIsNotAdmin_When_DeleteTag_Then_ActionForbidden() {
-        doThrow(new ActionForbiddenException(
-                "User with id 5 is not ADMIN. Access is forbidden")).when(validations).checkUserIsAdmin(any());
+/*        doThrow(new ActionForbiddenException(
+                "User with id 5 is not ADMIN. Access is forbidden")).when(validations).checkUserIsAdmin(any());*/
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
-                tagService.deleteTag(1L, notAdmin.getUserId()));
+                tagService.deleteTag(1L, notAdmin.getUsername()));
         assertEquals("User with id 5 is not ADMIN. Access is forbidden", ex.getMessage());
     }
 
@@ -179,7 +179,7 @@ public class TagServiceTest {
                 "Tag with given ID = 1 not found")).when(validations).isTagExists(anyLong());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                tagService.deleteTag(1L, admin.getUserId()));
+                tagService.deleteTag(1L, admin.getUsername()));
         assertEquals("Tag with given ID = 1 not found", ex.getMessage());
     }
 
@@ -189,7 +189,7 @@ public class TagServiceTest {
                 "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                tagService.deleteTag(1L, 1L));
+                tagService.deleteTag(1L, "author"));
         assertEquals("User with id 1 wasn't found", ex.getMessage());
-    }*/
+    }
 }

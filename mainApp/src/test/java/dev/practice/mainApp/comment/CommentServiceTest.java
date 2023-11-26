@@ -36,27 +36,25 @@ public class CommentServiceTest {
     @InjectMocks
     private CommentServiceImpl commentService;
 
-    private final Role roleAdmin = new Role(2L, "ROLE_ADMIN");
-    private final Role roleUser = new Role(1L, "ROLE_USER");
-    private final User author = new User(1L, "Harry", "Potter",
-            "harryPotter", "password", "harrypotter@test.test",
-            LocalDate.of(2000, 12, 27), Set.of(roleUser), "Hi! I'm Harry", false,
+    private final User author = new User(1L, "Harry", "Potter", "harryPotter",
+            "password", "harrypotter@test.test",
+            LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm Harry", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
-    private final User commentAuthor = new User(2L, "John", "Doe",
-            "johnDoe","password", "johndoe@test.test",
-            LocalDate.of(1999, 11, 11), Set.of(roleUser), "Hi! I'm John", false,
+    private final User commentAuthor = new User(2L, "John", "Doe", "johnDoe",
+            "password", "johndoe@test.test",
+            LocalDate.of(1999, 11, 11), new HashSet<>(), "Hi! I'm John", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
-    private final User notAnAuthor = new User(5L, "Alex", "Ferguson",
-            "alexFerguson", "password", "alexferguson@test.test",
-            LocalDate.of(1980, 6, 16), Set.of(roleUser), "Hi! I'm Alex", false,
+    private final User notAnAuthor = new User(5L, "Alex", "Ferguson", "alexFerguson",
+            "password", "alexferguson@test.test",
+            LocalDate.of(1980, 6, 16), new HashSet<>(), "Hi! I'm Alex", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
 
-    private final User admin = new User(10L, "Kirk", "Douglas",
-            "kirkDouglas", "password", "kirkdouglas@test.test",
-            LocalDate.of(1955, 3, 9), Set.of(roleAdmin), "Hi! I'm Admin", false,
+    private final User admin = new User(10L, "Kirk", "Douglas", "kirkDouglas",
+            "password", "kirkdouglas@test.test",
+            LocalDate.of(1955, 3, 9), new HashSet<>(), "Hi! I'm Admin", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
     private final UserShortDto shortUser = new UserShortDto(2L, "johnDoe");
@@ -87,7 +85,7 @@ public class CommentServiceTest {
     public void comment_test1_Given_ValidParameters_When_CreateComment_Then_CommentCreated() {
         when(commentRepositoryMock.save(any())).thenReturn(comment);
 
-        CommentFullDto createdComment = commentService.createComment(1L, newComment, new String());
+        CommentFullDto createdComment = commentService.createComment(1L, newComment, "johnDoe");
 
         assertEquals(createdComment.getComment(), newComment.getComment());
         assertEquals(createdComment.getCommentAuthor().getUsername(), commentAuthor.getUsername());
@@ -100,7 +98,7 @@ public class CommentServiceTest {
                 "Article with id 1 is not published yet")).when(validations).checkArticleIsPublished(any());
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
-                commentService.createComment(1L, newComment, new String()));
+                commentService.createComment(1L, newComment, "johnDoe"));
         assertEquals("Article with id 1 is not published yet", ex.getMessage());
     }
 
@@ -110,7 +108,7 @@ public class CommentServiceTest {
                 "User with id 1 is blocked")).when(validations).checkUserIsNotBanned(any());
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
-                commentService.createComment(1L, newComment, new String()));
+                commentService.createComment(1L, newComment, "johnDoe"));
         assertEquals("User with id 1 is blocked", ex.getMessage());
     }
 
@@ -120,7 +118,7 @@ public class CommentServiceTest {
                 "User with id 2 wasn't found")).when(validations).checkUserExist(anyLong());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                commentService.createComment(1L, newComment, new String()));
+                commentService.createComment(1L, newComment, "johnDoe"));
         assertEquals("User with id 2 wasn't found", ex.getMessage());
     }
 
@@ -130,7 +128,7 @@ public class CommentServiceTest {
                 "Article with id 1 wasn't found")).when(validations).checkArticleExist(anyLong());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                commentService.createComment(1L, newComment, new String()));
+                commentService.createComment(1L, newComment, "johnDoe"));
         assertEquals("Article with id 1 wasn't found", ex.getMessage());
     }
 
@@ -139,7 +137,7 @@ public class CommentServiceTest {
         when(validations.isCommentExists(anyLong())).thenReturn(comment);
         when(commentRepositoryMock.save(comment)).thenReturn(updatedComment);
 
-        CommentFullDto updated = commentService.updateComment(newComment, 1L, new String());
+        CommentFullDto updated = commentService.updateComment(newComment, 1L, commentAuthor.getUsername());
         assertEquals(updated.getComment(), newComment.getComment());
         assertEquals(updated.getCommentAuthor().getUsername(), commentAuthor.getUsername());
         assertEquals(updated.getArticleId(), article.getArticleId());
@@ -151,7 +149,7 @@ public class CommentServiceTest {
                 "Comment with given Id = 1 not found")).when(validations).isCommentExists(anyLong());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                commentService.updateComment(newComment, 1L, new String()));
+                commentService.updateComment(newComment, 1L, commentAuthor.getUsername()));
         assertEquals("Comment with given Id = 1 not found", ex.getMessage());
     }
 
@@ -161,7 +159,7 @@ public class CommentServiceTest {
                 "User with id 2 wasn't found")).when(validations).checkUserExist(anyLong());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                commentService.updateComment(newComment, 1L, new String()));
+                commentService.updateComment(newComment, 1L, commentAuthor.getUsername()));
         assertEquals("User with id 2 wasn't found", ex.getMessage());
     }
 
@@ -171,7 +169,7 @@ public class CommentServiceTest {
                 "Action forbidden for given user")).when(validations).checkUserIsCommentAuthor(any(), any());
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
-                commentService.updateComment(newComment, 1L, new String()));
+                commentService.updateComment(newComment, 1L, notAnAuthor.getUsername()));
         assertEquals("Action forbidden for given user", ex.getMessage());
     }
 
@@ -180,7 +178,7 @@ public class CommentServiceTest {
         when(validations.isCommentExists(anyLong())).thenReturn(comment);
         doNothing().when(commentRepositoryMock).deleteById(1L);
 
-        commentService.deleteComment(1L, new String());
+        commentService.deleteComment(1L, commentAuthor.getUsername());
         verify(commentRepositoryMock, times(1)).deleteById(1L);
     }
 
@@ -190,7 +188,7 @@ public class CommentServiceTest {
         when(validations.checkUserExist(anyLong())).thenReturn(admin);
         doNothing().when(commentRepositoryMock).deleteById(1L);
 
-        commentService.deleteComment(1L, new String());
+        commentService.deleteComment(1L, admin.getUsername());
         verify(commentRepositoryMock, times(1)).deleteById(1L);
     }
 
@@ -200,7 +198,7 @@ public class CommentServiceTest {
         when(validations.checkUserExist(anyLong())).thenReturn(notAnAuthor);
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
-                commentService.deleteComment(1L, new String()));
+                commentService.deleteComment(1L, notAnAuthor.getUsername()));
         assertEquals("Action forbidden for given user", ex.getMessage());
     }
 
@@ -210,7 +208,7 @@ public class CommentServiceTest {
                 "Comment with given Id = 1 not found")).when(validations).isCommentExists(any());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                commentService.deleteComment(1L,new String()));
+                commentService.deleteComment(1L, notAnAuthor.getUsername()));
         assertEquals("Comment with given Id = 1 not found", ex.getMessage());
     }
 
@@ -221,7 +219,7 @@ public class CommentServiceTest {
                 "User with id 1 wasn't found")).when(validations).checkUserExist(any());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                commentService.deleteComment(1L, new String()));
+                commentService.deleteComment(1L, author.getUsername()));
         assertEquals("User with id 1 wasn't found", ex.getMessage());
     }
 

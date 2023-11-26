@@ -1,14 +1,17 @@
 package dev.practice.mainApp.user;
 
+import dev.practice.mainApp.dtos.JWTAuthResponse;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
 import dev.practice.mainApp.dtos.message.MessageFullDto;
 import dev.practice.mainApp.dtos.message.MessageNewDto;
+import dev.practice.mainApp.dtos.user.LoginDto;
 import dev.practice.mainApp.dtos.user.UserFullDto;
 import dev.practice.mainApp.dtos.user.UserNewDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticlePrivateService;
+import dev.practice.mainApp.services.AuthService;
 import dev.practice.mainApp.services.MessageService;
 import dev.practice.mainApp.services.UserService;
 import jakarta.persistence.EntityManager;
@@ -42,126 +45,165 @@ public class UserIntegrationTest {
     private final UserRepository userRepository;
     private final MessageService messageService;
     private final ArticlePrivateService articlePrivateService;
+    private final AuthService authService;
 
     @Test
     public void user_test30_When_createNewArticleByExistingUser_Then_UserHaveThisArticle() {
 
-        UserNewDto newDto = new UserNewDto("firstName", "lastName", "username", "password", "email", LocalDate.of(
-                2000, 12, 12), "test");
+        UserNewDto newDto = new UserNewDto("firstName", "lastName", "username",
+                "password","email", LocalDate.of(2000, 12, 12),
+                "about");
 
-        /*UserFullDto createdUser = userService.createUser(newDto);
+        authService.register(newDto);
+        JWTAuthResponse response = authService.login(new LoginDto("username", "password"));
+        User user = userRepository.findByUsername("username");
+
+
         ArticleNewDto newArticle = new ArticleNewDto("Title", "Content", new HashSet<>());
-        articlePrivateService.createArticle(createdUser.getUserId(), newArticle);
-        UserFullDto userFullDto = userService.getUserById(createdUser.getUserId(), createdUser.getUserId());
-        assertThat(userFullDto.getArticles().size(), equalTo(1));*/
+        articlePrivateService.createArticle(user.getUsername(), newArticle);
+        UserFullDto userFullDto = userService.getUserById(user.getUserId(), user.getUsername());
+        assertThat(userFullDto.getArticles().size(), equalTo(1));
     }
 
     @Test
     public void user_test31_When_createMessage_Then_UserHaveThisMessageInSentList() {
 
-        /*UserNewDto newDto1 = new UserNewDto("firstName1", "lastName1", "username1", "email1", LocalDate.of(
-                2011, 11, 11), "test1");
-        UserNewDto newDto2 = new UserNewDto("firstName2", "lastName2", "username2", "email2", LocalDate.of(
-                2012, 12, 12), "test2");
+        UserNewDto newDto1 = new UserNewDto("firstName1", "lastName1", "username1",
+                "password", "email1", LocalDate.of(2011, 11, 11),
+                "test1");
+        UserNewDto newDto2 = new UserNewDto("firstName2", "lastName2", "username2",
+                "password", "email2", LocalDate.of(2012, 12, 12),
+                "test2");
 
-        UserFullDto createdUser1 = userService.createUser(newDto1);
-        UserFullDto createdUser2 = userService.createUser(newDto2);
+        authService.register(newDto1);
+        authService.register(newDto2);
+        JWTAuthResponse response1 = authService.login(new LoginDto("username1", "password"));
+        JWTAuthResponse response2 = authService.login(new LoginDto("username2", "password"));
+
         MessageNewDto message1 = new MessageNewDto("message from user1 to user2");
         MessageNewDto message2 = new MessageNewDto("message from user2 to user1");
-        messageService.createMessage(createdUser2.getUserId(), createdUser1.getUserId(), message1);
-        messageService.createMessage(createdUser1.getUserId(), createdUser2.getUserId(), message2);
-        User user1FromDb = userRepository.getReferenceById(createdUser1.getUserId());
-        User user2FromDb = userRepository.getReferenceById(createdUser2.getUserId());
+
+        User user1 = userRepository.findByUsername("username1");
+        User user2 = userRepository.findByUsername("username2");
+
+        messageService.createMessage(user2.getUserId(), user1.getUsername(), message1);
+        messageService.createMessage(user1.getUserId(), user2.getUsername(), message2);
+        User user1FromDb = userRepository.getReferenceById(user1.getUserId());
+        User user2FromDb = userRepository.getReferenceById(user2.getUserId());
 
         assertThat(user1FromDb.getSentMessages().size(), is(1));
         assertThat(new ArrayList<>(user1FromDb.getSentMessages()).get(0).getMessage(),
                 is(message1.getMessage()));
         assertThat(user2FromDb.getSentMessages().size(), is(1));
         assertThat(new ArrayList<>(user2FromDb.getSentMessages()).get(0).getMessage(),
-                is(message2.getMessage()));*/
+                is(message2.getMessage()));
     }
 
 
     @Test
     public void user_test32_When_createMessage_Then_RecipientHasItInReceivedList() {
-        /*UserNewDto newDto1 = new UserNewDto("firstName1", "lastName1", "username1", "email1", LocalDate.of(
-                2011, 11, 11), "test1");
-        UserNewDto newDto2 = new UserNewDto("firstName2", "lastName2", "username2", "email2", LocalDate.of(
-                2012, 12, 12), "test2");
+        UserNewDto newDto1 = new UserNewDto("firstName1", "lastName1", "username1",
+                "password", "email1", LocalDate.of(2011, 11, 11),
+                "test1");
+        UserNewDto newDto2 = new UserNewDto("firstName2", "lastName2", "username2",
+                "password", "email2", LocalDate.of(2012, 12, 12),
+                "test2");
 
-        UserFullDto createdUser1 = userService.createUser(newDto1);
-        UserFullDto createdUser2 = userService.createUser(newDto2);
+        authService.register(newDto1);
+        authService.register(newDto2);
+        JWTAuthResponse response1 = authService.login(new LoginDto("username1", "password"));
+        JWTAuthResponse response2 = authService.login(new LoginDto("username2", "password"));
+
         MessageNewDto message1 = new MessageNewDto("message from user1 to user2");
         MessageNewDto message2 = new MessageNewDto("message from user2 to user1");
-        messageService.createMessage(createdUser2.getUserId(), createdUser1.getUserId(), message1);
-        messageService.createMessage(createdUser1.getUserId(), createdUser2.getUserId(), message2);
-        User user1FromDb = userRepository.getReferenceById(createdUser1.getUserId());
-        User user2FromDb = userRepository.getReferenceById(createdUser2.getUserId());
+
+        User user1 = userRepository.findByUsername("username1");
+        User user2 = userRepository.findByUsername("username2");
+
+        messageService.createMessage(user2.getUserId(), user1.getUsername(), message1);
+        messageService.createMessage(user1.getUserId(), user2.getUsername(), message2);
+
+        User user1FromDb = userRepository.getReferenceById(user1.getUserId());
+        User user2FromDb = userRepository.getReferenceById(user2.getUserId());
 
         assertThat(user1FromDb.getReceivedMessages().size(), is(1));
         assertThat(new ArrayList<>(user1FromDb.getReceivedMessages()).get(0).getMessage(),
                 is(message2.getMessage()));
         assertThat(user2FromDb.getReceivedMessages().size(), is(1));
         assertThat(new ArrayList<>(user2FromDb.getReceivedMessages()).get(0).getMessage(),
-                is(message1.getMessage()));*/
+                is(message1.getMessage()));
     }
 
     @Test
     public void user_test33_When_deleteMessageByRecipient_Then_isDeletedTrue() {
-        /*UserNewDto newDto1 = new UserNewDto("firstName1", "lastName1", "username1", "email1", LocalDate.of(
-                2011, 11, 11), "test1");
-        UserNewDto newDto2 = new UserNewDto("firstName2", "lastName2", "username2", "email2", LocalDate.of(
-                2012, 12, 12), "test2");
+        UserNewDto newDto1 = new UserNewDto("firstName1", "lastName1", "username1",
+                "password", "email1", LocalDate.of(2011, 11, 11),
+                "test1");
+        UserNewDto newDto2 = new UserNewDto("firstName2", "lastName2", "username2",
+                "password", "email2", LocalDate.of(2012, 12, 12),
+                "test2");
 
-        UserFullDto createdUser1 = userService.createUser(newDto1);
-        UserFullDto createdUser2 = userService.createUser(newDto2);
+        authService.register(newDto1);
+        authService.register(newDto2);
+        JWTAuthResponse response1 = authService.login(new LoginDto("username1", "password"));
+        JWTAuthResponse response2 = authService.login(new LoginDto("username2", "password"));
 
         MessageNewDto message1 = new MessageNewDto("message from user1 to user2");
         MessageNewDto message2 = new MessageNewDto("message from user2 to user1");
 
-        MessageFullDto createdMessage1 = messageService.createMessage(createdUser2.getUserId(),
-                createdUser1.getUserId(), message1);
-        MessageFullDto createdMessage2 = messageService.createMessage(createdUser1.getUserId(),
-                createdUser2.getUserId(), message2);
+        User user1 = userRepository.findByUsername("username1");
+        User user2 = userRepository.findByUsername("username2");
 
-        messageService.deleteMessage(createdMessage1.getMessageId(), createdUser2.getUserId());
-        messageService.deleteMessage(createdMessage2.getMessageId(), createdUser1.getUserId());
+        MessageFullDto createdMessage1 = messageService.createMessage(user2.getUserId(),
+                user1.getUsername(), message1);
+        MessageFullDto createdMessage2 = messageService.createMessage(user1.getUserId(),
+                user2.getUsername(), message2);
 
-        User user1FromDb = userRepository.getReferenceById(createdUser1.getUserId());
-        User user2FromDb = userRepository.getReferenceById(createdUser2.getUserId());
+        messageService.deleteMessage(createdMessage1.getMessageId(), user2.getUsername());
+        messageService.deleteMessage(createdMessage2.getMessageId(), user1.getUsername());
+
+        User user1FromDb = userRepository.getReferenceById(user1.getUserId());
+        User user2FromDb = userRepository.getReferenceById(user2.getUserId());
 
         assertThat(user1FromDb.getReceivedMessages().size(), is(1));
         assertThat(new ArrayList<>(user1FromDb.getReceivedMessages()).get(0).getIsDeleted(),
                 is(Boolean.TRUE));
         assertThat(user2FromDb.getReceivedMessages().size(), is(1));
         assertThat(new ArrayList<>(user2FromDb.getReceivedMessages()).get(0).getIsDeleted(),
-                is(Boolean.TRUE));*/
+                is(Boolean.TRUE));
     }
 
     @Test
     public void user_test34_When_deleteMessageByNotRecipient_Then_ActionForbiddenException() {
-        /*UserNewDto newDto1 = new UserNewDto("firstName1", "lastName1", "username1", "email1", LocalDate.of(
-                2011, 11, 11), "test1");
-        UserNewDto newDto2 = new UserNewDto("firstName2", "lastName2", "username2", "email2", LocalDate.of(
-                2012, 12, 12), "test2");
+        UserNewDto newDto1 = new UserNewDto("firstName1", "lastName1", "username1",
+                "password", "email1", LocalDate.of(2011, 11, 11),
+                "test1");
+        UserNewDto newDto2 = new UserNewDto("firstName2", "lastName2", "username2",
+                "password", "email2", LocalDate.of(2012, 12, 12),
+                "test2");
 
-        UserFullDto createdUser1 = userService.createUser(newDto1);
-        UserFullDto createdUser2 = userService.createUser(newDto2);
+        authService.register(newDto1);
+        authService.register(newDto2);
+        JWTAuthResponse response1 = authService.login(new LoginDto("username1", "password"));
+        JWTAuthResponse response2 = authService.login(new LoginDto("username2", "password"));
 
         MessageNewDto message1 = new MessageNewDto("message from user1 to user2");
         MessageNewDto message2 = new MessageNewDto("message from user2 to user1");
 
-        MessageFullDto createdMessage1 = messageService.createMessage(createdUser2.getUserId(),
-                createdUser1.getUserId(), message1);
-        MessageFullDto createdMessage2 = messageService.createMessage(createdUser1.getUserId(),
-                createdUser2.getUserId(), message2);
+        User user1 = userRepository.findByUsername("username1");
+        User user2 = userRepository.findByUsername("username2");
+
+        MessageFullDto createdMessage1 = messageService.createMessage(user2.getUserId(),
+                user1.getUsername(), message1);
+        MessageFullDto createdMessage2 = messageService.createMessage(user1.getUserId(),
+                user2.getUsername(), message2);
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
-                messageService.deleteMessage(createdMessage1.getMessageId(), createdUser1.getUserId()));
+                messageService.deleteMessage(createdMessage1.getMessageId(), user1.getUsername()));
         assertEquals("Action forbidden for current user", ex.getMessage());
 
         ActionForbiddenException ex2 = assertThrows(ActionForbiddenException.class, () ->
-                messageService.deleteMessage(createdMessage2.getMessageId(), createdUser2.getUserId()));
-        assertEquals("Action forbidden for current user", ex2.getMessage());*/
+                messageService.deleteMessage(createdMessage2.getMessageId(), user2.getUsername()));
+        assertEquals("Action forbidden for current user", ex2.getMessage());
     }
 }

@@ -43,12 +43,11 @@ public class ArticleAdminControllerTest {
             "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED, 0L,
             0L, new HashSet<>(), new HashSet<>());
 
-    /*@Test
+    @Test
     void article_test_3_Given_adminUserExist_When_getAllArticlesByUserId_Then_returnArticlesStatusOK()
             throws Exception {
         Mockito
-                .when(articleService.getAllArticlesByUserId(
-                        Mockito.anyLong(), Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
+                .when(articleService.getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenReturn(List.of(articleFull));
 
         mvc.perform(get("/api/v1/admin/articles/users/{authorId}", 1L)
@@ -63,8 +62,7 @@ public class ArticleAdminControllerTest {
                 .andExpect(jsonPath("$[0].articleId").value(1));
 
         Mockito.verify(articleService, Mockito.times(1))
-                .getAllArticlesByUserId(Mockito.anyLong(), Mockito.anyLong(), Mockito.any(),
-                        Mockito.any(), Mockito.anyString());
+                .getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString());
     }
 
     @Test
@@ -72,7 +70,7 @@ public class ArticleAdminControllerTest {
             throws Exception {
         Mockito
                 .when(articleService.getAllArticlesByUserId(
-                        Mockito.anyLong(), Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
+                        Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenThrow(ActionForbiddenException.class);
 
         mvc.perform(get("/api/v1/admin/articles/users/{authorId}", 1L)
@@ -90,7 +88,7 @@ public class ArticleAdminControllerTest {
     void article_test_8_Given_adminPublishFalse_When_publishArticle_Then_ReturnArticleStatusOk() throws Exception {
         articleFull.setStatus(ArticleStatus.REJECTED);
         Mockito
-                .when(articleService.publishArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyBoolean()))
+                .when(articleService.publishArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.anyBoolean()))
                 .thenReturn(articleFull);
 
         mvc.perform(patch("/api/v1/admin/articles/{articleId}/publish", 1L)
@@ -113,7 +111,7 @@ public class ArticleAdminControllerTest {
                 .andExpect(jsonPath("$.tags").isEmpty());
 
         Mockito.verify(articleService, Mockito.times(1))
-                .publishArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyBoolean());
+                .publishArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.anyBoolean());
     }
 
     @Test
@@ -121,7 +119,7 @@ public class ArticleAdminControllerTest {
         articleFull.setStatus(ArticleStatus.PUBLISHED);
         articleFull.setPublished(LocalDateTime.now());
         Mockito
-                .when(articleService.publishArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyBoolean()))
+                .when(articleService.publishArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.anyBoolean()))
                 .thenReturn(articleFull);
 
         mvc.perform(patch("/api/v1/admin/articles/{articleId}/publish", 1L)
@@ -144,6 +142,6 @@ public class ArticleAdminControllerTest {
                 .andExpect(jsonPath("$.tags").isEmpty());
 
         Mockito.verify(articleService, Mockito.times(1))
-                .publishArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyBoolean());
-    }*/
+                .publishArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.anyBoolean());
+    }
 }

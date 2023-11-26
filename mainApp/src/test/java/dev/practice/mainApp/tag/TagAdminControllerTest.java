@@ -8,8 +8,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,7 +26,7 @@ public class TagAdminControllerTest {
 
     @Test
     public void tag_test19_DeleteTagTest() throws Exception {
-        doNothing().when(tagService).deleteTag(anyLong(), any());
+        doNothing().when(tagService).deleteTag(anyLong(), anyString());
         mockMvc.perform(delete("/api/v1/admin/tags/1")
                         .header("X-Current-User-Id", 1))
                 .andExpect(status().isOk());

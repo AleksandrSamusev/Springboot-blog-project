@@ -38,8 +38,8 @@ public class TagIntegrationTest {
     private final ArticleRepository articleRepository;
     private final ArticlePrivateService articleService;
 
-    /*private final User author = new User(null, "Harry", "Potter", "HP",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
+    private final User author = new User(null, "Harry", "Potter", "author", "password",
+            "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final TagNewDto newTag1 = new TagNewDto("tag1");
     private final TagNewDto newTag2 = new TagNewDto("tag2");
@@ -53,10 +53,10 @@ public class TagIntegrationTest {
         dropDB();
         User savedAuthor = userRepository.save(author);
         newArticle.getTags().add(newTag1);
-        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUserId(), newArticle);
+        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUsername(), newArticle);
 
         ArticleFullDto result = tagService.addTagsToArticle(
-                savedAuthor.getUserId(), savedArticle.getArticleId(), List.of(newTag2));
+                savedAuthor.getUsername(), savedArticle.getArticleId(), List.of(newTag2));
         List<TagShortDto> tags = result.getTags().stream().sorted(Comparator.comparing(TagShortDto::getTagId)).toList();
 
         assertThat(result).isNotNull();
@@ -71,11 +71,11 @@ public class TagIntegrationTest {
         User savedAuthor = userRepository.save(author);
         newArticle.getTags().add(newTag1);
         newArticle2.getTags().add(newTag2);
-        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUserId(), newArticle);
-        articleService.createArticle(savedAuthor.getUserId(), newArticle2);
+        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUsername(), newArticle);
+        articleService.createArticle(savedAuthor.getUsername(), newArticle2);
 
         ArticleFullDto result = tagService.addTagsToArticle(
-                savedAuthor.getUserId(), savedArticle.getArticleId(), List.of(newTag2));
+                savedAuthor.getUsername(), savedArticle.getArticleId(), List.of(newTag2));
         List<TagShortDto> tags = result.getTags().stream().sorted(Comparator.comparing(TagShortDto::getTagId)).toList();
 
         assertThat(result).isNotNull();
@@ -90,10 +90,10 @@ public class TagIntegrationTest {
         dropDB();
         User savedAuthor = userRepository.save(author);
         newArticle.getTags().add(newTag1);
-        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUserId(), newArticle);
+        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUsername(), newArticle);
 
         ArticleFullDto result = tagService.addTagsToArticle(
-                savedAuthor.getUserId(), savedArticle.getArticleId(), List.of(newTag1));
+                savedAuthor.getUsername(), savedArticle.getArticleId(), List.of(newTag1));
         List<TagShortDto> tags = result.getTags().stream().toList();
 
         assertThat(result).isNotNull();
@@ -107,10 +107,10 @@ public class TagIntegrationTest {
         dropDB();
         User savedAuthor = userRepository.save(author);
         newArticle.getTags().add(newTag1);
-        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUserId(), newArticle);
+        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUsername(), newArticle);
 
         ArticleFullDto result = tagService.addTagsToArticle(
-                savedAuthor.getUserId(), savedArticle.getArticleId(), new ArrayList<>());
+                savedAuthor.getUsername(), savedArticle.getArticleId(), new ArrayList<>());
         List<TagShortDto> tags = result.getTags().stream().toList();
 
         assertThat(result).isNotNull();
@@ -123,11 +123,11 @@ public class TagIntegrationTest {
     void tag_test_27_Given_tagConnectedToArticle_When_removeTagsFromArticle_Then_tegRemoved() {
         dropDB();
         User savedAuthor = userRepository.save(author);
-        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUserId(), newArticle);
+        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUsername(), newArticle);
         TagFullDto savedTag = tagService.createTag(newTag1, savedArticle.getArticleId());
 
         ArticleFullDto result = tagService.removeTagsFromArticle(
-                savedAuthor.getUserId(), savedArticle.getArticleId(), List.of(savedTag.getTagId()));
+                savedAuthor.getUsername(), savedArticle.getArticleId(), List.of(savedTag.getTagId()));
 
         assertThat(result.getTags().size()).isEqualTo(0);
         assertThat(tagRepository.findAll().size()).isEqualTo(1);
@@ -138,18 +138,18 @@ public class TagIntegrationTest {
     void tag_test_28_Given_tagNotConnectedToArticle_When_removeTagsFromArticle_Then_tegRemoved() {
         dropDB();
         User savedAuthor = userRepository.save(author);
-        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUserId(), newArticle);
-        ArticleFullDto savedArticle2 = articleService.createArticle(savedAuthor.getUserId(), newArticle2);
+        ArticleFullDto savedArticle = articleService.createArticle(savedAuthor.getUsername(), newArticle);
+        ArticleFullDto savedArticle2 = articleService.createArticle(savedAuthor.getUsername(), newArticle2);
         TagFullDto savedTag = tagService.createTag(newTag1, savedArticle.getArticleId());
         TagFullDto savedTag2 = tagService.createTag(newTag2, savedArticle2.getArticleId());
 
         ArticleFullDto result = tagService.removeTagsFromArticle(
-                savedAuthor.getUserId(), savedArticle.getArticleId(), List.of(savedTag2.getTagId()));
+                savedAuthor.getUsername(), savedArticle.getArticleId(), List.of(savedTag2.getTagId()));
 
         assertThat(result.getTags().size()).isEqualTo(1);
         assertThat(tagRepository.findAll().size()).isEqualTo(2);
         assertThat(tagRepository.findById(savedTag2.getTagId()).get().getArticles().size()).isEqualTo(1);
-    }*/
+    }
 
     private void dropDB() {
         tagRepository.deleteAll();

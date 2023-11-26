@@ -45,11 +45,11 @@ public class ArticlePublicServiceImplIntTest {
     private final TagService tagService;
 
 
-   /* private final User user = new User(null, "Harry", "Potter", "HP",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
+    private final User user = new User(null, "Harry", "Potter", "HP", "password",
+            "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final User user2 = new User(null, "Admin", "Admin", "ADMIN",
-            "admin@gmail.com", LocalDate.of(1990, 9, 10), Role.USER, null,
+    private final User user2 = new User(null, "Admin", "Admin", "ADMIN", "password",
+            "admin@gmail.com", LocalDate.of(1990, 9, 10), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final Article article = new Article(null, "The empty pot",
             "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now(),
@@ -67,7 +67,7 @@ public class ArticlePublicServiceImplIntTest {
 
     private final Article articleWithTags2 = new Article(2L, "A pretty cat",
             "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
-            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());*/
+            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
 
   /*  @Test
     void article_test_2_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticlesNewFirst() {
@@ -97,7 +97,7 @@ public class ArticlePublicServiceImplIntTest {
         assertThat(result).isInstanceOf(ArticleShortDto.class);
     }*/
 
-    /*@Test
+    @Test
     void article_test_6_Given_anyUserArticleNotExist_When_getArticleById_Then_throwException() {
         dropDB();
 
@@ -106,9 +106,9 @@ public class ArticlePublicServiceImplIntTest {
         assertEquals(String.format("Article with id %d wasn't found", Long.MAX_VALUE), exception.getMessage(),
                 "Incorrect message");
         assertThat(exception).isInstanceOf(ResourceNotFoundException.class);
-    }*/
+    }
 
-    /*@Test
+    @Test
     void article_test_7_Given_anyUserArticleNotPublished_When_getArticleById_Then_throwException() {
         dropDB();
         userRepository.save(user);
@@ -119,7 +119,7 @@ public class ArticlePublicServiceImplIntTest {
         assertEquals(String.format("Article with id %d is not published yet", saved.getArticleId()),
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
-    }*/
+    }
 
 /*    @Test
     void article_test_10_Given_anyUserAuthorExist_When_getAllArticlesByUserId_Then_returnArticles() {

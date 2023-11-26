@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -38,10 +37,9 @@ public class CommentPublicControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
-    private final Role roleUser = new Role(1L, "ROLE_USER");
-    private final User author = new User(1L, "Harry", "Potter",
-            "harryPotter", "password", "harrypotter@test.test",
-            LocalDate.of(2000, 12, 27), Set.of(roleUser), "Hi! I'm Harry", false,
+    private final User author = new User(1L, "Harry", "Potter", "password",
+            "harryPotter", "harrypotter@test.test",
+            LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm Harry", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
     private final UserShortDto shortUser = new UserShortDto(2L, "johnDoe");
