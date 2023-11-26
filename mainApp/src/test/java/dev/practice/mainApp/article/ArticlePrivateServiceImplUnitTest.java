@@ -232,7 +232,7 @@ public class ArticlePrivateServiceImplUnitTest {
 
 
     @Test
-    void article_test_11_Given_userNotAuthor_When_deleteArticle_Then_throwException() {
+    void articlePr_test_11_Given_userNotAuthor_When_deleteArticle_Then_throwException() {
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
