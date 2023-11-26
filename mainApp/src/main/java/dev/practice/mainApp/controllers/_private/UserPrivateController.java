@@ -3,6 +3,7 @@ package dev.practice.mainApp.controllers._private;
 import dev.practice.mainApp.dtos.user.UserFullDto;
 import dev.practice.mainApp.dtos.user.UserUpdateDto;
 import dev.practice.mainApp.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,8 +39,9 @@ public class UserPrivateController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserFullDto> getUserById(@PathVariable Long userId,
-                                                   @AuthenticationPrincipal UserDetails userDetails) {
-        return new ResponseEntity<>(userService.getUserById(userId, userDetails.getUsername()), HttpStatus.OK);
+                                                   HttpServletRequest request) {
+        return new ResponseEntity<>(userService.getUserById(userId, request.getUserPrincipal().getName()),
+                HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
