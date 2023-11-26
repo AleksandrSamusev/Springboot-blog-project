@@ -154,7 +154,8 @@ public class TagServiceTest {
     @Test
     public void tag_test11_Given_ValidIds_When_DeleteTag_TagDeleted() {
         Tag tag = new Tag(1L, "tag1", Set.of(article));
-        when(validations.checkUserExist(anyLong())).thenReturn(admin);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(admin);
+        when(validations.isAdmin(anyString())).thenReturn(true);
         when(validations.isTagExists(anyLong())).thenReturn(tag);
         doNothing().when(tagRepositoryMock).deleteById(1L);
 
@@ -165,16 +166,16 @@ public class TagServiceTest {
 
     @Test
     public void tag_test12_Given_UserIsNotAdmin_When_DeleteTag_Then_ActionForbidden() {
-/*        doThrow(new ActionForbiddenException(
-                "User with id 5 is not ADMIN. Access is forbidden")).when(validations).checkUserIsAdmin(any());*/
-
+        when(validations.isAdmin(anyString())).thenReturn(false);
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
                 tagService.deleteTag(1L, notAdmin.getUsername()));
-        assertEquals("User with id 5 is not ADMIN. Access is forbidden", ex.getMessage());
+        assertEquals("Action forbidden for current user. Only admin can delete tag", ex.getMessage());
     }
 
     @Test
     public void tag_test13_Given_TagNotExists_When_DeleteTag_Then_ResourceNotFound() {
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(admin);
+        when(validations.isAdmin(anyString())).thenReturn(true);
         doThrow(new ResourceNotFoundException(
                 "Tag with given ID = 1 not found")).when(validations).isTagExists(anyLong());
 
@@ -186,10 +187,10 @@ public class TagServiceTest {
     @Test
     public void tag_test14_Given_UserNotExists_When_DeleteTag_Then_ResourceNotFound() {
         doThrow(new ResourceNotFoundException(
-                "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
+                "User with given credentials not found")).when(validations).checkUserExistsByUsernameOrEmail(anyString());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 tagService.deleteTag(1L, "author"));
-        assertEquals("User with id 1 wasn't found", ex.getMessage());
+        assertEquals("User with given credentials not found", ex.getMessage());
     }
 }
