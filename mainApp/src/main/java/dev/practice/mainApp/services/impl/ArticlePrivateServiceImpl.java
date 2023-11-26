@@ -83,7 +83,7 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     public Optional<?> getArticleById(String username, Long articleId) {
         Article article = validations.checkArticleExist(articleId);
 
-        if (!article.getAuthor().getUsername().equals(username)) {
+        if (!article.getAuthor().getUsername().equals(username) && !validations.isAdmin(username)) {
             if (article.getStatus() != ArticleStatus.PUBLISHED) {
                 log.error("Article with id {} is not published yet. Current status is {}", articleId,
                         article.getStatus());

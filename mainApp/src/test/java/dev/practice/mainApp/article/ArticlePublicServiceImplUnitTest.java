@@ -1,5 +1,6 @@
 package dev.practice.mainApp.article;
 
+import dev.practice.mainApp.client.StatsClient;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -32,17 +34,24 @@ public class ArticlePublicServiceImplUnitTest {
     private ArticleRepository articleRepository;
 
     @Mock
+    private StatsClient statsClient;
+
+    @Mock
     private Validations validations;
 
     @InjectMocks
     private ArticlePublicServiceImpl articleService;
 
-    private final User author = new User(0L, "Harry", "Potter", "author", "password",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
-            false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final User author2 = new User(1L, "Ron", "Weasley", "author2", "password",
-            "rw@gmail.com", LocalDate.of(1981, 9, 16), new HashSet<>(), null,
-            false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
+    private final Role roleAdmin = new Role(1L, "ROLE_ADMIN");
+    private final Role roleUser = new Role(2L, "ROLE_USER");
+    private final User author = new User(0L, "Harry", "Potter", "author",
+            "password", "hp@gmail.com", LocalDate.of(1981, 7, 31),
+            Set.of(roleUser), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            new HashSet<>());
+    private final User author2 = new User(1L, "Ron", "Weasley", "author2",
+            "password", "rw@gmail.com", LocalDate.of(1981, 9, 16),
+            Set.of(roleUser), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            new HashSet<>());
     private final Article savedArticle = new Article(0L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), LocalDateTime.now(),
             ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
@@ -54,44 +63,45 @@ public class ArticlePublicServiceImplUnitTest {
             ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
 
 
- /*   @Test
-    void article_test_1_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticles() {
+    @Test
+    void articlePu_test_1_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticles() {
         Mockito
-                .when(articleRepository.findAllByStatusOrderByPublishedDesc(ArticleStatus.PUBLISHED,
-                        PageRequest.of(0, 10)))
+                .when(articleRepository.saveAll(Mockito.any()))
                 .thenReturn(List.of(savedArticle2, savedArticle));
 
         List<ArticleShortDto> result = articleService.getAllArticles(0, 10);
 
         assertThat(result.size()).isEqualTo(2);
-    }*/
+    }
 
-/*    @Test
-    void article_test_4_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() {
+    @Test
+    void articlePu_test_2_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() {
         Mockito
-                .when(validations.checkArticleExist(Mockito.any()))
+                .when(articleRepository.save(Mockito.any()))
                 .thenReturn(savedArticle);
 
         ArticleShortDto result = articleService.getArticleById(0L, null);
 
         assertThat(result.getArticleId()).isEqualTo(0);
-    }*/
+    }
 
-/*    @Test
-    void article_test_9_Given_anyUserAuthorExist_When_getAllArticlesByUserId_Then_returnArticles() {
+    @Test
+    void articlePu_test_3_Given_anyUserAuthorExist_When_getAllArticlesByUserId_Then_returnArticles() {
         Mockito
-                .when(articleRepository.findAllByAuthorUserIdAndStatus(Mockito.anyLong(), Mockito.any(), Mockito.any()))
+                .when(validations.checkUserExist(Mockito.any()))
+                .thenReturn(savedArticle2.getAuthor());
+        Mockito
+                .when(articleRepository.saveAll(Mockito.any()))
                 .thenReturn(List.of(savedArticle2));
 
         List<ArticleShortDto> result = articleService.getAllArticlesByUserId(0L, 0, 10);
 
         assertThat(result.get(0)).isInstanceOf(ArticleShortDto.class);
         assertThat(result.size()).isEqualTo(1);
-    }*/
-
+    }
 
     @Test
-    void article_test_12_Given_ExistingArticle_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
+    void articlePu_test_4_Given_ExistingArticle_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
@@ -106,7 +116,7 @@ public class ArticlePublicServiceImplUnitTest {
     }
 
     @Test
-    void article_test_13_Given_ArticleNotExists_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
+    void articlePu_test_5_Given_ArticleNotExists_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenThrow(new ResourceNotFoundException("Article with id 0 wasn't found"));
@@ -117,7 +127,7 @@ public class ArticlePublicServiceImplUnitTest {
     }
 
     @Test
-    void article_test_14_Given_ArticleNotPublished_When_likeArticle_Then_ActionForbidden() {
+    void articlePu_test_6_Given_ArticleNotPublished_When_likeArticle_Then_ActionForbidden() {
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
