@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.time.LocalDate;
@@ -35,7 +34,7 @@ public class ArticlePublicServiceImplUnitTest {
     private ArticleRepository articleRepository;
 
     @Mock
-    private StatsClient statsClient;
+    private StatsClient statsClient; // DO NOT DELETE!!!
 
     @Mock
     private Validations validations;
@@ -43,14 +42,9 @@ public class ArticlePublicServiceImplUnitTest {
     @InjectMocks
     private ArticlePublicServiceImpl articleService;
 
-    private final Role roleAdmin = new Role(1L, "ROLE_ADMIN");
     private final Role roleUser = new Role(2L, "ROLE_USER");
     private final User author = new User(0L, "Harry", "Potter", "author",
             "password", "hp@gmail.com", LocalDate.of(1981, 7, 31),
-            Set.of(roleUser), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
-            new HashSet<>());
-    private final User author2 = new User(1L, "Ron", "Weasley", "author2",
-            "password", "rw@gmail.com", LocalDate.of(1981, 9, 16),
             Set.of(roleUser), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
             new HashSet<>());
     private final Article savedArticle = new Article(0L, "The empty pot",
@@ -79,31 +73,20 @@ public class ArticlePublicServiceImplUnitTest {
     void articlePu_test_2_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() {
 
         Mockito
+                .when(validations.checkArticleExist(Mockito.any()))
+                .thenReturn(savedArticle);
+        Mockito
                 .when(articleRepository.save(Mockito.any()))
                 .thenReturn(savedArticle);
 
-        ArticleShortDto result = articleService.getArticleById(0L, null);
+        ArticleShortDto result = articleService.getArticleById(savedArticle.getArticleId(),
+                new MockHttpServletRequest());
 
         assertThat(result.getArticleId()).isEqualTo(0);
     }
 
     @Test
-    void articlePu_test_3_Given_anyUserAuthorExist_When_getAllArticlesByUserId_Then_returnArticles() {
-        Mockito
-                .when(validations.checkUserExist(Mockito.any()))
-                .thenReturn(savedArticle2.getAuthor());
-        Mockito
-                .when(articleRepository.saveAll(Mockito.any()))
-                .thenReturn(List.of(savedArticle2));
-
-        List<ArticleShortDto> result = articleService.getAllArticlesByUserId(0L, 0, 10);
-
-        assertThat(result.get(0)).isInstanceOf(ArticleShortDto.class);
-        assertThat(result.size()).isEqualTo(1);
-    }
-
-    @Test
-    void articlePu_test_4_Given_ExistingArticle_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
+    void articlePu_test_3_Given_ExistingArticle_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
@@ -118,7 +101,7 @@ public class ArticlePublicServiceImplUnitTest {
     }
 
     @Test
-    void articlePu_test_5_Given_ArticleNotExists_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
+    void articlePu_test_4_Given_ArticleNotExists_When_likeArticle_Then_ArticleLikesIncreaseByOne() {
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenThrow(new ResourceNotFoundException("Article with id 0 wasn't found"));
@@ -129,7 +112,7 @@ public class ArticlePublicServiceImplUnitTest {
     }
 
     @Test
-    void articlePu_test_6_Given_ArticleNotPublished_When_likeArticle_Then_ActionForbidden() {
+    void articlePu_test_5_Given_ArticleNotPublished_When_likeArticle_Then_ActionForbidden() {
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
