@@ -1,24 +1,32 @@
-/*
 package dev.practice.mainApp.comment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.practice.mainApp.config.SecurityConfig;
 import dev.practice.mainApp.controllers._private.CommentPrivateController;
 import dev.practice.mainApp.dtos.comment.CommentFullDto;
 import dev.practice.mainApp.dtos.comment.CommentNewDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.models.*;
+import dev.practice.mainApp.repositories.RoleRepository;
+import dev.practice.mainApp.security.JWTAuthenticationEntryPoint;
+import dev.practice.mainApp.security.JWTTokenProvider;
 import dev.practice.mainApp.services.impl.CommentServiceImpl;
+import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
@@ -28,22 +36,33 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Import(SecurityConfig.class)
 @WebMvcTest(CommentPrivateController.class)
 public class CommentPrivateControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
+    @MockBean
+    protected RoleRepository roleRepository;
+    @MockBean
+    protected Validations validations;
+    @MockBean
+    protected JWTTokenProvider tokenProvider;
+    @MockBean
+    protected UserDetailsService userDetailsService;
+    @MockBean
+    protected JWTAuthenticationEntryPoint entryPoint;
     @MockBean
     private CommentServiceImpl commentService;
 
     @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
     private ObjectMapper mapper;
 
+    private final Role roleUser = new Role(2L, "ROLE_USER");
     private final User author = new User(1L, "Harry", "Potter", "password",
-            "harryPotter", "harrypotter@test.test",
-            LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm Harry", false,
-            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+            "harryPotter", "harrypotter@test.test", LocalDate.of(2000, 12, 27),
+            Set.of(roleUser), "Hi! I'm Harry", false, new HashSet<Message>(), new HashSet<Message>(),
+            new HashSet<Article>(), new HashSet<Comment>());
 
     private final UserShortDto shortUser = new UserShortDto(2L, "johnDoe");
 
@@ -62,6 +81,7 @@ public class CommentPrivateControllerTest {
 
     private final CommentNewDto dtoForUpdate = new CommentNewDto("Updated!");
 
+    @WithMockUser
     @Test
     public void comment_test28_CreateCommentTest() throws Exception {
         when(commentService.createComment(anyLong(), any(), anyString())).thenReturn(fullComment);
@@ -78,6 +98,7 @@ public class CommentPrivateControllerTest {
                 .andExpect(jsonPath("$.commentAuthor.userId").value(2));
     }
 
+    @WithMockUser
     @Test
     public void comment_test29_UpdateCommentTest() throws Exception {
         when(commentService.updateComment(any(), anyLong(), anyString())).thenReturn(fullUpdatedComment);
@@ -94,6 +115,7 @@ public class CommentPrivateControllerTest {
                 .andExpect(jsonPath("$.commentAuthor.userId").value(2));
     }
 
+    @WithMockUser
     @Test
     public void comment_test30_DeleteCommentTest() throws Exception {
         doNothing().when(commentService).deleteComment(anyLong(), anyString());
@@ -102,6 +124,7 @@ public class CommentPrivateControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @WithMockUser
     @Test
     public void comment_test31_Given_MessageIsNull_When__CreateComment_Then_BadRequest() throws Exception {
 
@@ -117,6 +140,7 @@ public class CommentPrivateControllerTest {
                 .andExpect(jsonPath("$.errors[0]", is("Comment cannot be blank")));
     }
 
+    @WithMockUser
     @Test
     public void comment_test32_Given_MessageLength510Chars_When__CreateComment_Then_BadRequest() throws Exception {
 
@@ -139,4 +163,3 @@ public class CommentPrivateControllerTest {
     }
 
 }
-*/
