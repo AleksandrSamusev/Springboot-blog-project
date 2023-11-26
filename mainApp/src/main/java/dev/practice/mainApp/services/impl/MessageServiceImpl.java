@@ -64,6 +64,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MessageFullDto findMessageById(Long messageId, String currentUsername) {
+        User user = validations.checkUserExistsByUsernameOrEmail(currentUsername);
         Message message = validations.checkIfMessageExists(messageId);
         if (message.getSender().getUsername().equals(currentUsername) ||
                 message.getRecipient().getUsername().equals(currentUsername)) {
@@ -78,6 +79,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void deleteMessage(Long messageId, String currentUsername) {
         Message message = validations.checkIfMessageExists(messageId);
+        User user = validations.checkUserExistsByUsernameOrEmail(currentUsername);
         if (message.getRecipient().getUsername().equals(currentUsername)) {
             message.setIsDeleted(Boolean.TRUE);
             messageRepository.save(message);

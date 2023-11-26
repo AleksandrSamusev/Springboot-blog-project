@@ -9,6 +9,7 @@ import dev.practice.mainApp.mappers.ArticleMapper;
 import dev.practice.mainApp.mappers.TagMapper;
 import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.Tag;
+import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.services.TagService;
@@ -51,7 +52,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public void deleteTag(Long tagId, String username) {
-        if (validations.isAdmin(username)) {
+        User user = validations.checkUserExistsByUsernameOrEmail(username);
+        if (!validations.isAdmin(username)) {
             log.error("Only admin can delete tag. User with username {} is not admin", username);
             throw new ActionForbiddenException("Action forbidden for current user. Only admin can delete tag");
         }
