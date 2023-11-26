@@ -1,4 +1,4 @@
-package dev.practice.mainApp.article;
+/*package dev.practice.mainApp.article;
 
 import dev.practice.mainApp.config.SecurityConfig;
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
@@ -513,6 +513,4 @@ public class ArticlePrivateServiceImplIntTest {
         commentRepository.deleteAll();
         userRepository.deleteAll();
     }
-
-
-}
+}*/

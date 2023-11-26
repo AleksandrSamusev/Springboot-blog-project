@@ -116,14 +116,14 @@ public class ValidationsTest {
     public void val_test_7_Given_userIsNotAuthor_When_checkUserIsAuthor_Then_throwException() {
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
                 () -> validations.checkUserIsAuthor(savedArticle, "abc"));
-        assertEquals("Article with id 0 is not belongs to user with id 105. Action is forbidden",
+        assertEquals("Article with id 0 is not belongs to user with username abc. Action is forbidden",
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
 
     @Test
     public void val_test_8_Given_userIsAdmin_When_isUserAuthorized_Then_doNothing() {
-        validations.isUserAuthorized(user.getUserId(), admin);
+        validations.isUserAuthorized(admin.getUserId(), admin);
     }
 
     @Test

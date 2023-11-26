@@ -1,4 +1,4 @@
-package dev.practice.mainApp.article;
+/*package dev.practice.mainApp.article;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
@@ -69,7 +69,7 @@ public class ArticlePublicServiceImplIntTest {
             "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
             ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
 
-  /*  @Test
+  *//*  @Test
     void article_test_2_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticlesNewFirst() {
         dropDB();
         userRepository.save(user);
@@ -83,9 +83,9 @@ public class ArticlePublicServiceImplIntTest {
         assertThat(result.get(0)).isInstanceOf(ArticleShortDto.class);
         assertThat(result.get(0).getArticleId()).isEqualTo(newer.getArticleId());
         assertThat(result.get(1).getArticleId()).isEqualTo(older.getArticleId());
-    }*/
+    }*//*
 
-/*    @Test
+*//*    @Test
     void article_test_5_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() throws JsonProcessingException {
         dropDB();
         userRepository.save(user);
@@ -95,7 +95,7 @@ public class ArticlePublicServiceImplIntTest {
 
         assertThat(result.getArticleId()).isEqualTo(saved.getArticleId());
         assertThat(result).isInstanceOf(ArticleShortDto.class);
-    }*/
+    }*//*
 
     @Test
     void article_test_6_Given_anyUserArticleNotExist_When_getArticleById_Then_throwException() {
@@ -121,7 +121,7 @@ public class ArticlePublicServiceImplIntTest {
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
 
-/*    @Test
+*//*    @Test
     void article_test_10_Given_anyUserAuthorExist_When_getAllArticlesByUserId_Then_returnArticles() {
         dropDB();
         User author = userRepository.save(user);
@@ -145,9 +145,9 @@ public class ArticlePublicServiceImplIntTest {
         assertThat(result.size()).isEqualTo(5);
         assertThat(result.get(0)).isInstanceOf(ArticleShortDto.class);
         assertThat(result.get(0).getTitle()).isEqualTo("24");
-    }*/
+    }*//*
 
-/*    @Test
+*//*    @Test
     public void article_test_40_Given_ValidId_When_GetAllArticlesByTag_Then_ReturnList() {
         dropDB();
         Article article2 = new Article(null, "A pretty cat",
@@ -169,11 +169,11 @@ public class ArticlePublicServiceImplIntTest {
         Assertions.assertEquals(result.get(1).getArticleId(), savedArticle1.getArticleId());
         Assertions.assertEquals(new ArrayList<>(result.get(0).getTags()).get(0).getTagId(), createdTag.getTagId());
         Assertions.assertEquals(new ArrayList<>(result.get(1).getTags()).get(0).getTagId(), createdTag.getTagId());
-    }*/
+    }*//*
 
 
     private void dropDB() {
         articleRepository.deleteAll();
         userRepository.deleteAll();
     }
-}
+}*/

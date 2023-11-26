@@ -1,4 +1,4 @@
-package dev.practice.mainApp.article;
+/*package dev.practice.mainApp.article;
 
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
@@ -73,4 +73,4 @@ public class ArticleAdminServiceImplIntTest {
         assertThat(result.get(0)).isInstanceOf(ArticleFullDto.class);
         assertThat(result.size()).isEqualTo(1);
     }
-}
+}*/

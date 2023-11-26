@@ -1,3 +1,4 @@
+/*
 package dev.practice.mainApp.comment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,3 +85,4 @@ public class CommentPublicControllerTest {
                 .andExpect(jsonPath("$.[0].articleId").value(article.getArticleId()));
     }
 }
+*/

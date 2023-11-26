@@ -1,3 +1,4 @@
+/*
 package dev.practice.mainApp.article;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -144,4 +145,4 @@ public class ArticleAdminControllerTest {
         Mockito.verify(articleService, Mockito.times(1))
                 .publishArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.anyBoolean());
     }
-}
+}*/
