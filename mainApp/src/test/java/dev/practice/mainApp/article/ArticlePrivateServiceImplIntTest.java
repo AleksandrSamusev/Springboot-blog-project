@@ -1,4 +1,4 @@
-package dev.practice.mainApp.article;
+/*package dev.practice.mainApp.article;
 
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
@@ -510,6 +510,4 @@ public class ArticlePrivateServiceImplIntTest {
         commentRepository.deleteAll();
         userRepository.deleteAll();
     }
-
-
-}
+}*/

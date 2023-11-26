@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -76,6 +77,7 @@ public class ArticlePublicServiceImplUnitTest {
 
     @Test
     void articlePu_test_2_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() {
+
         Mockito
                 .when(articleRepository.save(Mockito.any()))
                 .thenReturn(savedArticle);
