@@ -1,7 +1,7 @@
-/*
 package dev.practice.mainApp.tag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.practice.mainApp.config.SecurityConfig;
 import dev.practice.mainApp.controllers._private.TagPrivateController;
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.tag.TagFullDto;
@@ -9,14 +9,23 @@ import dev.practice.mainApp.dtos.tag.TagNewDto;
 import dev.practice.mainApp.dtos.tag.TagShortDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.models.ArticleStatus;
+import dev.practice.mainApp.repositories.RoleRepository;
 import dev.practice.mainApp.repositories.TagRepository;
+import dev.practice.mainApp.security.JWTAuthenticationEntryPoint;
+import dev.practice.mainApp.security.JWTTokenProvider;
+import dev.practice.mainApp.services.TagService;
+import dev.practice.mainApp.services.UserService;
 import dev.practice.mainApp.services.impl.TagServiceImpl;
+import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
@@ -34,19 +43,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TagPrivateController.class)
+@Import(SecurityConfig.class)
 public class TagPrivateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
-    private TagServiceImpl tagService;
-
+    private RoleRepository roleRepository;
     @MockBean
-    private TagRepository tagRepository;
-
+    private UserDetailsService userDetailsService;
+    @MockBean
+    private Validations validations;
+    @MockBean
+    private JWTTokenProvider jwtTokenProvider;
+    @MockBean
+    private UserService userService;
     @Autowired
     private ObjectMapper mapper;
+    @MockBean
+    TagService tagService;
+    @MockBean
+    JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     TagNewDto newTag = new TagNewDto("New Tag");
 
@@ -57,6 +74,7 @@ public class TagPrivateControllerTest {
             LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L, new HashSet<>(), new HashSet<>());
 
     @Test
+    @WithMockUser
     public void tag_test16_CreateTagTest() throws Exception {
 
         when(tagService.createTag(any(), anyLong())).thenReturn(fullDto);
@@ -74,6 +92,7 @@ public class TagPrivateControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void tag_test20_Given_TagNameIsNull_When_CreateTagTest_Then_BadRequest() throws Exception {
 
         TagNewDto newTag = new TagNewDto(null);
@@ -91,6 +110,7 @@ public class TagPrivateControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void tag_test21_Given_TagNameLengthIs60Chars_When_CreateTagTest_Then_BadRequest() throws Exception {
 
         TagNewDto newTag = new TagNewDto("012345678901234567890123456789012345678901234567890123456789");
@@ -108,6 +128,7 @@ public class TagPrivateControllerTest {
     }
 
     @Test
+    @WithMockUser
     void tag_test_26_Given_newTagsNotExistInDB_When_addTagsToArticle_Then_tagsAddedStatusOk() throws Exception {
         articleFull.getTags().add(new TagShortDto(1L, "new tag"));
         when(tagService.addTagsToArticle(any(), anyLong(), any())).thenReturn(articleFull);
@@ -136,6 +157,7 @@ public class TagPrivateControllerTest {
     }
 
     @Test
+    @WithMockUser
     void tag_test_29_Given_listTags_When_removeTagsFromArticle_Then_tegRemoved() throws Exception {
         when(tagService.removeTagsFromArticle(anyString(), anyLong(), any())).thenReturn(articleFull);
 
@@ -162,4 +184,3 @@ public class TagPrivateControllerTest {
                 .removeTagsFromArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.any());
     }
 }
-*/

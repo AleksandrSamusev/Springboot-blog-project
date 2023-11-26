@@ -1,16 +1,23 @@
-/*
 package dev.practice.mainApp.tag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.practice.mainApp.controllers._public.TagPublicController;
 import dev.practice.mainApp.dtos.tag.TagFullDto;
 import dev.practice.mainApp.dtos.tag.TagNewDto;
+import dev.practice.mainApp.repositories.RoleRepository;
+import dev.practice.mainApp.security.JWTAuthenticationEntryPoint;
+import dev.practice.mainApp.security.JWTTokenProvider;
+import dev.practice.mainApp.services.TagService;
+import dev.practice.mainApp.services.UserService;
 import dev.practice.mainApp.services.impl.TagServiceImpl;
+import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
@@ -28,18 +35,27 @@ public class TagPublicControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
-    private TagServiceImpl tagService;
-
+    private RoleRepository roleRepository;
+    @MockBean
+    private Validations validations;
+    @MockBean
+    private JWTTokenProvider jwtTokenProvider;
+    @MockBean
+    private UserService userService;
     @Autowired
     private ObjectMapper mapper;
+    @MockBean
+    TagService tagService;
+    @MockBean
+    JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     TagNewDto newTag = new TagNewDto("New Tag");
 
     TagFullDto fullDto = new TagFullDto(1L, "New Tag", Set.of(1L));
 
     @Test
+    @WithMockUser
     public void tag_test17_GetAllArticleTagsTest() throws Exception {
 
         when(tagService.getAllArticleTags(anyLong())).thenReturn(List.of(fullDto));
@@ -53,6 +69,7 @@ public class TagPublicControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void tag_test18_GetTagByIdTest() throws Exception {
         when(tagService.getTagById(anyLong())).thenReturn(fullDto);
 
@@ -65,4 +82,3 @@ public class TagPublicControllerTest {
                 .andExpect(jsonPath("$.articles.size()").value(1));
     }
 }
-*/
