@@ -1,6 +1,7 @@
 package dev.practice.mainApp.article;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.practice.mainApp.config.SecurityConfig;
 import dev.practice.mainApp.controllers._private.ArticlePrivateController;
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
@@ -9,13 +10,20 @@ import dev.practice.mainApp.dtos.article.ArticleUpdateDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.models.ArticleStatus;
+import dev.practice.mainApp.repositories.RoleRepository;
+import dev.practice.mainApp.security.JWTAuthenticationEntryPoint;
+import dev.practice.mainApp.security.JWTTokenProvider;
 import dev.practice.mainApp.services.ArticlePrivateService;
+import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
@@ -30,8 +38,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Import(SecurityConfig.class)
 @WebMvcTest(controllers = ArticlePrivateController.class)
 public class ArticlePrivateControllerTest {
+    @MockBean
+    protected RoleRepository roleRepository;
+    @MockBean
+    protected Validations validations;
+    @MockBean
+    protected JWTTokenProvider tokenProvider;
+    @MockBean
+    protected UserDetailsService userDetailsService;
+    @MockBean
+    protected JWTAuthenticationEntryPoint entryPoint;
+
+
     @MockBean
     private ArticlePrivateService articleService;
 
@@ -44,7 +65,7 @@ public class ArticlePrivateControllerTest {
     private final UserShortDto author = new UserShortDto(1L, "Harry");
     private final ArticleFullDto articleFull = new ArticleFullDto(1L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), null, ArticleStatus.CREATED,
-            0L, 0L,  new HashSet<>(), new HashSet<>());
+            0L, 0L, new HashSet<>(), new HashSet<>());
     private final ArticleShortDto articleShort = new ArticleShortDto(1L, "The empty pot",
             "Very interesting information", author, LocalDateTime.now(), 0L, 0L, new HashSet<>(),
             new HashSet<>());
@@ -52,7 +73,7 @@ public class ArticlePrivateControllerTest {
             "Very interesting information", null);
     private final ArticleUpdateDto update = new ArticleUpdateDto();
 
-
+    @WithMockUser
     @Test
     void article_test_8_Given_validArticleAndUser_When_createArticle_Then_articleSavedStatusCreated() throws Exception {
         Mockito
@@ -61,7 +82,6 @@ public class ArticlePrivateControllerTest {
 
         mvc.perform(post("/api/v1/private/articles")
                         .content(mapper.writeValueAsString(articleNew))
-                        .header("X-Current-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -83,6 +103,7 @@ public class ArticlePrivateControllerTest {
                 .createArticle(Mockito.anyString(), Mockito.any());
     }
 
+    @WithMockUser
     @Test
     void article_test_15_Given_validNewTitle_When_updateArticle_Then_articleUpdatedStatusOk() throws Exception {
         update.setTitle("New title");
@@ -114,6 +135,7 @@ public class ArticlePrivateControllerTest {
                 .updateArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.any());
     }
 
+    @WithMockUser
     @Test
     void article_test_22_Given_authorizedUserArticleNotPublished_When_getArticleById_Then_throwException()
             throws Exception {
@@ -123,13 +145,13 @@ public class ArticlePrivateControllerTest {
                 .thenThrow(ActionForbiddenException.class);
 
         mvc.perform(get("/api/v1/private/articles/{articleId}", 1L)
-                        .header("X-Current-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
+    @WithMockUser
     @Test
     void article_test_22_Given_authorArticleNotPublished_When_getArticleById_Then_articleReturnedStatusOk()
             throws Exception {
@@ -160,6 +182,7 @@ public class ArticlePrivateControllerTest {
                 .getArticleById(Mockito.anyString(), Mockito.anyLong());
     }
 
+    @WithMockUser
     @Test
     void article_test_23_Given_authorizedUserArticlePublished_When_getArticleById_Then_articleReturnedStatusOk()
             throws Exception {
@@ -190,6 +213,7 @@ public class ArticlePrivateControllerTest {
                 .getArticleById(Mockito.anyString(), Mockito.anyLong());
     }
 
+    @WithMockUser
     @Test
     void article_test_27_Given_authorIdAndValidArticleId_When_deleteArticle_Then_articleDeletedStatusOk()
             throws Exception {
@@ -205,6 +229,7 @@ public class ArticlePrivateControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @WithMockUser
     @Test
     void article_test_35_Given_userIdDefaultParameters_When_getAllArticlesByUserId_Then_returnArticlesStatusOK()
             throws Exception {
@@ -225,6 +250,7 @@ public class ArticlePrivateControllerTest {
                 .getAllArticlesByUserId(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyString());
     }
 
+    @WithMockUser
     @Test
     void article_test_36_Given_userIdStatusCreated_When_getAllArticlesByUserId_Then_returnArticlesStatusOK()
             throws Exception {
@@ -248,6 +274,7 @@ public class ArticlePrivateControllerTest {
                 .getAllArticlesByUserId(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyString());
     }
 
+    @WithMockUser
     @Test
     void article_test_38_Given_articleCreated_When_publishArticle_Then_returnArticleStatusOk() throws Exception {
         articleFull.setStatus(ArticleStatus.MODERATING);
@@ -277,6 +304,7 @@ public class ArticlePrivateControllerTest {
                 .publishArticle(Mockito.anyString(), Mockito.anyLong());
     }
 
+    @WithMockUser
     @Test
     void article_test_39_Given_bannedUser_When_publishArticle_Then_throwExceptionStatusForbidden() throws Exception {
         Mockito
@@ -293,6 +321,4 @@ public class ArticlePrivateControllerTest {
         Mockito.verify(articleService, Mockito.times(1))
                 .publishArticle(Mockito.anyString(), Mockito.anyLong());
     }
-
-
 }
