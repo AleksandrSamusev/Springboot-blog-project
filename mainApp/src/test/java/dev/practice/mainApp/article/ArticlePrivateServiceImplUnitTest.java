@@ -41,11 +41,11 @@ public class ArticlePrivateServiceImplUnitTest {
     private ArticlePrivateServiceImpl articleService;
 
 
-    private final User author = new User(0L, "Harry", "Potter", "HP",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
+    private final User author = new User(0L, "Harry", "Potter", "author", "password",
+            "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final User author2 = new User(1L, "Ron", "Weasley", "RW",
-            "rw@gmail.com", LocalDate.of(1981, 9, 16), Role.USER, null,
+    private final User author2 = new User(1L, "Ron", "Weasley", "author2", "password",
+            "rw@gmail.com", LocalDate.of(1981, 9, 16), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final ArticleNewDto newArticle = new ArticleNewDto("The empty pot",
             "Very interesting information", new HashSet<>());
@@ -68,7 +68,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .when(articleRepository.save(Mockito.any(Article.class)))
                 .thenReturn(savedArticle);
 
-        ArticleFullDto result = articleService.createArticle(0L, newArticle);
+        ArticleFullDto result = articleService.createArticle("author", newArticle);
 
         assertThat(result).isNotNull();
         assertThat(result.getTags()).isEqualTo(new HashSet<>());
@@ -91,7 +91,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .when(validations).checkUserIsNotBanned(Mockito.any());
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
-                () -> articleService.createArticle(0L, newArticle));
+                () -> articleService.createArticle("author", newArticle));
         assertEquals("User with id 0 is blocked", exception.getMessage(),
                 "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
@@ -105,7 +105,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .thenThrow(new ResourceNotFoundException("User with id 1 wasn't found"));
 
         final ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> articleService.createArticle(1L, newArticle));
+                () -> articleService.createArticle("author2", newArticle));
         assertEquals("User with id 1 wasn't found", exception.getMessage(),
                 "Incorrect message");
         assertThat(exception).isInstanceOf(ResourceNotFoundException.class);
@@ -119,7 +119,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .thenThrow(new ResourceNotFoundException("Article with id 1000 wasn't found"));
 
         final ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> articleService.updateArticle(0L, 1000L, Mockito.any()));
+                () -> articleService.updateArticle("author", 1000L, Mockito.any()));
         assertEquals("Article with id 1000 wasn't found", exception.getMessage(),
                 "Incorrect message");
         assertThat(exception).isInstanceOf(ResourceNotFoundException.class);
@@ -136,10 +136,10 @@ public class ArticlePrivateServiceImplUnitTest {
                 .thenReturn(savedArticle);
         Mockito
                 .doCallRealMethod()
-                .when(validations).checkUserIsAuthor(Mockito.any(), Mockito.anyLong());
+                .when(validations).checkUserIsAuthor(Mockito.any(), Mockito.anyString());
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
-                () -> articleService.updateArticle(1L, 0L, Mockito.any()));
+                () -> articleService.updateArticle("author2", 0L, Mockito.any()));
         assertEquals("Article with id 0 is not belongs to user with id 1. Action is forbidden",
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
@@ -157,7 +157,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .when(validations.checkUserExist(Mockito.anyLong()))
                 .thenReturn(author2);
 
-        ArticleShortDto result = (ArticleShortDto) articleService.getArticleById(1L, 0L).get();
+        ArticleShortDto result = (ArticleShortDto) articleService.getArticleById("author2", 0L).get();
 
         assertThat(result).isInstanceOf(ArticleShortDto.class);
         assertThat(result.getArticleId()).isEqualTo(savedArticle.getArticleId());
@@ -175,7 +175,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .when(validations.checkUserExist(Mockito.anyLong()))
                 .thenReturn(author);
 
-        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(0L, 0L).get();
+        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById("author", 0L).get();
 
         assertThat(result).isInstanceOf(ArticleFullDto.class);
         assertThat(result.getArticleId()).isEqualTo(savedArticle.getArticleId());
@@ -187,7 +187,7 @@ public class ArticlePrivateServiceImplUnitTest {
     void article_test_18_Given_adminArticlePublished_When_getArticleById_Then_returnedArticleFullDto() {
         savedArticle.setStatus(ArticleStatus.PUBLISHED);
         savedArticle.setPublished(LocalDateTime.now());
-        author2.setRole(Role.ADMIN);
+        //author2.setRole(Role.ADMIN);
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
@@ -195,7 +195,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .when(validations.checkUserExist(Mockito.anyLong()))
                 .thenReturn(author2);
 
-        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(1L, 0L).get();
+        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById("author", 0L).get();
 
         assertThat(result).isInstanceOf(ArticleFullDto.class);
         assertThat(result.getArticleId()).isEqualTo(savedArticle.getArticleId());
@@ -206,7 +206,7 @@ public class ArticlePrivateServiceImplUnitTest {
     @Test
     void article_test_19_Given_adminArticleRejected_When_getArticleById_Then_returnedArticleFullDto() {
         savedArticle.setStatus(ArticleStatus.REJECTED);
-        author2.setRole(Role.ADMIN);
+        //author2.setRole(Role.ADMIN);
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
@@ -214,7 +214,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .when(validations.checkUserExist(Mockito.anyLong()))
                 .thenReturn(author2);
 
-        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(1L, 0L).get();
+        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById("author2", 0L).get();
 
         assertThat(result).isInstanceOf(ArticleFullDto.class);
         assertThat(result.getArticleId()).isEqualTo(savedArticle.getArticleId());
@@ -232,7 +232,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .when(validations.checkUserExist(Mockito.anyLong()))
                 .thenReturn(author2);
 
-        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(0L, 0L).get();
+        ArticleFullDto result = (ArticleFullDto) articleService.getArticleById("author", 0L).get();
 
         assertThat(result).isInstanceOf(ArticleFullDto.class);
         assertThat(result.getArticleId()).isEqualTo(savedArticle.getArticleId());
@@ -251,7 +251,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .thenReturn(author2);
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
-                () -> articleService.getArticleById(1L, 0L));
+                () -> articleService.getArticleById("author2", 0L));
         assertEquals("Article with id 0 is not published yet",
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
@@ -268,10 +268,10 @@ public class ArticlePrivateServiceImplUnitTest {
                 .thenReturn(author2);
         Mockito
                 .doCallRealMethod()
-                .when(validations).checkUserIsAuthor(Mockito.any(), Mockito.anyLong());
+                .when(validations).checkUserIsAuthor(Mockito.any(), Mockito.anyString());
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
-                () -> articleService.deleteArticle(1L, 0L));
+                () -> articleService.deleteArticle("author2", 0L));
         assertEquals("Article with id 0 is not belongs to user with id 1. Action is forbidden",
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
@@ -289,7 +289,7 @@ public class ArticlePrivateServiceImplUnitTest {
                 .when(articleRepository.save(Mockito.any()))
                 .thenReturn(savedArticle);
 
-        ArticleFullDto result = articleService.publishArticle(0L, 0L);
+        ArticleFullDto result = articleService.publishArticle("author", 0L);
 
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(ArticleStatus.MODERATING);

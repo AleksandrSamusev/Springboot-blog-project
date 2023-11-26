@@ -72,23 +72,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserFullDto banUser(Long userId, Long currentUserId) {
+    public UserFullDto banUser(Long userId, String username) {
         User user = validations.checkUserExist(userId);
-        User currentUser = validations.checkUserExist(currentUserId);
-        user.setIsBanned(Boolean.TRUE);
-        User savedUser = userRepository.save(user);
-        log.info("User with ID = " + userId + " was banned by admin with ID = " + currentUserId);
-        return UserMapper.toUserFullDto(savedUser);
+        User currentUser = validations.checkUserExistsByUsernameOrEmail(username);
+        if (validations.isAdmin(username)) {
+            user.setIsBanned(Boolean.TRUE);
+            User savedUser = userRepository.save(user);
+            log.info("User with ID = " + userId + " was banned by admin with ID = " + currentUser.getUserId());
+            return UserMapper.toUserFullDto(savedUser);
+        } else {
+            throw new ActionForbiddenException("Action forbidden for current user");
+        }
     }
 
     @Override
-    public UserFullDto unbanUser(Long userId, Long currentUserId) {
+    public UserFullDto unbanUser(Long userId, String username) {
         User user = validations.checkUserExist(userId);
-        User currentUser = validations.checkUserExist(currentUserId);
-        user.setIsBanned(Boolean.FALSE);
-        User savedUser = userRepository.save(user);
-        log.info("User with ID = " + userId + " was unbanned by admin with ID = " + currentUserId);
-        return UserMapper.toUserFullDto(savedUser);
+        User currentUser = validations.checkUserExistsByUsernameOrEmail(username);
+        if (validations.isAdmin(username)) {
+            user.setIsBanned(Boolean.FALSE);
+            User savedUser = userRepository.save(user);
+            log.info("User with ID = " + userId + " was unbanned by admin with ID = " + currentUser.getUserId());
+            return UserMapper.toUserFullDto(savedUser);
+        } else {
+            throw new ActionForbiddenException("Action forbidden for current user");
+        }
     }
 
     @Override

@@ -44,8 +44,8 @@ public class UserPublicControllerTest {
     private ObjectMapper mapper;
 
     private final UserFullDto result = new UserFullDto(1L, "John", "Doe",
-            "johnDoe", "johnDoe@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER,
+            "johnDoe","password",  "johnDoe@test.test",
+            LocalDate.of(2000, 12, 27), new HashSet<>(),
             "Hi! I'm John", false, new HashSet<>(), new HashSet<>(),
             new HashSet<>(), new HashSet<>());
 
@@ -53,12 +53,10 @@ public class UserPublicControllerTest {
     public void user_test_17_CreateUserTest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", "Doe",
-                "johnDoe", "johnDoe@test.test",
+                "johnDoe","password", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
 
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
-
-        mockMvc.perform(post("/api/v1/public/users")
+        mockMvc.perform(post("/api/v1/auth")
                         .content(mapper.writeValueAsString(dto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -71,12 +69,10 @@ public class UserPublicControllerTest {
     public void user_test_18_CreateUserTestThrowsInvalidParameterException() throws Exception {
 
         UserNewDto dto = new UserNewDto(null, "Doe",
-                "johnDoe", "johnDoe@test.test",
+                "johnDoe", "password", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
 
-        Mockito.when(userService.createUser(dto)).thenThrow(InvalidParameterException.class);
-
-        mockMvc.perform(post("/api/v1/public/users")
+        mockMvc.perform(post("/api/v1/auth")
                         .content(mapper.writeValueAsString(dto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -128,10 +124,8 @@ public class UserPublicControllerTest {
     public void user_test_35_Given_FirstNameIsNull_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto(null, "Doe",
-                "johnDoe", "johnDoe@test.test",
+                "johnDoe","password", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))
@@ -146,10 +140,8 @@ public class UserPublicControllerTest {
     public void user_test_36_Given_LastNameIsNull_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", null,
-                "johnDoe", "johnDoe@test.test",
+                "johnDoe","password", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))
@@ -164,10 +156,8 @@ public class UserPublicControllerTest {
     public void user_test_37_Given_UsernameIsNull_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", "Doe",
-                null, "johnDoe@test.test",
+                null, "password", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))
@@ -183,10 +173,8 @@ public class UserPublicControllerTest {
     public void user_test_37_Given_EmailIsNull_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", "Doe",
-                "johnDoe", null,
+                "johnDoe","password", null,
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))
@@ -202,10 +190,8 @@ public class UserPublicControllerTest {
     public void user_test_38_Given_EmailIsNotValid_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", "Doe",
-                "johnDoe", "johnDoetest.test",
+                "johnDoe","password", "johnDoetest.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))
@@ -221,10 +207,8 @@ public class UserPublicControllerTest {
     public void user_test_39_Given_SeveralNullParams_When_CreateUser_Then_BadRequestAndListErrors() throws Exception {
 
         UserNewDto dto = new UserNewDto(null, null,
-                null, null,
+                null, null, null,
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))
@@ -232,19 +216,17 @@ public class UserPublicControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors.size()", is(4)));
+                .andExpect(jsonPath("$.errors.size()", is(5)));
     }
 
     @Test
     public void user_test_40_Given_BirthDateInFuture_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", "Doe",
-                "johnDoe", "johnDoe@test.test",
+                "johnDoe", "password", "johnDoe@test.test",
                 LocalDate.of(2025, 12, 27), "Hi! I'm John");
 
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
-
-        mockMvc.perform(post("/api/v1/public/users")
+          mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -258,10 +240,8 @@ public class UserPublicControllerTest {
 
         UserNewDto dto = new UserNewDto("JohnJohnJohnJohnJohnJohnJohnJohnJohnJohnJohnJohnJohn",
                 "Doe",
-                "johnDoe", "johnDoe@test.test",
+                "johnDoe", "password", "johnDoe@test.test",
                 LocalDate.of(2021, 12, 27), "Hi! I'm John");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))
@@ -277,10 +257,8 @@ public class UserPublicControllerTest {
 
         UserNewDto dto = new UserNewDto("John",
                 "DoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoe",
-                "johnDoe", "johnDoe@test.test",
+                "johnDoe", "password", "johnDoe@test.test",
                 LocalDate.of(2021, 12, 27), "Hi! I'm John");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))
@@ -297,11 +275,9 @@ public class UserPublicControllerTest {
 
         UserNewDto dto = new UserNewDto("John",
                 "Doe",
-                "johnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoe",
+                "johnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoejohnDoe", "password",
                 "johnDoe@test.test",
                 LocalDate.of(2021, 12, 27), "Hi! I'm John");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))
@@ -318,6 +294,7 @@ public class UserPublicControllerTest {
         UserNewDto dto = new UserNewDto("John",
                 "Doe",
                 "johnDoe",
+                "password",
                 "johnDoe@test.test",
                 LocalDate.of(2021, 12, 27),
                 "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
@@ -332,8 +309,6 @@ public class UserPublicControllerTest {
                         "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
                         "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
                         "01234567890123456789");
-
-        Mockito.when(userService.createUser(dto)).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/public/users")
                         .content(mapper.writeValueAsString(dto))

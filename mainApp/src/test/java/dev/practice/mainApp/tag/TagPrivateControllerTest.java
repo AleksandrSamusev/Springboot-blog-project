@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -132,12 +131,12 @@ public class TagPrivateControllerTest {
                 .andExpect(jsonPath("$.tags[0].name").value(newTag.getName().toLowerCase()));
 
         Mockito.verify(tagService, Mockito.times(1))
-                .addTagsToArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.any());
+                .addTagsToArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.any());
     }
 
     @Test
     void tag_test_29_Given_listTags_When_removeTagsFromArticle_Then_tegRemoved() throws Exception {
-        when(tagService.removeTagsFromArticle(anyLong(), anyLong(), any())).thenReturn(articleFull);
+        when(tagService.removeTagsFromArticle(anyString(), anyLong(), any())).thenReturn(articleFull);
 
         mockMvc.perform(patch("/api/v1/private/tags/articles/{articleId}/remove", 1L)
                         .header("X-Current-User-Id", 1)
@@ -159,6 +158,6 @@ public class TagPrivateControllerTest {
                 .andExpect(jsonPath("$.tags").isEmpty());
 
         Mockito.verify(tagService, Mockito.times(1))
-                .removeTagsFromArticle(Mockito.anyLong(), Mockito.anyLong(), Mockito.any());
+                .removeTagsFromArticle(Mockito.anyString(), Mockito.anyLong(), Mockito.any());
     }
 }

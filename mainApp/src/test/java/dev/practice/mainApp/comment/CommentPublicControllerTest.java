@@ -37,9 +37,9 @@ public class CommentPublicControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
-    private final User author = new User(1L, "Harry", "Potter",
+    private final User author = new User(1L, "Harry", "Potter", "password",
             "harryPotter", "harrypotter@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm Harry", false,
+            LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm Harry", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
     private final UserShortDto shortUser = new UserShortDto(2L, "johnDoe");

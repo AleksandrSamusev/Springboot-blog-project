@@ -8,7 +8,9 @@ import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.models.*;
+import dev.practice.mainApp.repositories.RoleRepository;
 import dev.practice.mainApp.repositories.UserRepository;
+import dev.practice.mainApp.services.impl.AuthServiceImpl;
 import dev.practice.mainApp.services.impl.UserServiceImpl;
 import dev.practice.mainApp.utils.Validations;
 import org.junit.Test;
@@ -17,10 +19,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -32,63 +36,73 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepositoryMock;
     @Mock
+    private RoleRepository roleRepositoryMock;
+    @Mock
     private Validations validations;
     @InjectMocks
     private UserServiceImpl userService;
+    @InjectMocks
+    private AuthServiceImpl authService;
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
+
+
+    private final Role roleUser = new Role(2L, "ROLE_USER");
 
     private final User user1 = new User(1L, "John", "Doe",
-            "johnDoe", "johnDoe@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", false,
+            "johnDoe", "password", "johnDoe@test.test",
+            LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
+
     private final User user2 = new User(2L, "Marry", "Dawson",
-            "marryDawson", "merryDawson@test.test",
-            LocalDate.of(1995, 6, 14), Role.ADMIN, "Hi! I'm Marry", true,
+            "marryDawson", "password", "merryDawson@test.test",
+            LocalDate.of(1995, 6, 14), new HashSet<>(), "Hi! I'm Marry", true,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
     private final User user3 = new User(3L, "Harry", "Potter",
-            "harryPotter", "harryPotter@test.test",
-            LocalDate.of(1901, 5, 13), Role.USER, "Hi! I'm Harry", false,
+            "harryPotter", "password", "harryPotter@test.test",
+            LocalDate.of(1901, 5, 13), new HashSet<>(), "Hi! I'm Harry", false,
             new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
     private final UserNewDto newUser3 = new UserNewDto("Harry", "Potter",
-            "johnDoe", "harryPotter@test.test",
+            "harryPotter", "password", "harryPotter@test.test",
             LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
 
     private final UserNewDto newUser4 = new UserNewDto("Harry", "Potter",
-            "Kirk", "johnDoe@test.test",
+            "Kirk", "password", "johnDoe@test.test",
             LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
 
     private final UserUpdateDto updateUser5 = new UserUpdateDto("Martin", "Potter",
-            "Kirk", "johnDoe@test.test",
+            "Kirk", "password", "johnDoe@test.test",
             LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
 
 
-    User admin = new User(1L, "Sam", "Samson",
-            "samSamson", "samSamson@test.test",
-            LocalDate.of(1980, 1, 1), Role.ADMIN, "Hi! I'm Sam", false,
-            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+    User admin = new User(1L, "Sam", "Samson", "samSamson",
+            "password", "samSamson@test.test", LocalDate.of(1980, 1, 1),
+            new HashSet<>(), "Hi! I'm Sam", false, new HashSet<Message>(), new HashSet<Message>(),
+            new HashSet<Article>(), new HashSet<Comment>());
 
-    User noAdmin = new User(2L, "Martin", "Potter",
-            "Kirk123123123", "johnDoe@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", true,
-            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+    User noAdmin = new User(2L, "Martin", "Potter", "Kirk123123123",
+            "password", "johnDoe@test.test", LocalDate.of(2000, 12, 27),
+            new HashSet<>(), "Hi! I'm John", true, new HashSet<Message>(), new HashSet<Message>(),
+            new HashSet<Article>(), new HashSet<Comment>());
 
-    User noAdminUnbanned = new User(2L, "Martin", "Potter",
-            "Kirk123123123", "johnDoe@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", false,
-            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+    User noAdminUnbanned = new User(2L, "Martin", "Potter", "Kirk123123123",
+            "password", "johnDoe@test.test", LocalDate.of(2000, 12, 27),
+            new HashSet<>(), "Hi! I'm John", false, new HashSet<Message>(), new HashSet<Message>(),
+            new HashSet<Article>(), new HashSet<Comment>());
 
-    User noAdminBanned = new User(2L, "Martin", "Potter",
-            "Kirk123123123", "johnDoe@test.test",
-            LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", true,
-            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+    User noAdminBanned = new User(2L, "Martin", "Potter", "Kirk123123123",
+            "password", "johnDoe@test.test", LocalDate.of(2000, 12, 27),
+            new HashSet<>(), "Hi! I'm John", true, new HashSet<Message>(), new HashSet<Message>(),
+            new HashSet<Article>(), new HashSet<Comment>());
 
 
     @Test
     public void user_test_1_When_getAllUsers_Then_returnListOfAllUsers() {
-        when(userRepositoryMock.findAll()).thenReturn(List.of(user1, user2));
 
+        when(userRepositoryMock.findAll()).thenReturn(List.of(user1, user2));
         List<UserShortDto> result = userService.getAllUsers();
 
         assertEquals(result.get(0).getUsername(), user1.getUsername());
@@ -122,59 +136,86 @@ public class UserServiceTest {
     @Test
     public void user_test_4_Given_ValidUserIdAndCurrentUserId_When_getUserById_Then_returnValidUser() {
         when(validations.checkUserExist(1L)).thenReturn(user1);
-        when(validations.checkUserExist(2L)).thenReturn(user2);
 
-        assertEquals(userService.getUserById(1L, 1L).getClass(), UserFullDto.class);
-        assertEquals(userService.getUserById(1L, 2L).getClass(), UserFullDto.class);
+        when(userRepositoryMock.findByUsername(anyString())).thenReturn(user1);
+
+
+        assertEquals(userService.getUserById(1L, "johnDoe").getClass(), UserFullDto.class);
+        assertEquals(userService.getUserById(1L, "marryDawson").getClass(), UserFullDto.class);
     }
 
     @Test
     public void user_test_5_Given_UserWithRoleAsUser_When_getUserById_Then_ActionForbiddenException() {
         when(validations.checkUserExist(1L)).thenReturn(user1);
-        when(validations.checkUserExist(3L)).thenReturn(user3);
+
+        when(userRepositoryMock.findByUsername(anyString())).thenReturn(user3);
+
 
         ActionForbiddenException thrown = assertThrows(ActionForbiddenException.class, () ->
-                userService.getUserById(1L, user3.getUserId()));
+                userService.getUserById(1L, user3.getUsername()));
         assertEquals("Action forbidden for current user", thrown.getMessage());
     }
 
     @Test
     public void user_test_6_Given_ValidUser_When_createUser_Then_userCreated() {
-        when(userRepositoryMock.findByUsernameOrEmail(anyString(), anyString())).thenReturn(null);
+        when(validations.usernameAlreadyExists(anyString())).thenReturn(false);
+        when(validations.isExistsByEmail(anyString())).thenReturn(false);
+        when(roleRepositoryMock.findByName(any())).thenReturn(Optional.of(roleUser));
         when(userRepositoryMock.save(any())).thenReturn(user3);
 
-        UserFullDto createdUser = userService.createUser(newUser3);
+        authService.register(newUser3);
 
-        assertEquals(createdUser.getClass(), UserFullDto.class);
-        assertEquals(createdUser.getFirstName(), "Harry");
+        assertEquals(newUser3.getUsername(), user3.getUsername());
+        assertEquals(newUser3.getEmail(), user3.getEmail());
+        assertEquals(newUser3.getFirstName(), user3.getFirstName());
+        assertEquals(newUser3.getLastName(), user3.getLastName());
     }
 
     @Test
     public void user_test_7_Given_UserExistByUsername_When_createUser_Then_InvalidParameterException() {
-        when(userRepositoryMock.findByUsernameOrEmail(anyString(), anyString())).thenReturn(user1);
+        when(validations.usernameAlreadyExists(anyString())).thenReturn(true);
+
 
         InvalidParameterException thrown = assertThrows(InvalidParameterException.class, () ->
-                userService.createUser(newUser3));
-        assertEquals("User with given Username already exists", thrown.getMessage());
+                authService.register(newUser3));
+        assertEquals("User with given username = 'harryPotter' already exists", thrown.getMessage());
     }
 
     @Test
     public void user_test_8_Given_UserExistByEmail_When_createUser_Then_InvalidParameterException() {
-        when(userRepositoryMock.findByUsernameOrEmail(anyString(), anyString())).thenReturn(user1);
+        when(validations.isExistsByEmail(anyString())).thenReturn(true);
+
 
         InvalidParameterException thrown = assertThrows(InvalidParameterException.class, () ->
-                userService.createUser(newUser4));
-        assertEquals("User with given email already exists", thrown.getMessage());
+                authService.register(newUser4));
+        assertEquals("User with given email = 'johnDoe@test.test' already exists", thrown.getMessage());
     }
 
     @Test
     public void user_test_9_Given_ValidDtoAndIds_When_updateUser_Then_userUpdated() {
-        when(validations.checkUserExist(any())).thenReturn(user1);
-        when(userRepositoryMock.save(any())).thenReturn(user1);
 
-        UserFullDto dto = userService.updateUser(1L, 1L, updateUser5);
+        User user = new User(1L, "John", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
-        assertEquals(dto.getFirstName(), updateUser5.getFirstName());
+        UserUpdateDto updateDto = new UserUpdateDto("UPDATED FIRST NAME", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(1901, 5, 13), "Hi! I'm John");
+
+        User updatedUser = new User(1L, "UPDATED FIRST NAME", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user);
+        when(validations.checkUserExist(anyLong())).thenReturn(user);
+        when(validations.usernameAlreadyExists(anyString())).thenReturn(false);
+        when(userRepositoryMock.save(any())).thenReturn(updatedUser);
+
+        UserFullDto dto = userService.updateUser(1L, updateDto, "johnDoe");
+
+        assertEquals(dto.getUsername(), updateDto.getUsername());
     }
 
     @Test
@@ -183,7 +224,7 @@ public class UserServiceTest {
                 "User with id 8 wasn't found")).when(validations).checkUserExist(8L);
 
         assertThrows(ResourceNotFoundException.class, () ->
-                userService.updateUser(8L, 1L, updateUser5));
+                userService.updateUser(8L, updateUser5, "johnDoe"));
     }
 
     @Test
@@ -192,40 +233,74 @@ public class UserServiceTest {
                 "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
 
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
-                userService.updateUser(1L, 8L, updateUser5));
+                userService.updateUser(1L, updateUser5, "xxx"));
         assertEquals("User with id 1 wasn't found", exception.getMessage());
     }
 
     @Test
     public void user_test_12_Given_currentUserIdNotEqualUserId_When_updateUser_Then_ActionForbiddenException() {
-        when(validations.checkUserExist(1L)).thenReturn(user1);
-        when(validations.checkUserExist(3L)).thenReturn(user3);
+
+        User user = new User(1L, "John", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        User user2 = new User(2L, "Marry", "Whatson",
+                "marryWhatson", "password", "merryWhatson@test.test",
+                LocalDate.of(1981, 6, 6), new HashSet<>(), "Hi! I'm Marry", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        UserUpdateDto updateDto = new UserUpdateDto("UPDATED FIRST NAME", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(1901, 5, 13), "Hi! I'm John");
+
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user);
+        when(validations.checkUserExist(anyLong())).thenReturn(user2);
+        when(validations.isAdmin(anyString())).thenReturn(false);
+
 
         ActionForbiddenException exception = assertThrows(ActionForbiddenException.class, () ->
-                userService.updateUser(1L, 3L, updateUser5));
-
+                userService.updateUser(2L, updateDto, "marryWhatson"));
         assertEquals("Action forbidden for current user", exception.getMessage());
     }
 
     @Test
     public void user_test_13_Given_validUserId_When_deleteUser_Then_userDeleted() {
-        when(validations.checkUserExist(1L)).thenReturn(user1);
+
+        User user = new User(1L, "John", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user);
+        when(validations.checkUserExist(anyLong())).thenReturn(user);
+
         Mockito.doNothing().when(userRepositoryMock).deleteById(1L);
 
-        userService.deleteUser(1L, 1L);
+        userService.deleteUser(1L, "johnDoe");
 
         verify(userRepositoryMock, times(1)).deleteById(1L);
     }
 
     @Test
     public void user_test_14_Given_userIdNotEqualsCurrentUserId_When_deleteUser_Then_ActionForbiddenException() {
-        when(validations.checkUserExist(1L)).thenReturn(user1);
-        when(validations.checkUserExist(3L)).thenReturn(user3);
-        doThrow(new ActionForbiddenException(
-                "Action forbidden for current user")).when(validations).isUserAuthorized(anyLong(), any());
+
+        User user = new User(1L, "John", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        User user2 = new User(2L, "Marry", "Whatson",
+                "marryWhatson", "password", "merryWhatson@test.test",
+                LocalDate.of(1981, 6, 6), new HashSet<>(), "Hi! I'm Marry", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user);
+        when(validations.checkUserExist(anyLong())).thenReturn(user2);
+        when(validations.isAdmin(anyString())).thenReturn(false);
 
         ActionForbiddenException thrown = assertThrows(ActionForbiddenException.class, () ->
-                userService.deleteUser(1L, 3L));
+                userService.deleteUser(2L, "marryWhatson"));
         assertEquals("Action forbidden for current user", thrown.getMessage());
     }
 
@@ -235,7 +310,7 @@ public class UserServiceTest {
                 "User with id 2 wasn't found")).when(validations).checkUserExist(2L);
 
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
-                userService.deleteUser(2L, 1L));
+                userService.deleteUser(2L, "johnDoe"));
         assertEquals("User with id 2 wasn't found", thrown.getMessage());
     }
 
@@ -245,108 +320,169 @@ public class UserServiceTest {
                 "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
 
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
-                userService.deleteUser(1L, 2L));
+                userService.deleteUser(1L, "marryDawson"));
         assertEquals("User with id 1 wasn't found", thrown.getMessage());
     }
 
     @Test
     public void user_test_45_Given_UsernameWithWhitespaces_When_createUser_Then_userCreated() {
-        UserNewDto newUser3 = new UserNewDto("Harry", "Potter",
-                "harry      Potter", "harryPotter@test.test",
+        UserNewDto dto = new UserNewDto("Harry", "Potter",
+                "harry      Potter", "password", "harryPotter@test.test",
                 LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
 
-        User user4 = new User(3L, "Harry", "Potter",
-                "harryPotter", "harryPotter@test.test",
-                LocalDate.of(1901, 5, 13), Role.USER, "Hi! I'm Harry", false,
-                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+        User user = new User(1L, "Harry", "Potter", "harryPotter",
+                "password", "harryPotter@test.test", LocalDate.of(1901, 5,
+                13), new HashSet<>(), "Hi! I'm Harry", false, new HashSet<Message>(),
+                new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
-        when(userRepositoryMock.findByUsernameOrEmail(anyString(), anyString())).thenReturn(null);
-        when(userRepositoryMock.save(any())).thenReturn(user4);
+        when((validations.usernameAlreadyExists(anyString()))).thenReturn(false);
+        when(validations.isExistsByEmail(anyString())).thenReturn(false);
+        when(roleRepositoryMock.findByName(any())).thenReturn(Optional.of(roleUser));
+        when(userRepositoryMock.save(any())).thenReturn(user);
+        when(userRepositoryMock.findByUsername(anyString())).thenReturn(user);
 
-        UserFullDto createdUser = userService.createUser(newUser3);
+        authService.register(dto);
 
-        assertEquals(createdUser.getClass(), UserFullDto.class);
-        assertEquals(createdUser.getUsername(), "harryPotter");
+        User findUser = userRepositoryMock.findByUsername("harryPotter");
+
+        assertEquals(findUser.getUsername(), "harryPotter");
     }
 
 
     @Test
     public void user_test_46_Given_UsernameWithWhitespaces_When_updateUser_Then_userUpdated() {
-        User user1 = new User(1L, "Martin", "Potter",
-                "Kirk456456456", "johnDoe@test.test",
-                LocalDate.of(2000, 12, 27), Role.USER, "Hi! I'm John", false,
+        User user = new User(1L, "John", "Doe",
+                "john     Doe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
                 new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
-        UserUpdateDto updateUser5 = new UserUpdateDto("Martin", "Potter",
-                "Kirk 123 123 123", "johnDoe@test.test",
-                LocalDate.of(1901, 5, 13), "Hi! I'm Harry");
+        UserUpdateDto updateDto = new UserUpdateDto("UPDATED FIRST NAME", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(1901, 5, 13), "Hi! I'm John");
 
-        when(validations.checkUserExist(any())).thenReturn(user1);
-        when(userRepositoryMock.save(any())).thenReturn(user1);
+        User updatedUser = new User(1L, "UPDATED FIRST NAME", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
-        UserFullDto dto = userService.updateUser(1L, 1L, updateUser5);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user);
+        when(validations.checkUserExist(anyLong())).thenReturn(user);
+        when(validations.usernameAlreadyExists(anyString())).thenReturn(false);
+        when(userRepositoryMock.save(any())).thenReturn(updatedUser);
 
-        assertEquals(dto.getUsername(), "Kirk123123123");
+        UserFullDto dto = userService.updateUser(1L, updateDto, "johnDoe");
+
+        assertEquals(dto.getUsername(), "johnDoe");
     }
 
     @Test
     public void user_test_47_Given_ValidIds_When_banUser_Then_userBanned() {
-        when(validations.checkUserExist(1L)).thenReturn(admin);
-        when(validations.checkUserExist(2L)).thenReturn(noAdmin);
-        when(userRepositoryMock.save(any())).thenReturn(noAdminBanned);
 
-        UserFullDto result = userService.banUser(2L, 1L);
+        User user = new User(1L, "John", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
-        assertEquals(result.getUserId(), noAdmin.getUserId());
-        assertEquals(result.getFirstName(), noAdmin.getFirstName());
-        assertEquals(result.getLastName(), noAdmin.getLastName());
+        User user2 = new User(2L, "Marry", "Whatson",
+                "marryWhatson", "password", "merryWhatson@test.test",
+                LocalDate.of(1981, 6, 6), new HashSet<>(), "Hi! I'm Marry", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        User user2banned = new User(2L, "Marry", "Whatson",
+                "marryWhatson", "password", "merryWhatson@test.test",
+                LocalDate.of(1981, 6, 6), new HashSet<>(), "Hi! I'm Marry", true,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(validations.checkUserExist(anyLong())).thenReturn(user);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user2);
+        when(validations.isAdmin(anyString())).thenReturn(true);
+        when(userRepositoryMock.save(any())).thenReturn(user2banned);
+
+        UserFullDto result = userService.banUser(2L, "johnDoe");
+
+        assertEquals(result.getUserId(), user2.getUserId());
+        assertEquals(result.getFirstName(), user2.getFirstName());
+        assertEquals(result.getLastName(), user2.getLastName());
         assertEquals(result.getIsBanned(), Boolean.TRUE);
     }
 
     @Test
-    public void user_test_48_Given_ValidIds_When_unbanUser_Then_userBanned() {
-        when(validations.checkUserExist(1L)).thenReturn(admin);
-        when(validations.checkUserExist(2L)).thenReturn(noAdminBanned);
-        when(userRepositoryMock.save(any())).thenReturn(noAdminUnbanned);
+    public void user_test_48_Given_ValidIds_When_unbanUser_Then_userUnbanned() {
+        User user = new User(1L, "John", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
-        UserFullDto result = userService.unbanUser(2L, 1L);
+        User user2 = new User(2L, "Marry", "Whatson",
+                "marryWhatson", "password", "merryWhatson@test.test",
+                LocalDate.of(1981, 6, 6), new HashSet<>(), "Hi! I'm Marry", true,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
 
-        assertEquals(result.getUserId(), noAdmin.getUserId());
-        assertEquals(result.getFirstName(), noAdmin.getFirstName());
-        assertEquals(result.getLastName(), noAdmin.getLastName());
+        User user2unbanned = new User(2L, "Marry", "Whatson",
+                "marryWhatson", "password", "merryWhatson@test.test",
+                LocalDate.of(1981, 6, 6), new HashSet<>(), "Hi! I'm Marry", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(validations.checkUserExist(anyLong())).thenReturn(user);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user2);
+        when(validations.isAdmin(anyString())).thenReturn(true);
+        when(userRepositoryMock.save(any())).thenReturn(user2unbanned);
+
+        UserFullDto result = userService.unbanUser(2L, "johnDoe");
+
+        assertEquals(result.getUserId(), user2.getUserId());
+        assertEquals(result.getFirstName(), user2.getFirstName());
+        assertEquals(result.getLastName(), user2.getLastName());
         assertEquals(result.getIsBanned(), Boolean.FALSE);
     }
 
     @Test
     public void user_test_49_Given_userNotExists_When_banUser_Then_ResourceNotFound() {
+
         doThrow(new ResourceNotFoundException(
                 "User with id 2 wasn't found")).when(validations).checkUserExist(2L);
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                userService.banUser(2L, 1L));
+                userService.banUser(2L, "marryWhatson"));
         assertEquals("User with id 2 wasn't found", ex.getMessage());
     }
 
     @Test
     public void user_test_50_Given_currentUserNotExists_When_banUser_Then_ResourceNotFound() {
-        when(validations.checkUserExist(2L)).thenReturn(noAdmin);
-        doThrow(new ResourceNotFoundException(
-                "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
+        User user2 = new User(2L, "Marry", "Whatson",
+                "marryWhatson", "password", "merryWhatson@test.test",
+                LocalDate.of(1981, 6, 6), new HashSet<>(), "Hi! I'm Marry", true,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(validations.checkUserExist(2L)).thenReturn(user2);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString()))
+                .thenThrow(new ResourceNotFoundException("User with given credentials not found"));
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                userService.banUser(2L, 1L));
-        assertEquals("User with id 1 wasn't found", ex.getMessage());
+                userService.banUser(2L, "johnDoe"));
+        assertEquals("User with given credentials not found", ex.getMessage());
     }
 
     @Test
     public void user_test_51_Given_currentUserNotAdmin_When_banUser_Then_ActionForbidden() {
-        when(validations.checkUserExist(2L)).thenReturn(noAdmin);
-        doThrow(new ActionForbiddenException(
-                "User with id 1 is not ADMIN. Access is forbidden")).when(validations).checkUserIsAdmin(any());
+
+        User user = new User(1L, "John", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        User user2 = new User(2L, "Marry", "Whatson",
+                "marryWhatson", "password", "merryWhatson@test.test",
+                LocalDate.of(1981, 6, 6), new HashSet<>(), "Hi! I'm Marry", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(validations.checkUserExist(anyLong())).thenReturn(user);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user2);
+        when(validations.isAdmin("johnDoe")).thenReturn(false);
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
-                userService.banUser(2L, 1L));
-        assertEquals("User with id 1 is not ADMIN. Access is forbidden", ex.getMessage());
+                userService.banUser(2L, "johnDoe"));
+        assertEquals("Action forbidden for current user", ex.getMessage());
     }
 
     @Test
@@ -355,29 +491,44 @@ public class UserServiceTest {
                 "User with id 2 wasn't found")).when(validations).checkUserExist(2L);
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                userService.unbanUser(2L, 1L));
+                userService.unbanUser(2L, "marryWhatson"));
         assertEquals("User with id 2 wasn't found", ex.getMessage());
     }
 
     @Test
     public void user_test_53_Given_currentUserNotExists_When_unbanUser_Then_ResourceNotFound() {
-        when(validations.checkUserExist(2L)).thenReturn(noAdmin);
-        doThrow(new ResourceNotFoundException(
-                "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
+        User user2 = new User(2L, "Marry", "Whatson",
+                "marryWhatson", "password", "merryWhatson@test.test",
+                LocalDate.of(1981, 6, 6), new HashSet<>(), "Hi! I'm Marry", true,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(validations.checkUserExist(2L)).thenReturn(user2);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString()))
+                .thenThrow(new ResourceNotFoundException("User with given credentials not found"));
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
-                userService.unbanUser(2L, 1L));
-        assertEquals("User with id 1 wasn't found", ex.getMessage());
+                userService.unbanUser(2L, "johnDoe"));
+        assertEquals("User with given credentials not found", ex.getMessage());
     }
 
     @Test
     public void user_test_54_Given_currentUserNotAdmin_When_unbanUser_Then_ActionForbidden() {
-        when(validations.checkUserExist(2L)).thenReturn(noAdmin);
-        doThrow(new ActionForbiddenException(
-                "User with id 1 is not ADMIN. Access is forbidden")).when(validations).checkUserIsAdmin(any());
+        User user = new User(1L, "John", "Doe",
+                "johnDoe", "password", "johnDoe@test.test",
+                LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        User user2 = new User(2L, "Marry", "Whatson",
+                "marryWhatson", "password", "merryWhatson@test.test",
+                LocalDate.of(1981, 6, 6), new HashSet<>(), "Hi! I'm Marry", true,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        when(validations.checkUserExist(anyLong())).thenReturn(user);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user2);
+        when(validations.isAdmin(anyString())).thenReturn(false);
 
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
-                userService.unbanUser(2L, 1L));
-        assertEquals("User with id 1 is not ADMIN. Access is forbidden", ex.getMessage());
+                userService.unbanUser(2L, "johnDoe"));
+        assertEquals("Action forbidden for current user", ex.getMessage());
     }
 }

@@ -43,11 +43,11 @@ public class ArticlePrivateServiceImplIntTest {
     private final CommentService commentService;
     private final CommentRepository commentRepository;
 
-    private final User user = new User(null, "Harry", "Potter", "HP",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), Role.USER, null,
+    private final User user = new User(null, "Harry", "Potter", "HP", "password",
+            "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final User user2 = new User(null, "Admin", "Admin", "ADMIN",
-            "admin@gmail.com", LocalDate.of(1990, 9, 10), Role.USER, null,
+    private final User user2 = new User(null, "Admin", "Admin", "ADMIN", "password",
+            "admin@gmail.com", LocalDate.of(1990, 9, 10), new HashSet<>(), null,
             false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
     private final Tag tag1 = new Tag(null, "Potions", new HashSet<>());
     private final Tag tag2 = new Tag(null, "Cat", new HashSet<>());
@@ -69,7 +69,7 @@ public class ArticlePrivateServiceImplIntTest {
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         User author = userRepository.save(user);
 
-        ArticleFullDto result = articleService.createArticle(author.getUserId(), newArticle);
+        ArticleFullDto result = articleService.createArticle(author.getUsername(), newArticle);
 
         List<TagShortDto> tags = result.getTags().stream().toList();
         Tag tag = tagRepository.findTagByName(tag1.getName().toLowerCase());
@@ -86,9 +86,9 @@ public class ArticlePrivateServiceImplIntTest {
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         newArticle2.getTags().add(new TagNewDto(tag1.getName()));
         User author = userRepository.save(user);
-        articleService.createArticle(author.getUserId(), newArticle);
+        articleService.createArticle(author.getUsername(), newArticle);
 
-        ArticleFullDto result = articleService.createArticle(author.getUserId(), newArticle2);
+        ArticleFullDto result = articleService.createArticle(author.getUsername(), newArticle2);
 
         List<TagShortDto> tags = result.getTags().stream().toList();
         Tag tag = tagRepository.findTagByName(tag1.getName().toLowerCase());
@@ -106,9 +106,9 @@ public class ArticlePrivateServiceImplIntTest {
         newArticle2.getTags().add(new TagNewDto(tag1.getName()));
         newArticle2.getTags().add(new TagNewDto(tag2.getName()));
         User author = userRepository.save(user);
-        articleService.createArticle(author.getUserId(), newArticle);
+        articleService.createArticle(author.getUsername(), newArticle);
 
-        ArticleFullDto result = articleService.createArticle(author.getUserId(), newArticle2);
+        ArticleFullDto result = articleService.createArticle(author.getUsername(), newArticle2);
 
         List<TagShortDto> tags = result.getTags().stream().sorted(Comparator.comparing(TagShortDto::getName)).toList();
         Tag tag = tagRepository.findTagByName(tag1.getName().toLowerCase());
@@ -126,11 +126,11 @@ public class ArticlePrivateServiceImplIntTest {
     void article_test_5_Given_articleWithTitleAlreadyExist_When_createArticle_Then_throwException() {
         dropDB();
         User author = userRepository.save(user);
-        articleService.createArticle(author.getUserId(), newArticle);
+        articleService.createArticle(author.getUsername(), newArticle);
 
 
         final InvalidParameterException exception = Assertions.assertThrows(InvalidParameterException.class,
-                () -> articleService.createArticle(author.getUserId(), newArticle));
+                () -> articleService.createArticle(author.getUsername(), newArticle));
         assertEquals("Article with title The empty pot already exist", exception.getMessage(),
                 "Incorrect message");
         assertThat(exception).isInstanceOf(InvalidParameterException.class);
@@ -150,7 +150,7 @@ public class ArticlePrivateServiceImplIntTest {
         ArticleUpdateDto update = new ArticleUpdateDto();
         update.setTitle("new title");
 
-        ArticleFullDto result = articleService.updateArticle(author.getUserId(), article.getArticleId(), update);
+        ArticleFullDto result = articleService.updateArticle(author.getUsername(), article.getArticleId(), update);
 
         assertThat(result).isNotNull();
         assertThat(result.getArticleId()).isEqualTo(articleSaved.getArticleId());
@@ -180,7 +180,7 @@ public class ArticlePrivateServiceImplIntTest {
         ArticleUpdateDto update = new ArticleUpdateDto();
         update.setContent("new content");
 
-        ArticleFullDto result = articleService.updateArticle(author.getUserId(), article.getArticleId(), update);
+        ArticleFullDto result = articleService.updateArticle(author.getUsername(), article.getArticleId(), update);
 
         assertThat(result).isNotNull();
         assertThat(result.getArticleId()).isEqualTo(articleSaved.getArticleId());
@@ -211,7 +211,7 @@ public class ArticlePrivateServiceImplIntTest {
         update.setContent("new content");
         update.setTitle("newTitle");
 
-        ArticleFullDto result = articleService.updateArticle(author.getUserId(), article.getArticleId(), update);
+        ArticleFullDto result = articleService.updateArticle(author.getUsername(), article.getArticleId(), update);
 
         assertThat(result).isNotNull();
         assertThat(result.getArticleId()).isEqualTo(articleSaved.getArticleId());
@@ -237,7 +237,7 @@ public class ArticlePrivateServiceImplIntTest {
         update.setTitle("THE EMPTY POT   ");
 
         final InvalidParameterException exception = Assertions.assertThrows(InvalidParameterException.class,
-                () -> articleService.updateArticle(author.getUserId(), articleSaved2.getArticleId(), update));
+                () -> articleService.updateArticle(author.getUsername(), articleSaved2.getArticleId(), update));
         assertEquals("Article with title THE EMPTY POT    already exist",
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(InvalidParameterException.class);
@@ -249,14 +249,14 @@ public class ArticlePrivateServiceImplIntTest {
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         newArticle.getTags().add(new TagNewDto(tag2.getName()));
         User author = userRepository.save(user);
-        ArticleFullDto articleSaved = articleService.createArticle(author.getUserId(), newArticle);
+        ArticleFullDto articleSaved = articleService.createArticle(author.getUsername(), newArticle);
         Article dbArticle = articleRepository.getReferenceById(articleSaved.getArticleId());
         dbArticle.setStatus(ArticleStatus.PUBLISHED);
         articleRepository.save(dbArticle);
 
-        commentService.createComment(articleSaved.getArticleId(), new CommentNewDto("comment"), author.getUserId());
+        commentService.createComment(articleSaved.getArticleId(), new CommentNewDto("comment"), author.getUsername());
 
-        articleService.deleteArticle(author.getUserId(), articleSaved.getArticleId());
+        articleService.deleteArticle(author.getUsername(), articleSaved.getArticleId());
 
         assertThat(articleRepository.findAll().size()).isEqualTo(0);
         assertThat(tagRepository.findAll().size()).isEqualTo(2);
@@ -271,15 +271,15 @@ public class ArticlePrivateServiceImplIntTest {
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         newArticle.getTags().add(new TagNewDto(tag2.getName()));
         User author = userRepository.save(user);
-        user2.setRole(Role.ADMIN);
+        //user2.setRole(Role.ADMIN);
         User admin = userRepository.save(user2);
-        ArticleFullDto articleSaved = articleService.createArticle(author.getUserId(), newArticle);
+        ArticleFullDto articleSaved = articleService.createArticle(author.getUsername(), newArticle);
         Article dbArticle = articleRepository.getReferenceById(articleSaved.getArticleId());
         dbArticle.setStatus(ArticleStatus.PUBLISHED);
         articleRepository.save(dbArticle);
-        commentService.createComment(articleSaved.getArticleId(), new CommentNewDto("comment"), author.getUserId());
+        commentService.createComment(articleSaved.getArticleId(), new CommentNewDto("comment"), author.getUsername());
 
-        articleService.deleteArticle(admin.getUserId(), articleSaved.getArticleId());
+        articleService.deleteArticle(admin.getUsername(), articleSaved.getArticleId());
 
         assertThat(articleRepository.findAll().size()).isEqualTo(0);
         assertThat(tagRepository.findAll().size()).isEqualTo(2);
@@ -298,7 +298,7 @@ public class ArticlePrivateServiceImplIntTest {
                     new HashSet<>()));
         }
 
-        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10,
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 0, 10,
                 "ALL");
 
         assertThat(articleRepository.findAll().size()).isEqualTo(20);
@@ -316,7 +316,7 @@ public class ArticlePrivateServiceImplIntTest {
                     new HashSet<>()));
         }
 
-        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 10, 5,
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 10, 5,
                 "ALL");
 
         assertThat(articleRepository.findAll().size()).isEqualTo(20);
@@ -341,7 +341,7 @@ public class ArticlePrivateServiceImplIntTest {
                     new HashSet<>()));
         }
 
-        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10,
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 0, 10,
                 "PUBLISHED");
 
         assertThat(articleRepository.findAll().size()).isEqualTo(25);
@@ -368,7 +368,7 @@ public class ArticlePrivateServiceImplIntTest {
                 LocalDateTime.now(), null, ArticleStatus.REJECTED, 0L, 0L, new HashSet<>(),
                 new HashSet<>()));
 
-        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10,
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 0, 10,
                 "REJECTED");
 
         assertThat(articleRepository.findAll().size()).isEqualTo(26);
@@ -395,7 +395,7 @@ public class ArticlePrivateServiceImplIntTest {
                 LocalDateTime.now(), null, ArticleStatus.MODERATING, 0L, 0L, new HashSet<>(),
                 new HashSet<>()));
 
-        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10,
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 0, 10,
                 "MODERATING");
 
         assertThat(articleRepository.findAll().size()).isEqualTo(26);
@@ -422,7 +422,7 @@ public class ArticlePrivateServiceImplIntTest {
                 LocalDateTime.now(), null, ArticleStatus.MODERATING, 0L, 0L, new HashSet<>(),
                 new HashSet<>()));
 
-        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10,
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 0, 10,
                 "CREATED");
 
         assertThat(articleRepository.findAll().size()).isEqualTo(26);
@@ -437,7 +437,7 @@ public class ArticlePrivateServiceImplIntTest {
         User author = userRepository.save(user);
 
         final InvalidParameterException exception = Assertions.assertThrows(InvalidParameterException.class,
-                () -> articleService.getAllArticlesByUserId(author.getUserId(), 0, 10, "UNSUPPORTED"));
+                () -> articleService.getAllArticlesByUserId(author.getUsername(), 0, 10, "UNSUPPORTED"));
         assertEquals("Unknown status: UNSUPPORTED", exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(InvalidParameterException.class);
     }
@@ -454,7 +454,7 @@ public class ArticlePrivateServiceImplIntTest {
         articleSaved.getComments().add(comment);
         articleRepository.save(articleSaved);
 
-        ArticleFullDto result = articleService.updateArticle(author.getUserId(), articleSaved.getArticleId(), update);
+        ArticleFullDto result = articleService.updateArticle(author.getUsername(), articleSaved.getArticleId(), update);
 
         assertThat(result).isNotNull();
         assertThat(result.getArticleId()).isEqualTo(articleSaved.getArticleId());
@@ -490,7 +490,7 @@ public class ArticlePrivateServiceImplIntTest {
         articleSaved2.getComments().add(comment2);
         articleRepository.save(articleSaved2);
 
-        ArticleFullDto result = articleService.updateArticle(author.getUserId(), articleSaved.getArticleId(), update);
+        ArticleFullDto result = articleService.updateArticle(author.getUsername(), articleSaved.getArticleId(), update);
 
         assertThat(result).isNotNull();
         assertThat(result.getArticleId()).isEqualTo(articleSaved.getArticleId());
