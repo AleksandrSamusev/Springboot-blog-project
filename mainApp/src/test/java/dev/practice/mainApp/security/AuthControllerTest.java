@@ -3,20 +3,9 @@ package dev.practice.mainApp.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.practice.mainApp.controllers.AuthController;
-import dev.practice.mainApp.controllers._public.UserPublicController;
-import dev.practice.mainApp.dtos.user.UserFullDto;
 import dev.practice.mainApp.dtos.user.UserNewDto;
-import dev.practice.mainApp.dtos.user.UserShortDto;
-import dev.practice.mainApp.exceptions.InvalidParameterException;
-import dev.practice.mainApp.exceptions.ResourceNotFoundException;
-import dev.practice.mainApp.models.Role;
-import dev.practice.mainApp.repositories.RoleRepository;
-import dev.practice.mainApp.security.JWTAuthenticationFilter;
 import dev.practice.mainApp.services.impl.AuthServiceImpl;
-import dev.practice.mainApp.services.impl.UserServiceImpl;
-import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,11 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
