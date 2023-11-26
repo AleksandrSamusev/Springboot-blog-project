@@ -7,6 +7,7 @@ import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.models.*;
 import dev.practice.mainApp.repositories.CommentRepository;
+import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.impl.CommentServiceImpl;
 import dev.practice.mainApp.utils.Validations;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +33,8 @@ public class CommentServiceTest {
 
     @Mock
     private CommentRepository commentRepositoryMock;
+    @Mock
+    private UserRepository userRepositoryMock;
     @Mock
     private Validations validations;
     @InjectMocks
@@ -114,9 +118,8 @@ public class CommentServiceTest {
 
     @Test
     public void comment_test2_Given_UserNotExists_When_CreateComment_Then_ResourceNotFoundException() {
-        doThrow(new ResourceNotFoundException(
-                "User with id 2 wasn't found")).when(validations).checkUserExist(anyLong());
-
+        when(userRepositoryMock.findByUsername(any()))
+                .thenThrow(new ResourceNotFoundException("User with id 2 wasn't found"));
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 commentService.createComment(1L, newComment, "johnDoe"));
         assertEquals("User with id 2 wasn't found", ex.getMessage());
@@ -155,8 +158,12 @@ public class CommentServiceTest {
 
     @Test
     public void comment_test9_Given_UserIdNotExists_When_UpdateComment_Then_ResourceNotFoundException() {
-        doThrow(new ResourceNotFoundException(
-                "User with id 2 wasn't found")).when(validations).checkUserExist(anyLong());
+        Comment comment = new Comment(1L,
+                "I found this article very interesting!!!", LocalDateTime.now(),
+                article, commentAuthor);
+        when(validations.isCommentExists(anyLong())).thenReturn(comment);
+        when(userRepositoryMock.findByUsername(anyString())).thenThrow(new ResourceNotFoundException(
+                "User with id 2 wasn't found"));
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 commentService.updateComment(newComment, 1L, commentAuthor.getUsername()));
@@ -184,8 +191,24 @@ public class CommentServiceTest {
 
     @Test
     public void comment_test15_Given_UserIsAdmin_When_DeleteComment_Then_CommentDeleted() {
+
+        User admin = new User(10L, "Kirk", "Douglas", "kirkDouglas",
+                "password", "kirkdouglas@test.test",
+                LocalDate.of(1955, 3, 9), new HashSet<>(), "Hi! I'm Admin", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+
+        User commentAuthor = new User(2L, "John", "Doe", "johnDoe",
+                "password", "johndoe@test.test",
+                LocalDate.of(1999, 11, 11), new HashSet<>(), "Hi! I'm John", false,
+                new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+
+        Comment comment = new Comment(1L,
+                "I found this article very interesting!!!", LocalDateTime.now(),
+                article, commentAuthor);
+
         when(validations.isCommentExists(anyLong())).thenReturn(comment);
-        when(validations.checkUserExist(anyLong())).thenReturn(admin);
+        when(validations.isAdmin(anyString())).thenReturn(true);
         doNothing().when(commentRepositoryMock).deleteById(1L);
 
         commentService.deleteComment(1L, admin.getUsername());
@@ -195,8 +218,6 @@ public class CommentServiceTest {
     @Test
     public void comment_test16_Given_UserNotCommentAuthor_When_DeleteComment_Then_ActionForbiddenException() {
         when(validations.isCommentExists(anyLong())).thenReturn(comment);
-        when(validations.checkUserExist(anyLong())).thenReturn(notAnAuthor);
-
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
                 commentService.deleteComment(1L, notAnAuthor.getUsername()));
         assertEquals("Action forbidden for given user", ex.getMessage());
@@ -214,9 +235,9 @@ public class CommentServiceTest {
 
     @Test
     public void comment_test18_Given_UserNotExists_When_DeleteComment_Then_ResourceNotFoundException() {
-        when(validations.isCommentExists(anyLong())).thenReturn(comment);
+
         doThrow(new ResourceNotFoundException(
-                "User with id 1 wasn't found")).when(validations).checkUserExist(any());
+                "User with id 1 wasn't found")).when(validations).checkUserExistsByUsernameOrEmail(any());
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 commentService.deleteComment(1L, author.getUsername()));
