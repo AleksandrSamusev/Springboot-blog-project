@@ -23,6 +23,7 @@ public class Validations {
     private final CommentRepository commentRepository;
     private final MessageRepository messageRepository;
     private final UserDetailsService userDetailsService;
+    private final RoleRepository roleRepository;
 
     public User checkUserExist(Long userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -159,5 +160,10 @@ public class Validations {
         String formattedUsername = username.trim().replaceAll("\\s+", "").toLowerCase();
         return userRepository.findAll().stream()
                 .anyMatch(n -> n.getUsername().toLowerCase().equals(formattedUsername));
+    }
+
+    public Boolean isRoleExistsByName(String name) {
+        Optional<Role> role = roleRepository.findByName(name);
+        return role.isPresent();
     }
 }

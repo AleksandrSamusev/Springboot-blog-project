@@ -60,12 +60,15 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void deleteUser(Long userId, Long currentUserId) {
-        validations.checkUserExist(userId);
-        User currentUser = validations.checkUserExist(currentUserId);
-        validations.isUserAuthorized(userId, currentUser);
-        log.info("User with ID = " + userId + " deleted");
-        userRepository.deleteById(userId);
+    public void deleteUser(Long userId, String username) {
+        User requester = validations.checkUserExistsByUsernameOrEmail(username);
+        User user = validations.checkUserExist(userId);
+        if (userId.equals(requester.getUserId()) || validations.isAdmin(username)) {
+            userRepository.deleteById(userId);
+            log.info("User with ID = " + userId + " was successfully deleted.");
+        } else {
+            throw new ActionForbiddenException("Action forbidden for current user");
+        }
     }
 
     @Override
@@ -106,13 +109,13 @@ public class UserServiceImpl implements UserService {
                     throw new InvalidParameterException(
                             "User with given username " + dto.getUsername() + " already exists");
                 } else {
-                    user.setUsername(dto.getUsername().trim().replaceAll("\\s+",""));
+                    user.setUsername(dto.getUsername().trim().replaceAll("\\s+", ""));
                 }
             }
-            if(dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
                 user.setPassword(encoder.encode(dto.getPassword()));
             }
-            if(dto.getBirthDate() != null) {
+            if (dto.getBirthDate() != null) {
                 user.setBirthDate(dto.getBirthDate());
             }
             if (dto.getAbout() != null && !dto.getAbout().isBlank()) {

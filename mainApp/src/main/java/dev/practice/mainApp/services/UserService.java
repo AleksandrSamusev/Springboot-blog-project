@@ -18,7 +18,7 @@ public interface UserService {
 
     UserFullDto getUserById(Long userId, String username);
 
-    void deleteUser(Long userId, Long currentUserId);
+    void deleteUser(Long userId, String username);
 
     UserFullDto banUser(Long userId, Long currentUserId);
 

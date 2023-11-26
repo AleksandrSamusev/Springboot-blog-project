@@ -4,6 +4,7 @@ import dev.practice.mainApp.dtos.JWTAuthResponse;
 import dev.practice.mainApp.dtos.user.LoginDto;
 import dev.practice.mainApp.dtos.user.UserNewDto;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
+import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.exceptions.TodoAPIException;
 import dev.practice.mainApp.mappers.UserMapper;
 import dev.practice.mainApp.models.Role;
@@ -54,13 +55,17 @@ public class AuthServiceImpl implements AuthService {
         User user = UserMapper.toUser(userNewDto);
         user.setPassword(passwordEncoder.encode(userNewDto.getPassword()));
         Set<Role> roles = new HashSet<>();
-        Role userRole = roleRepository.findByName("ROLE_USER");
-        roles.add(userRole);
-        user.setRoles(roles);
+        Optional<Role> userRole = roleRepository.findByName("ROLE_USER");
 
-        User savedUser = userRepository.save(user);
-        log.info("New user with ID = {} successfully registered", savedUser.getUserId());
-        return "New user with ID = " + savedUser.getUserId() + " successfully registered";
+        if(userRole.isPresent()) {
+            roles.add(userRole.get());
+            user.setRoles(roles);
+            User savedUser = userRepository.save(user);
+            log.info("New user with ID = {} successfully registered", savedUser.getUserId());
+            return "New user with ID = " + savedUser.getUserId() + " successfully registered";
+        } else {
+            throw new ResourceNotFoundException("Role with given name ROLE_USER not found");
+        }
     }
 
     @Override
