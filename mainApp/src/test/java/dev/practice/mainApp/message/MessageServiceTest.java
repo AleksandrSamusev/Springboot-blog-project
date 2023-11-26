@@ -53,8 +53,8 @@ public class MessageServiceTest {
 
     @Test
     public void message_test1_Given_ValidIdsAndDto_When_CreateMessage_Then_MessageCreated() {
-        when(validations.checkUserExist(1L)).thenReturn(user1);
         when(validations.checkUserExist(2L)).thenReturn(user2);
+        when(userRepository.findByUsername(anyString())).thenReturn(user1);
         when(messageRepositoryMock.save(any())).thenReturn(fromUser1toUser2);
 
         MessageFullDto messageFullDto = messageService.createMessage(2L, "johnDoe", newMessage);
@@ -87,8 +87,9 @@ public class MessageServiceTest {
     }
 
     @Test
-    public void message_test4_Given_SenderIdEqualsReceiverId_When_CreateMessage_Then_ActionForbiddenException() {
+    public void message_test4_Given_SenderIdEqualsRecipientId_When_CreateMessage_Then_ActionForbiddenException() {
         when(validations.checkUserExist(anyLong())).thenReturn(user1);
+        when(userRepository.findByUsername(anyString())).thenReturn(user1);
         doThrow(new ActionForbiddenException(
                 "Action forbidden for current user")).when(validations).checkSenderIsNotRecipient(anyLong(), anyLong());
 
@@ -120,12 +121,12 @@ public class MessageServiceTest {
 
     @Test
     public void message_test7_Given_NotExistingUserId_When_findMessageById_Then_ResourceNotFoundException() {
-        doThrow(new ResourceNotFoundException(
-                "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenThrow(
+                new ResourceNotFoundException("User with given credentials not found"));
 
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
                 messageService.findMessageById(1L, "johnDoe"));
-        assertEquals("User with id 1 wasn't found", thrown.getMessage());
+        assertEquals("User with given credentials not found", thrown.getMessage());
     }
 
     @Test
@@ -140,11 +141,11 @@ public class MessageServiceTest {
 
     @Test
     public void message_test9_Given_InvalidUserId_When_deleteMessage_Then_ResourceNotFoundException() {
-        doThrow(new ResourceNotFoundException(
-                "User with id 1 wasn't found")).when(validations).checkUserExist(1L);
-
+        when(validations.checkIfMessageExists(anyLong())).thenReturn(fromUser1toUser2);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenThrow(
+                new ResourceNotFoundException("User with given credentials not found"));
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 messageService.deleteMessage(1L, "johnDoe"));
-        assertEquals("User with id 1 wasn't found", ex.getMessage());
+        assertEquals("User with given credentials not found", ex.getMessage());
     }
 }
