@@ -1,20 +1,24 @@
-/*
 package dev.practice.mainApp.article;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.practice.mainApp.config.SecurityConfig;
 import dev.practice.mainApp.controllers._public.ArticlePublicController;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
+import dev.practice.mainApp.repositories.RoleRepository;
+import dev.practice.mainApp.security.JWTAuthenticationEntryPoint;
+import dev.practice.mainApp.security.JWTTokenProvider;
 import dev.practice.mainApp.services.ArticlePublicService;
-import dev.practice.mainApp.services.TagService;
+import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
@@ -28,19 +32,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Import(SecurityConfig.class)
 @WebMvcTest(controllers = ArticlePublicController.class)
 public class ArticlePublicControllerTest {
     @MockBean
-    private ArticlePublicService articleService;
-
+    protected RoleRepository roleRepository;
     @MockBean
-    private TagService tagService;
+    protected Validations validations;
+    @MockBean
+    protected JWTTokenProvider tokenProvider;
+    @MockBean
+    protected UserDetailsService userDetailsService;
+    @MockBean
+    protected JWTAuthenticationEntryPoint entryPoint;
+    @MockBean
+    private ArticlePublicService articleService;
 
     @Autowired
     private MockMvc mvc;
 
-    @Autowired
-    private ObjectMapper mapper;
 
     private final UserShortDto author = new UserShortDto(1L, "Harry");
     private final ArticleShortDto articleShort = new ArticleShortDto(1L, "The empty pot",
@@ -170,4 +180,3 @@ public class ArticlePublicControllerTest {
                 .andExpect(status().isOk());
     }
 }
-*/

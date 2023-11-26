@@ -114,7 +114,6 @@ public class ArticlePrivateControllerTest {
 
         mvc.perform(patch("/api/v1/private/articles/{articleId}", 1L)
                         .content(mapper.writeValueAsString(update))
-                        .header("X-Current-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -161,7 +160,6 @@ public class ArticlePrivateControllerTest {
                 .thenReturn(Optional.of(articleFull));
 
         mvc.perform(get("/api/v1/private/articles/{articleId}", 1L)
-                        .header("X-Current-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -192,7 +190,6 @@ public class ArticlePrivateControllerTest {
                 .thenReturn(Optional.of(articleShort));
 
         mvc.perform(get("/api/v1/private/articles/{articleId}", 1L)
-                        .header("X-Current-User-Id", 2)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -222,7 +219,6 @@ public class ArticlePrivateControllerTest {
                 .when(articleService).deleteArticle(Mockito.anyString(), Mockito.anyLong());
 
         mvc.perform(delete("/api/v1/private/articles/{articleId}", 0L)
-                        .header("X-Current-User-Id", 0)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -239,7 +235,6 @@ public class ArticlePrivateControllerTest {
                 .thenReturn(List.of(articleFull));
 
         mvc.perform(get("/api/v1/private/articles")
-                        .header("X-Current-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -260,7 +255,6 @@ public class ArticlePrivateControllerTest {
                 .thenReturn(List.of(articleFull));
 
         mvc.perform(get("/api/v1/private/articles")
-                        .header("X-Current-User-Id", 1)
                         .param("status", "CREATED")
                         .param("from", String.valueOf(0))
                         .param("size", String.valueOf(10))
@@ -283,7 +277,6 @@ public class ArticlePrivateControllerTest {
                 .thenReturn(articleFull);
 
         mvc.perform(patch("/api/v1/private/articles/{articleId}/publish", 1L)
-                        .header("X-Current-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -312,7 +305,6 @@ public class ArticlePrivateControllerTest {
                 .thenThrow(ActionForbiddenException.class);
 
         mvc.perform(patch("/api/v1/private/articles/{articleId}/publish", 1L)
-                        .header("X-Current-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
