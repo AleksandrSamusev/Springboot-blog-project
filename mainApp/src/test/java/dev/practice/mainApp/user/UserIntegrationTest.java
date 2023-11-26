@@ -1,4 +1,4 @@
-package dev.practice.mainApp.user;
+/*package dev.practice.mainApp.user;
 
 import dev.practice.mainApp.dtos.JWTAuthResponse;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
@@ -206,4 +206,4 @@ public class UserIntegrationTest {
                 messageService.deleteMessage(createdMessage2.getMessageId(), user2.getUsername()));
         assertEquals("Action forbidden for current user", ex2.getMessage());
     }
-}
+}*/

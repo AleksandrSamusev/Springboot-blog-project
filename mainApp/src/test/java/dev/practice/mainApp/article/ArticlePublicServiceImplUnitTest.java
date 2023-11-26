@@ -71,6 +71,7 @@ public class ArticlePublicServiceImplUnitTest {
 
     @Test
     void articlePu_test_2_Given_anyUserArticleExist_When_getArticleById_Then_returnArticle() {
+
         Mockito
                 .when(validations.checkArticleExist(Mockito.any()))
                 .thenReturn(savedArticle);

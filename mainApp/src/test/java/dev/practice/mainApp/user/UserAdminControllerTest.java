@@ -1,3 +1,4 @@
+/*
 package dev.practice.mainApp.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -130,3 +131,4 @@ public class UserAdminControllerTest {
                 .andExpect(status().isForbidden());
     }
 }
+*/

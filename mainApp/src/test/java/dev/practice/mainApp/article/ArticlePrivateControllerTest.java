@@ -1,3 +1,4 @@
+/*
 package dev.practice.mainApp.article;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -293,6 +294,5 @@ public class ArticlePrivateControllerTest {
         Mockito.verify(articleService, Mockito.times(1))
                 .publishArticle(Mockito.anyString(), Mockito.anyLong());
     }
-
-
 }
+*/

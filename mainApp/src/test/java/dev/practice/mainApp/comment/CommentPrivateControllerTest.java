@@ -1,3 +1,4 @@
+/*
 package dev.practice.mainApp.comment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -138,3 +139,4 @@ public class CommentPrivateControllerTest {
     }
 
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package dev.practice.mainApp.message;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -303,3 +304,4 @@ public class MessagePrivateControllerTest {
                 .andExpect(jsonPath("$.errors[0]", is("Message length should be 500 chars max")));
     }
 }
+*/

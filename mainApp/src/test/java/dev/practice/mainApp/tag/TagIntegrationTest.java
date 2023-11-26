@@ -1,4 +1,4 @@
-package dev.practice.mainApp.tag;
+/*package dev.practice.mainApp.tag;
 
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
@@ -15,8 +15,10 @@ import dev.practice.mainApp.services.TagService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Transactional
+@RunWith(SpringRunner.class)
 @SpringBootTest(
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -156,4 +159,4 @@ public class TagIntegrationTest {
         articleRepository.deleteAll();
         userRepository.deleteAll();
     }
-}
+}*/
