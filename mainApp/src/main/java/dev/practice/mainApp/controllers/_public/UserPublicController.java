@@ -3,6 +3,7 @@ package dev.practice.mainApp.controllers._public;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.services.UserService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

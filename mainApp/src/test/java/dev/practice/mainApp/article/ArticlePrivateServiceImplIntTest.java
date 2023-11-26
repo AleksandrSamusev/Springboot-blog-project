@@ -1,5 +1,6 @@
 /*package dev.practice.mainApp.article;
 
+import dev.practice.mainApp.config.SecurityConfig;
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
 import dev.practice.mainApp.dtos.article.ArticleUpdateDto;
@@ -18,8 +19,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

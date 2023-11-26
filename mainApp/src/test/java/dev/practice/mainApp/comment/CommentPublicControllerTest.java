@@ -1,17 +1,22 @@
-/*
 package dev.practice.mainApp.comment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.practice.mainApp.config.SecurityConfig;
 import dev.practice.mainApp.controllers._public.CommentPublicController;
 import dev.practice.mainApp.dtos.comment.CommentFullDto;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.models.*;
+import dev.practice.mainApp.repositories.RoleRepository;
+import dev.practice.mainApp.security.JWTAuthenticationEntryPoint;
+import dev.practice.mainApp.security.JWTTokenProvider;
 import dev.practice.mainApp.services.impl.CommentServiceImpl;
+import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
@@ -20,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -27,21 +33,30 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Import(SecurityConfig.class)
 @WebMvcTest(CommentPublicController.class)
 public class CommentPublicControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-
+    @MockBean
+    protected RoleRepository roleRepository;
+    @MockBean
+    protected Validations validations;
+    @MockBean
+    protected JWTTokenProvider tokenProvider;
+    @MockBean
+    protected UserDetailsService userDetailsService;
+    @MockBean
+    protected JWTAuthenticationEntryPoint entryPoint;
     @MockBean
     private CommentServiceImpl commentService;
 
     @Autowired
-    private ObjectMapper mapper;
+    private MockMvc mockMvc;
 
+    private final Role roleUser = new Role(2L, "ROLE_USER");
     private final User author = new User(1L, "Harry", "Potter", "password",
-            "harryPotter", "harrypotter@test.test",
-            LocalDate.of(2000, 12, 27), new HashSet<>(), "Hi! I'm Harry", false,
-            new HashSet<Message>(), new HashSet<Message>(), new HashSet<Article>(), new HashSet<Comment>());
+            "harryPotter", "harrypotter@test.test", LocalDate.of(2000, 12, 27),
+            Set.of(roleUser), "Hi! I'm Harry", false, new HashSet<Message>(), new HashSet<Message>(),
+            new HashSet<Article>(), new HashSet<Comment>());
 
     private final UserShortDto shortUser = new UserShortDto(2L, "johnDoe");
 
@@ -85,4 +100,3 @@ public class CommentPublicControllerTest {
                 .andExpect(jsonPath("$.[0].articleId").value(article.getArticleId()));
     }
 }
-*/
