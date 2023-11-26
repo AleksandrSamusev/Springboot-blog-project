@@ -1,44 +1,24 @@
 package dev.practice.mainApp.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.practice.mainApp.config.SecurityConfig;
 import dev.practice.mainApp.controllers._public.UserPublicController;
 import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
-import dev.practice.mainApp.models.Article;
-import dev.practice.mainApp.models.Comment;
-import dev.practice.mainApp.models.Message;
-import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.RoleRepository;
-import dev.practice.mainApp.security.JWTAuthenticationEntryPoint;
-import dev.practice.mainApp.security.JWTAuthenticationFilter;
 import dev.practice.mainApp.security.JWTTokenProvider;
 import dev.practice.mainApp.services.UserService;
-import dev.practice.mainApp.services.impl.UserServiceImpl;
 import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-
-import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = UserPublicController.class)
