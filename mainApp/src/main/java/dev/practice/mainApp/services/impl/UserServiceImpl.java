@@ -12,6 +12,7 @@ import dev.practice.mainApp.services.UserService;
 import dev.practice.mainApp.utils.Validations;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final Validations validations;
+    private final BCryptPasswordEncoder encoder;
 
     @Override
     public List<UserShortDto> getAllUsers() {
@@ -58,12 +60,15 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void deleteUser(Long userId, Long currentUserId) {
-        validations.checkUserExist(userId);
-        User currentUser = validations.checkUserExist(currentUserId);
-        validations.isUserAuthorized(userId, currentUser);
-        log.info("User with ID = " + userId + " deleted");
-        userRepository.deleteById(userId);
+    public void deleteUser(Long userId, String username) {
+        User requester = validations.checkUserExistsByUsernameOrEmail(username);
+        User user = validations.checkUserExist(userId);
+        if (userId.equals(requester.getUserId()) || validations.isAdmin(username)) {
+            userRepository.deleteById(userId);
+            log.info("User with ID = " + userId + " was successfully deleted.");
+        } else {
+            throw new ActionForbiddenException("Action forbidden for current user");
+        }
     }
 
     @Override
@@ -104,13 +109,13 @@ public class UserServiceImpl implements UserService {
                     throw new InvalidParameterException(
                             "User with given username " + dto.getUsername() + " already exists");
                 } else {
-                    user.setUsername(dto.getUsername().trim().replaceAll("\\s+",""));
+                    user.setUsername(dto.getUsername().trim().replaceAll("\\s+", ""));
                 }
             }
-            if(dto.getPassword() != null && !dto.getPassword().isBlank()) {
-                user.setPassword(dto.getPassword());
+            if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+                user.setPassword(encoder.encode(dto.getPassword()));
             }
-            if(dto.getBirthDate() != null) {
+            if (dto.getBirthDate() != null) {
                 user.setBirthDate(dto.getBirthDate());
             }
             if (dto.getAbout() != null && !dto.getAbout().isBlank()) {

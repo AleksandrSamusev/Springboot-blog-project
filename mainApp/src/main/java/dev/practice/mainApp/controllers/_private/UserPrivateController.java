@@ -1,7 +1,9 @@
 package dev.practice.mainApp.controllers._private;
 
 import dev.practice.mainApp.dtos.user.UserFullDto;
+import dev.practice.mainApp.dtos.user.UserUpdateDto;
 import dev.practice.mainApp.services.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,9 +44,9 @@ public class UserPrivateController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @DeleteMapping("/users/{userId}")
-    public ResponseEntity<HttpStatus> deleteUser(@PathVariable Long userId,
-                                                 @RequestHeader("X-Current-User-Id") Long currentUserId) {
-        userService.deleteUser(userId, currentUserId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId,
+                                             @AuthenticationPrincipal UserDetails userDetails) {
+        userService.deleteUser(userId, userDetails.getUsername());
+        return ResponseEntity.ok("User with ID = " + userId + " was successfully deleted.");
     }
 }
