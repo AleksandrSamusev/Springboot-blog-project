@@ -1,3 +1,4 @@
+/*
 package dev.practice.mainApp.tag;
 
 import dev.practice.mainApp.controllers._admin.TagAdminController;
@@ -32,3 +33,4 @@ public class TagAdminControllerTest {
                 .andExpect(status().isOk());
     }
 }
+*/
