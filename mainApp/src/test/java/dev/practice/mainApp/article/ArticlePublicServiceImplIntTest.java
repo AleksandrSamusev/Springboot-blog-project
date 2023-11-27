@@ -1,6 +1,7 @@
 package dev.practice.mainApp.article;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import dev.practice.mainApp.client.StatsClient;
 import dev.practice.mainApp.dtos.article.ArticleShortDto;
 import dev.practice.mainApp.dtos.tag.TagFullDto;
 import dev.practice.mainApp.dtos.tag.TagNewDto;
@@ -10,7 +11,6 @@ import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.ArticleStatus;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
-import dev.practice.mainApp.repositories.TagRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.ArticlePublicService;
 import dev.practice.mainApp.services.TagService;
@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,7 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ArticlePublicServiceImplIntTest {
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
-    private final TagRepository tagRepository;
     private final ArticlePublicService articleService;
     private final TagService tagService;
 
@@ -55,13 +55,13 @@ public class ArticlePublicServiceImplIntTest {
     protected HttpSecurity httpSecurity;
     @MockBean
     protected SecurityFilterChain securityFilterChain;
+    @MockBean
+    protected StatsClient statsClient;
 
-    private final User user = new User(null, "Harry", "Potter", "HP", "password",
-            "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
-            false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
-    private final User user2 = new User(null, "Admin", "Admin", "ADMIN", "password",
-            "admin@gmail.com", LocalDate.of(1990, 9, 10), new HashSet<>(), null,
-            false, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
+    private final User user = new User(null, "Harry", "Potter", "HP",
+            "password", "hp@gmail.com", LocalDate.of(1981, 7, 31),
+            new HashSet<>(), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            new HashSet<>());
     private final Article article = new Article(null, "The empty pot",
             "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now(),
             ArticleStatus.PUBLISHED, 1450L, 0L, new HashSet<>(), new HashSet<>());
@@ -72,13 +72,6 @@ public class ArticlePublicServiceImplIntTest {
             "Very interesting information", user, LocalDateTime.now(), null, ArticleStatus.CREATED,
             0L, 0L, new HashSet<>(), new HashSet<>());
 
-    private final Article articleWithTags1 = new Article(1L, "A pretty cat",
-            "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
-            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
-
-    private final Article articleWithTags2 = new Article(2L, "A pretty cat",
-            "Very interesting information", user, LocalDateTime.now(), LocalDateTime.now().minusDays(2),
-            ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(), new HashSet<>());
 
     @Test
     void article_test_2_Given_anyUser_When_getAllArticles_Then_returnAllPublishedArticlesNewFirst() {
@@ -86,7 +79,7 @@ public class ArticlePublicServiceImplIntTest {
         userRepository.save(user);
         Article newer = articleRepository.save(article);
         Article older = articleRepository.save(article2);
-        Article created = articleRepository.save(article3);
+        articleRepository.save(article3);
 
         List<ArticleShortDto> result = articleService.getAllArticles(0, 10);
 
@@ -102,7 +95,7 @@ public class ArticlePublicServiceImplIntTest {
         userRepository.save(user);
         Article saved = articleRepository.save(article);
 
-        ArticleShortDto result = articleService.getArticleById(saved.getArticleId(), null);
+        ArticleShortDto result = articleService.getArticleById(saved.getArticleId(), new MockHttpServletRequest());
 
         assertThat(result.getArticleId()).isEqualTo(saved.getArticleId());
         assertThat(result).isInstanceOf(ArticleShortDto.class);
@@ -149,6 +142,9 @@ public class ArticlePublicServiceImplIntTest {
         articleRepository.save(new Article(null, "r", "some information", author,
                 LocalDateTime.now(), null, ArticleStatus.MODERATING, 0L, 0L, new HashSet<>(),
                 new HashSet<>()));
+        author.getArticles().addAll(articleRepository.findAllByAuthorUsername(author.getUsername(), null));
+        userRepository.save(author);
+
 
         List<ArticleShortDto> result = articleService.getAllArticlesByUserId(author.getUserId(), 0, 10);
 
