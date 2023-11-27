@@ -12,19 +12,19 @@ import java.util.List;
 public interface UserService {
     List<UserShortDto> getAllUsers();
 
-    List<UserFullDto> getAllUsers(String username);
+    List<UserFullDto> getAllUsers(String login);
 
     UserShortDto getUserById(Long id);
 
-    UserFullDto getUserById(Long userId, String username);
+    UserFullDto getUserById(Long userId, String login);
 
-    void deleteUser(Long userId, String username);
+    void deleteUser(Long userId, String login);
 
-    UserFullDto banUser(Long userId, String username);
+    UserFullDto banUser(Long userId, String login);
 
-    UserFullDto unbanUser(Long userId, String username);
+    UserFullDto unbanUser(Long userId, String login);
 
-    UserFullDto updateUser(Long userId, UserUpdateDto dto, String username);
+    UserFullDto updateUser(Long userId, UserUpdateDto dto, String login);
 
     UserFullDto changeRole(Long userId, String role);
 }

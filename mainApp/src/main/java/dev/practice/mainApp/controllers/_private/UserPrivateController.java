@@ -39,8 +39,8 @@ public class UserPrivateController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserFullDto> getUserById(@PathVariable Long userId,
-                                                   HttpServletRequest request) {
-        return new ResponseEntity<>(userService.getUserById(userId, request.getUserPrincipal().getName()),
+                                                   @AuthenticationPrincipal UserDetails userDetails) {
+        return new ResponseEntity<>(userService.getUserById(userId, userDetails.getUsername()),
                 HttpStatus.OK);
     }
 

@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().map(UserMapper::toUserShortDto).collect(Collectors.toList());
     }
 
-    public List<UserFullDto> getAllUsers(String username) {
-        User user = userRepository.findByUsername(username);
+    public List<UserFullDto> getAllUsers(String login) {
+        validations.checkUserExistsByUsernameOrEmail(login);
         log.info("Returned the List of all UserFullDto users by Admin request");
         return userRepository.findAll().stream().map(UserMapper::toUserFullDto)
                 .collect(Collectors.toList());
@@ -52,9 +52,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserFullDto getUserById(Long userId, String username) {
+    public UserFullDto getUserById(Long userId, String login) {
         User user = validations.checkUserExist(userId);
-        if (userId.equals(userRepository.findByUsername(username).getUserId()) || validations.isAdmin(username)) {
+        User currentUser = validations.checkUserExistsByUsernameOrEmail(login);
+        if (user.equals(currentUser) || validations.isAdmin(login)) {
             log.info("Returned user with id = " + userId + " by Admin request");
             return UserMapper.toUserFullDto(user);
         } else {
@@ -65,10 +66,10 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void deleteUser(Long userId, String username) {
-        User requester = validations.checkUserExistsByUsernameOrEmail(username);
-        User user = validations.checkUserExist(userId);
-        if (userId.equals(requester.getUserId()) || validations.isAdmin(username)) {
+    public void deleteUser(Long userId, String login) {
+        User requester = validations.checkUserExistsByUsernameOrEmail(login);
+        validations.checkUserExist(userId);
+        if (userId.equals(requester.getUserId()) || validations.isAdmin(login)) {
             userRepository.deleteById(userId);
             log.info("User with ID = " + userId + " was successfully deleted.");
         } else {
@@ -77,10 +78,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserFullDto banUser(Long userId, String username) {
+    public UserFullDto banUser(Long userId, String login) {
         User user = validations.checkUserExist(userId);
-        User currentUser = validations.checkUserExistsByUsernameOrEmail(username);
-        if (validations.isAdmin(username)) {
+        User currentUser = validations.checkUserExistsByUsernameOrEmail(login);
+        if (validations.isAdmin(login)) {
             user.setIsBanned(Boolean.TRUE);
             User savedUser = userRepository.save(user);
             log.info("User with ID = " + userId + " was banned by admin with ID = " + currentUser.getUserId());
@@ -91,10 +92,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserFullDto unbanUser(Long userId, String username) {
+    public UserFullDto unbanUser(Long userId, String login) {
         User user = validations.checkUserExist(userId);
-        User currentUser = validations.checkUserExistsByUsernameOrEmail(username);
-        if (validations.isAdmin(username)) {
+        User currentUser = validations.checkUserExistsByUsernameOrEmail(login);
+        if (validations.isAdmin(login)) {
             user.setIsBanned(Boolean.FALSE);
             User savedUser = userRepository.save(user);
             log.info("User with ID = " + userId + " was unbanned by admin with ID = " + currentUser.getUserId());
@@ -105,12 +106,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserFullDto updateUser(Long userId, UserUpdateDto dto, String username) {
+    public UserFullDto updateUser(Long userId, UserUpdateDto dto, String login) {
 
-        User requester = validations.checkUserExistsByUsernameOrEmail(username);
+        User requester = validations.checkUserExistsByUsernameOrEmail(login);
         User user = validations.checkUserExist(userId);
 
-        if (userId.equals(requester.getUserId()) || validations.isAdmin(username)) {
+        if (userId.equals(requester.getUserId()) || validations.isAdmin(login)) {
             if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
                 user.setFirstName(dto.getFirstName());
             }

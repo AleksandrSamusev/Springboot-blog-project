@@ -27,8 +27,8 @@ public class CommentServiceImpl implements CommentService {
     private final Validations validations;
 
     @Override
-    public CommentFullDto createComment(Long articleId, CommentNewDto dto, String username) {
-        User user = userRepository.findByUsername(username);
+    public CommentFullDto createComment(Long articleId, CommentNewDto dto, String login) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
         validations.checkUserIsNotBanned(user);
         Article article = validations.checkArticleExist(articleId);
         validations.checkArticleIsPublished(article);
@@ -39,9 +39,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentFullDto updateComment(CommentNewDto dto, Long commentId, String username) {
+    public CommentFullDto updateComment(CommentNewDto dto, Long commentId, String login) {
         Comment comment = validations.isCommentExists(commentId);
-        User user = userRepository.findByUsername(username);
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
         validations.checkUserIsCommentAuthor(user, comment);
         comment.setComment(dto.getComment());
         Comment updatedComment = commentRepository.save(comment);
@@ -50,10 +50,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(Long commentId, String username) {
-        User user = validations.checkUserExistsByUsernameOrEmail(username);
+    public void deleteComment(Long commentId, String login) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
         Comment comment = validations.isCommentExists(commentId);
-        if (username.equals(comment.getCommentAuthor().getUsername()) || validations.isAdmin(username)) {
+        if (user.equals(comment.getCommentAuthor()) || validations.isAdmin(login)) {
             log.info("Comment with ID = " + commentId + " deleted");
             commentRepository.deleteById(commentId);
         } else {

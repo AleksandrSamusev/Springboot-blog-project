@@ -19,10 +19,9 @@ import dev.practice.mainApp.services.TagService;
 import dev.practice.mainApp.utils.Validations;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,15 +37,15 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     private final Validations validations;
 
     @Override
-    public ArticleFullDto createArticle(String username, ArticleNewDto newArticle) {
-        User user = userRepository.findByUsername(username);
+    public ArticleFullDto createArticle(String login, ArticleNewDto newArticle) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
         validations.checkUserIsNotBanned(user);
         validations.checkTitleNotExist(newArticle.getTitle(), null);
 
         Article savedArticle = articleRepository.save(ArticleMapper.toArticleFromNew(newArticle, user));
         if (newArticle.getTags() != null && !newArticle.getTags().isEmpty()) {
             ArticleFullDto articleWithTags = tagService.addTagsToArticle(
-                    username, savedArticle.getArticleId(), newArticle.getTags().stream().toList());
+                    login, savedArticle.getArticleId(), newArticle.getTags().stream().toList());
 
             user.getArticles().add(savedArticle);
             userRepository.save(user);
@@ -64,9 +63,11 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     }
 
     @Override
-    public ArticleFullDto updateArticle(String username, Long articleId, ArticleUpdateDto updateArticle) {
+    public ArticleFullDto updateArticle(String login, Long articleId, ArticleUpdateDto updateArticle) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
         Article article = validations.checkArticleExist(articleId);
-        validations.checkUserIsAuthor(article, username);
+        validations.checkUserIsAuthor(article, user.getUserId());
+
         if (updateArticle.getTitle() != null && !updateArticle.getTitle().trim().isBlank()) {
             validations.checkTitleNotExist(updateArticle.getTitle(), articleId);
         }
@@ -80,10 +81,11 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     }
 
     @Override
-    public Optional<?> getArticleById(String username, Long articleId) {
+    public Optional<?> getArticleById(String login, Long articleId) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
         Article article = validations.checkArticleExist(articleId);
 
-        if (!article.getAuthor().getUsername().equals(username) && !validations.isAdmin(username)) {
+        if (!article.getAuthor().getUserId().equals(user.getUserId()) && !validations.isAdmin(login)) {
             if (article.getStatus() != ArticleStatus.PUBLISHED) {
                 log.error("Article with id {} is not published yet. Current status is {}", articleId,
                         article.getStatus());
@@ -95,34 +97,53 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     }
 
     @Override
-    public List<ArticleFullDto> getAllArticlesByUserId(String username, Integer from, Integer size, String status) {
-        PageRequest pageable = PageRequest.of(from / size, size);
+    public List<ArticleFullDto> getAllArticlesByUserId(String login, Integer from, Integer size, String status) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
 
         return switch (status) {
             case "PUBLISHED" -> {
-                pageable.withSort(Sort.by("published").descending());
-                yield ArticleMapper.toListArticleFull(articleRepository.findAllByAuthorUsernameAndStatus(
-                        username, ArticleStatus.PUBLISHED, pageable));
+                List<Article> articles = user.getArticles()
+                        .stream()
+                        .filter(a -> a.getStatus() == ArticleStatus.PUBLISHED)
+                        .sorted(Comparator.comparing(Article::getPublished).reversed())
+                        .toList();
+                yield ArticleMapper.toListArticleFull(articles.subList(
+                        from * size, size > articles.size() ? articles.size() : from * size + size));
             }
             case "MODERATING" -> {
-                pageable.withSort(Sort.by("created").descending());
-                yield ArticleMapper.toListArticleFull(articleRepository.findAllByAuthorUsernameAndStatus(
-                        username, ArticleStatus.MODERATING, pageable));
+                List<Article> articles = user.getArticles()
+                        .stream()
+                        .filter(a -> a.getStatus() == ArticleStatus.MODERATING)
+                        .sorted(Comparator.comparing(Article::getCreated).reversed())
+                        .toList();
+                yield ArticleMapper.toListArticleFull(articles.subList(
+                        from * size, size > articles.size() ? articles.size() : from * size + size));
             }
             case "REJECTED" -> {
-                pageable.withSort(Sort.by("created").descending());
-                yield ArticleMapper.toListArticleFull(articleRepository.findAllByAuthorUsernameAndStatus(
-                        username, ArticleStatus.REJECTED, pageable));
+                List<Article> articles = user.getArticles()
+                        .stream()
+                        .filter(a -> a.getStatus() == ArticleStatus.REJECTED)
+                        .sorted(Comparator.comparing(Article::getCreated).reversed())
+                        .toList();
+                yield ArticleMapper.toListArticleFull(articles.subList(
+                        from * size, size > articles.size() ? articles.size() : from * size + size));
             }
             case "CREATED" -> {
-                pageable.withSort(Sort.by("created").descending());
-                yield ArticleMapper.toListArticleFull(articleRepository.findAllByAuthorUsernameAndStatus(
-                        username, ArticleStatus.CREATED, pageable));
+                List<Article> articles = user.getArticles()
+                        .stream()
+                        .filter(a -> a.getStatus() == ArticleStatus.CREATED)
+                        .sorted(Comparator.comparing(Article::getCreated).reversed())
+                        .toList();
+                yield ArticleMapper.toListArticleFull(articles.subList(
+                        from * size, size > articles.size() ? articles.size() : from * size + size));
             }
             case "ALL" -> {
-                pageable.withSort(Sort.by("created").descending());
-                yield ArticleMapper.toListArticleFull(
-                        articleRepository.findAllByAuthorUsername(username, pageable));
+                List<Article> articles = user.getArticles()
+                        .stream()
+                        .sorted(Comparator.comparing(Article::getCreated).reversed())
+                        .toList();
+                yield ArticleMapper.toListArticleFull(articles.subList(
+                        from * size, size > articles.size() ? articles.size() : from * size + size));
             }
             default -> {
                 log.info("Incorrect status: {}", status);
@@ -132,11 +153,12 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     }
 
     @Override
-    public void deleteArticle(String username, Long articleId) {
+    public void deleteArticle(String login, Long articleId) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
         Article article = validations.checkArticleExist(articleId);
 
-        if (!validations.isAdmin(username)) {
-            validations.checkUserIsAuthor(article, username);
+        if (!validations.isAdmin(login)) {
+            validations.checkUserIsAuthor(article, user.getUserId());
         }
 
         if (!article.getTags().isEmpty()) {
@@ -151,11 +173,11 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
     }
 
     @Override
-    public ArticleFullDto publishArticle(String username, Long articleId) {
-        User user = userRepository.findByUsername(username);
+    public ArticleFullDto publishArticle(String login, Long articleId) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
         validations.checkUserIsNotBanned(user);
         Article article = validations.checkArticleExist(articleId);
-        validations.checkUserIsAuthor(article, username);
+        validations.checkUserIsAuthor(article, user.getUserId());
         article.setStatus(ArticleStatus.MODERATING);
 
         log.info("Article with id {} was sent to moderation", articleId);
