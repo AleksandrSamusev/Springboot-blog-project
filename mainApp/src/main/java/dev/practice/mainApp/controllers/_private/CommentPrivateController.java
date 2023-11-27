@@ -19,7 +19,7 @@ public class CommentPrivateController {
     private final CommentService commentService;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @PostMapping("/comments/article/{articleId}")
+    @PostMapping("/comments/articles/{articleId}")
     public ResponseEntity<CommentFullDto> createComment(@AuthenticationPrincipal UserDetails userDetails,
                                                         @PathVariable Long articleId,
                                                         @Valid @RequestBody CommentNewDto dto) {
