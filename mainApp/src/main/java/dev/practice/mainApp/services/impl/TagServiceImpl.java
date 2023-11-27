@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,8 +58,12 @@ public class TagServiceImpl implements TagService {
             log.error("Only admin can delete tag. User with id {} is not admin", user.getUserId());
             throw new ActionForbiddenException("Action forbidden for current user. Only admin can delete tag");
         }
-        validations.isTagExists(tagId);
-        tagRepository.deleteById(tagId);
+
+        Tag tag = validations.isTagExists(tagId);
+        Set<Article> articles = tag.getArticles();
+        articles.forEach(article -> article.getTags().remove(tag));
+        articleRepository.saveAll(articles);
+        tagRepository.delete(tag);
         log.info("Tag with ID = " + tagId + " successfully deleted");
     }
 
@@ -127,7 +132,6 @@ public class TagServiceImpl implements TagService {
             article.getTags().remove(tag);
             log.info("Tags with id {} unconnected from article with id {}", tagId, articleId);
         }
-
         return ArticleMapper.toArticleFullDto(articleRepository.save(article));
     }
 }
