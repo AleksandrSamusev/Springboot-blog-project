@@ -1,10 +1,7 @@
-/*package dev.practice.mainApp.user;
-
-import dev.practice.mainApp.dtos.JWTAuthResponse;
+package dev.practice.mainApp.user;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
 import dev.practice.mainApp.dtos.message.MessageFullDto;
 import dev.practice.mainApp.dtos.message.MessageNewDto;
-import dev.practice.mainApp.dtos.user.LoginDto;
 import dev.practice.mainApp.dtos.user.UserFullDto;
 import dev.practice.mainApp.dtos.user.UserNewDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
@@ -14,12 +11,16 @@ import dev.practice.mainApp.services.ArticlePrivateService;
 import dev.practice.mainApp.services.AuthService;
 import dev.practice.mainApp.services.MessageService;
 import dev.practice.mainApp.services.UserService;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
@@ -40,22 +41,31 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Sql(scripts = "/schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class UserIntegrationTest {
 
-    private final EntityManager em;
-    private final UserService userService;
-    private final UserRepository userRepository;
-    private final MessageService messageService;
-    private final ArticlePrivateService articlePrivateService;
     private final AuthService authService;
+    private final UserRepository userRepository;
+    private final ArticlePrivateService articlePrivateService;
+    private final UserService userService;
+    private final MessageService messageService;
+
+    @MockBean
+    protected AuthenticationConfiguration authenticationConfiguration;
+    @MockBean
+    protected AuthenticationManager authenticationManager;
+    @MockBean
+    protected HttpSecurity httpSecurity;
+    @MockBean
+    protected SecurityFilterChain securityFilterChain;
+
+
 
     @Test
     public void user_test30_When_createNewArticleByExistingUser_Then_UserHaveThisArticle() {
 
         UserNewDto newDto = new UserNewDto("firstName", "lastName", "username",
-                "password","email", LocalDate.of(2000, 12, 12),
+                "password", "email", LocalDate.of(2000, 12, 12),
                 "about");
 
         authService.register(newDto);
-        JWTAuthResponse response = authService.login(new LoginDto("username", "password"));
         User user = userRepository.findByUsername("username");
 
 
@@ -77,8 +87,6 @@ public class UserIntegrationTest {
 
         authService.register(newDto1);
         authService.register(newDto2);
-        JWTAuthResponse response1 = authService.login(new LoginDto("username1", "password"));
-        JWTAuthResponse response2 = authService.login(new LoginDto("username2", "password"));
 
         MessageNewDto message1 = new MessageNewDto("message from user1 to user2");
         MessageNewDto message2 = new MessageNewDto("message from user2 to user1");
@@ -111,8 +119,6 @@ public class UserIntegrationTest {
 
         authService.register(newDto1);
         authService.register(newDto2);
-        JWTAuthResponse response1 = authService.login(new LoginDto("username1", "password"));
-        JWTAuthResponse response2 = authService.login(new LoginDto("username2", "password"));
 
         MessageNewDto message1 = new MessageNewDto("message from user1 to user2");
         MessageNewDto message2 = new MessageNewDto("message from user2 to user1");
@@ -145,8 +151,6 @@ public class UserIntegrationTest {
 
         authService.register(newDto1);
         authService.register(newDto2);
-        JWTAuthResponse response1 = authService.login(new LoginDto("username1", "password"));
-        JWTAuthResponse response2 = authService.login(new LoginDto("username2", "password"));
 
         MessageNewDto message1 = new MessageNewDto("message from user1 to user2");
         MessageNewDto message2 = new MessageNewDto("message from user2 to user1");
@@ -184,8 +188,6 @@ public class UserIntegrationTest {
 
         authService.register(newDto1);
         authService.register(newDto2);
-        JWTAuthResponse response1 = authService.login(new LoginDto("username1", "password"));
-        JWTAuthResponse response2 = authService.login(new LoginDto("username2", "password"));
 
         MessageNewDto message1 = new MessageNewDto("message from user1 to user2");
         MessageNewDto message2 = new MessageNewDto("message from user2 to user1");
@@ -206,4 +208,4 @@ public class UserIntegrationTest {
                 messageService.deleteMessage(createdMessage2.getMessageId(), user2.getUsername()));
         assertEquals("Action forbidden for current user", ex2.getMessage());
     }
-}*/
+}

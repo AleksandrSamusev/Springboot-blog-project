@@ -7,8 +7,6 @@ import dev.practice.mainApp.dtos.user.UserNewDto;
 import dev.practice.mainApp.repositories.RoleRepository;
 import dev.practice.mainApp.services.AuthService;
 import dev.practice.mainApp.services.TagService;
-import dev.practice.mainApp.services.UserService;
-import dev.practice.mainApp.services.impl.AuthServiceImpl;
 import dev.practice.mainApp.utils.Validations;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

@@ -1,11 +1,10 @@
-/*package dev.practice.mainApp.tag;
+package dev.practice.mainApp.tag;
 
 import dev.practice.mainApp.dtos.article.ArticleFullDto;
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
 import dev.practice.mainApp.dtos.tag.TagFullDto;
 import dev.practice.mainApp.dtos.tag.TagNewDto;
 import dev.practice.mainApp.dtos.tag.TagShortDto;
-import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.ArticleRepository;
 import dev.practice.mainApp.repositories.TagRepository;
@@ -15,10 +14,13 @@ import dev.practice.mainApp.services.TagService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,7 +31,6 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Transactional
-@RunWith(SpringRunner.class)
 @SpringBootTest(
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -40,6 +41,15 @@ public class TagIntegrationTest {
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
     private final ArticlePrivateService articleService;
+
+    @MockBean
+    protected AuthenticationConfiguration authenticationConfiguration;
+    @MockBean
+    protected AuthenticationManager authenticationManager;
+    @MockBean
+    protected HttpSecurity httpSecurity;
+    @MockBean
+    protected SecurityFilterChain securityFilterChain;
 
     private final User author = new User(null, "Harry", "Potter", "author", "password",
             "hp@gmail.com", LocalDate.of(1981, 7, 31), new HashSet<>(), null,
@@ -159,4 +169,4 @@ public class TagIntegrationTest {
         articleRepository.deleteAll();
         userRepository.deleteAll();
     }
-}*/
+}
