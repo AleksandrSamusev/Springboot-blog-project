@@ -25,4 +25,6 @@ public interface UserService {
     UserFullDto unbanUser(Long userId, String username);
 
     UserFullDto updateUser(Long userId, UserUpdateDto dto, String username);
+
+    UserFullDto changeRole(Long userId, String role);
 }

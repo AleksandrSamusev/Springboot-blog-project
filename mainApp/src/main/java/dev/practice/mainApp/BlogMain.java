@@ -1,4 +1,4 @@
-package dev.practice.mainApp; //
+package dev.practice.mainApp;
 
 import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.repositories.RoleRepository;

@@ -293,6 +293,7 @@ public class ArticlePrivateServiceImplIntTest {
     @Test
     void article_test_25_Given_adminAndValidArticleId_When_deleteArticle_Then_articleDeleted() {
         dropDB();
+        setRoles();
         newArticle.getTags().add(new TagNewDto(tag1.getName()));
         newArticle.getTags().add(new TagNewDto(tag2.getName()));
         User author = userRepository.save(user);

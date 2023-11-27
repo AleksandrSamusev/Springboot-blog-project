@@ -78,14 +78,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, headers, status);
     }
 
-    @ExceptionHandler(TodoAPIException.class)
-    public ResponseEntity<ErrorResponse> handleTodoAPIException(TodoAPIException ex, WebRequest webRequest) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(LocalDateTime.now());
-        errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        errorResponse.setPath(((ServletWebRequest) webRequest).getRequest().getServletPath());
-        errorResponse.addError(ex.getMessage());
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
 }

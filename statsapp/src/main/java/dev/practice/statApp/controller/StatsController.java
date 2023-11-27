@@ -25,7 +25,7 @@ public class StatsController {
         return new ResponseEntity<>(statsService.addStats(statisticRecord), HttpStatus.CREATED);
     }
 
-    @GetMapping("/stats")
+    @GetMapping(value = "/stats", produces="application/json")
     public List<StatisticRecord> getStats(
             @RequestParam LocalDateTime start,
             @RequestParam LocalDateTime end,

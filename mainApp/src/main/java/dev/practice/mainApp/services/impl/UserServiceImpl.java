@@ -5,8 +5,11 @@ import dev.practice.mainApp.dtos.user.UserShortDto;
 import dev.practice.mainApp.dtos.user.UserUpdateDto;
 import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
+import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.mappers.UserMapper;
+import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.models.User;
+import dev.practice.mainApp.repositories.RoleRepository;
 import dev.practice.mainApp.repositories.UserRepository;
 import dev.practice.mainApp.services.UserService;
 import dev.practice.mainApp.utils.Validations;
@@ -16,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final Validations validations;
     private final BCryptPasswordEncoder encoder;
 
@@ -134,6 +139,20 @@ public class UserServiceImpl implements UserService {
         }
         User savedUser = userRepository.save(user);
         log.info("User with ID = {} was successfully updated", savedUser.getUserId());
+        return UserMapper.toUserFullDto(savedUser);
+    }
+
+    @Override
+    public UserFullDto changeRole(Long userId, String roleName) {
+        User user = validations.checkUserExist(userId);
+        Optional<Role> role = roleRepository.findByName(roleName);
+        if(role.isPresent()) {
+            user.getRoles().add(role.get());
+        } else {
+            throw new ResourceNotFoundException("Role with given name: '" + roleName +"' not found");
+        }
+        User savedUser = userRepository.save(user);
+        log.info("Set new role: {} to user with ID: {}", roleName, userId);
         return UserMapper.toUserFullDto(savedUser);
     }
 }
