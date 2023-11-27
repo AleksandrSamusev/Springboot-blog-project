@@ -1,4 +1,5 @@
 package dev.practice.mainApp.user;
+
 import dev.practice.mainApp.dtos.article.ArticleNewDto;
 import dev.practice.mainApp.dtos.message.MessageFullDto;
 import dev.practice.mainApp.dtos.message.MessageNewDto;
@@ -55,7 +56,6 @@ public class UserIntegrationTest {
     protected HttpSecurity httpSecurity;
     @MockBean
     protected SecurityFilterChain securityFilterChain;
-
 
 
     @Test

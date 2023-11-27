@@ -37,12 +37,12 @@ public class ValidationsTest {
     private Validations validations;
 
     private final User user = new User(0L, "Harry", "Potter", "user",
-            "password","hp@gmail.com", LocalDate.of(1981, 7, 31),
-            new HashSet<>(), null,false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            "password", "hp@gmail.com", LocalDate.of(1981, 7, 31),
+            new HashSet<>(), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
             new HashSet<>());
     private final User admin = new User(1L, "Ron", "Weasley", "admin",
             "password", "rw@gmail.com", LocalDate.of(1981, 9, 16),
-            new HashSet<>(), null,false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+            new HashSet<>(), null, false, new HashSet<>(), new HashSet<>(), new HashSet<>(),
             new HashSet<>());
     private final Article savedArticle = new Article(0L, "A pretty cat",
             "Very interesting information", user, LocalDateTime.now(), null, ArticleStatus.CREATED,
