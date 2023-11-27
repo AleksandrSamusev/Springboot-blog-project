@@ -31,7 +31,6 @@ public class SecurityConfig {
             authorize.requestMatchers("/api/v1/public/**").permitAll();
             authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
             authorize.requestMatchers("/api/v1/auth/**").permitAll();
-            authorize.requestMatchers("/**").permitAll();
             authorize.anyRequest().authenticated();
         }).httpBasic(Customizer.withDefaults());
 
