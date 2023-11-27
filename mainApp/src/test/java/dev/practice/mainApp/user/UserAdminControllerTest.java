@@ -54,13 +54,13 @@ public class UserAdminControllerTest {
 
 
     private final UserFullDto bannedUser = new UserFullDto(1L, "John", "Doe",
-            "bannedUser","password", "johnDoe@test.test",
+            "bannedUser", "password", "johnDoe@test.test",
             LocalDate.of(2000, 12, 27), new HashSet<>(),
             "Hi! I'm John", true, new HashSet<>(), new HashSet<>(),
             new HashSet<>(), new HashSet<>());
 
     private final UserFullDto notBannedUser = new UserFullDto(1L, "John", "Doe",
-            "notBannedUser","password", "johnDoe@test.test",
+            "notBannedUser", "password", "johnDoe@test.test",
             LocalDate.of(2000, 12, 27), new HashSet<>(),
             "Hi! I'm John", false, new HashSet<>(), new HashSet<>(),
             new HashSet<>(), new HashSet<>());

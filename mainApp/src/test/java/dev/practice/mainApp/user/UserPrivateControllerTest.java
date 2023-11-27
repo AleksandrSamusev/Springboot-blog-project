@@ -189,6 +189,6 @@ public class UserPrivateControllerTest {
 
         doThrow(ResourceNotFoundException.class).when(userService).deleteUser(anyLong(), anyString());
         mockMvc.perform(delete("/api/v1/private/users/1"))
-                                        .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound());
     }
 }

@@ -55,7 +55,7 @@ public class AuthControllerTest {
     public void user_test_17_RegisterUser() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", "Doe",
-                "johnDoe","password", "johnDoe@test.test",
+                "johnDoe", "password", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
 
         mockMvc.perform(post("/api/v1/auth/register")
@@ -88,7 +88,7 @@ public class AuthControllerTest {
     public void user_test_35_Given_FirstNameIsNull_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto(null, "Doe",
-                "johnDoe","password", "johnDoe@test.test",
+                "johnDoe", "password", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
 
         mockMvc.perform(post("/api/v1/auth/register")
@@ -105,7 +105,7 @@ public class AuthControllerTest {
     public void user_test_36_Given_LastNameIsNull_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", null,
-                "johnDoe","password", "johnDoe@test.test",
+                "johnDoe", "password", "johnDoe@test.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
 
         mockMvc.perform(post("/api/v1/auth/register")
@@ -139,7 +139,7 @@ public class AuthControllerTest {
     public void user_test_37_Given_EmailIsNull_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", "Doe",
-                "johnDoe","password", null,
+                "johnDoe", "password", null,
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
 
         mockMvc.perform(post("/api/v1/auth/register")
@@ -156,7 +156,7 @@ public class AuthControllerTest {
     public void user_test_38_Given_EmailIsNotValid_When_CreateUser_Then_BadRequest() throws Exception {
 
         UserNewDto dto = new UserNewDto("John", "Doe",
-                "johnDoe","password", "johnDoetest.test",
+                "johnDoe", "password", "johnDoetest.test",
                 LocalDate.of(2000, 12, 27), "Hi! I'm John");
 
         mockMvc.perform(post("/api/v1/auth/register")
