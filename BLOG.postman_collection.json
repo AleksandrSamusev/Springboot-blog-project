@@ -7,16 +7,16 @@
 	},
 	"item": [
 		{
-			"name": "users",
+			"name": "auth",
 			"item": [
 				{
-					"name": "Create user",
+					"name": "(public) Log In user",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"firstName\":\"Marry\",\r\n    \"lastName\":\"Dowson\",\r\n    \"username\":\"maryMary123\",\r\n    \"email\":\"marrydawson@test.test\",\r\n    \"birthDate\":\"1989-12-27\",\r\n    \"about\":\"Hi! I'm Marry\"\r\n}",
+							"raw": "{\r\n \"usernameOrEmail\":\"user\",\r\n \"password\":\"user-password\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -24,7 +24,7 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/api/v1/public/users",
+							"raw": "localhost:8080/api/v1/auth/login",
 							"host": [
 								"localhost"
 							],
@@ -32,25 +32,67 @@
 							"path": [
 								"api",
 								"v1",
-								"public",
-								"users"
+								"auth",
+								"login"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get all users",
+					"name": "(public) Register user",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"user\",\r\n    \"lastName\":\"user\",\r\n    \"username\":\"user\",\r\n    \"password\":\"user-password\",\r\n    \"email\":\"user.potter@test.test\",\r\n    \"birthDate\":\"1910-10-10\",\r\n    \"about\":\"Hi, i'm user!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/register",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "(public) Get all users",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [
 							{
-								"key": "X-Current-User-Id",
-								"value": "3",
-								"type": "text"
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"body": {
@@ -79,12 +121,15 @@
 					"response": []
 				},
 				{
-					"name": "Get user by ID",
+					"name": "(public) Get user by ID",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/v1/public/users/123",
+							"raw": "localhost:8080/api/v1/public/users/1",
 							"host": [
 								"localhost"
 							],
@@ -94,15 +139,54 @@
 								"v1",
 								"public",
 								"users",
-								"123"
+								"1"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Delete user",
+					"name": "(public) Change users role",
 					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/public/users/1/roles?name=ROLE_ADMIN",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"public",
+								"users",
+								"1",
+								"roles"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "ROLE_ADMIN"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Delete user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA4OTQ2NSwiZXhwIjoxNzAxNjk0MjY1fQ.RTJnKLgPJkAqvIphOod-M_TnbUVpXWwv9BD4pAn2UDh_H8LpmTWF0ukXLQUNC4LH",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [
 							{
@@ -112,7 +196,7 @@
 							}
 						],
 						"url": {
-							"raw": "localhost:8080/api/v1/private/users/1",
+							"raw": "localhost:8080/api/v1/private/users/2",
 							"host": [
 								"localhost"
 							],
@@ -122,43 +206,25 @@
 								"v1",
 								"private",
 								"users",
-								"1"
+								"2"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get user by ID (private)",
+					"name": "(private) Update user",
 					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "X-Current-User-Id",
-								"value": "1",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "localhost:8080/api/v1/private/users/1",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"v1",
-								"private",
-								"users",
-								"1"
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA4OTQ2NSwiZXhwIjoxNzAxNjk0MjY1fQ.RTJnKLgPJkAqvIphOod-M_TnbUVpXWwv9BD4pAn2UDh_H8LpmTWF0ukXLQUNC4LH",
+									"type": "string"
+								}
 							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update user",
-					"request": {
+						},
 						"method": "PATCH",
 						"header": [
 							{
@@ -169,7 +235,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"firstName\":\"xxx\",\r\n    \"lastName\":\"xxxx\",\r\n    \"username\":\"xxxxx123\",\r\n    \"email\":\"xxxxxxxxxxx123@test.test\",\r\n    \"birthDate\":\"1989-12-27\",\r\n    \"about\":\"Hi! I'm Marry\"\r\n}",
+							"raw": "{\r\n    \"firstName\":\"admin\",\r\n    \"lastName\":\"admin\",\r\n    \"about\":\"Hi! My name is admin! This is my updated about.\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -194,12 +260,91 @@
 					"response": []
 				},
 				{
-					"name": "Change users role",
+					"name": "(private) Get user by ID",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA4OTQ2NSwiZXhwIjoxNzAxNjk0MjY1fQ.RTJnKLgPJkAqvIphOod-M_TnbUVpXWwv9BD4pAn2UDh_H8LpmTWF0ukXLQUNC4LH",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Current-User-Id",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/v1/private/users/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Get all users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA4OTQ2NSwiZXhwIjoxNzAxNjk0MjY1fQ.RTJnKLgPJkAqvIphOod-M_TnbUVpXWwv9BD4pAn2UDh_H8LpmTWF0ukXLQUNC4LH",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/private/users",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(admin) Ban user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/v1/admin/users/70?role=ADMIN",
+							"raw": "localhost:8080/api/v1/admin/users/1/ban",
 							"host": [
 								"localhost"
 							],
@@ -209,13 +354,264 @@
 								"v1",
 								"admin",
 								"users",
-								"70"
+								"1",
+								"ban"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(admin) Unban user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/admin/users/1/unban",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"users",
+								"1",
+								"unban"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "tags",
+			"item": [
+				{
+					"name": "(public) Get all article tags",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/public/tags/articles/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"public",
+								"tags",
+								"articles",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(public) Get tag by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/public/tags/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"public",
+								"tags",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Create tag",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA4OTQ2NSwiZXhwIjoxNzAxNjk0MjY1fQ.RTJnKLgPJkAqvIphOod-M_TnbUVpXWwv9BD4pAn2UDh_H8LpmTWF0ukXLQUNC4LH",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"#Witchcraft2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/private/tags/articles/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"tags",
+								"articles",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Add several tags  at once",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA4OTQ2NSwiZXhwIjoxNzAxNjk0MjY1fQ.RTJnKLgPJkAqvIphOod-M_TnbUVpXWwv9BD4pAn2UDh_H8LpmTWF0ukXLQUNC4LH",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n       \"name\":\"#HarryRocks\"\r\n    },\r\n    {\r\n        \"name\":\"#ElDiablo\"\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/private/tags/articles/1/add?tags=HarryHorse&Quiddich",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"tags",
+								"articles",
+								"1",
+								"add"
 							],
 							"query": [
 								{
-									"key": "role",
-									"value": "ADMIN"
+									"key": "tags",
+									"value": "HarryHorse"
+								},
+								{
+									"key": "Quiddich",
+									"value": null
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Remove several tags at once",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA4OTQ2NSwiZXhwIjoxNzAxNjk0MjY1fQ.RTJnKLgPJkAqvIphOod-M_TnbUVpXWwv9BD4pAn2UDh_H8LpmTWF0ukXLQUNC4LH",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/private/tags/articles/1/remove?tags=1,2,3",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"tags",
+								"articles",
+								"1",
+								"remove"
+							],
+							"query": [
+								{
+									"key": "tags",
+									"value": "1,2,3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(admin) Delete tag",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/admin/tags/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"tags",
+								"1"
 							]
 						}
 					},
@@ -227,14 +623,159 @@
 			"name": "articles",
 			"item": [
 				{
-					"name": "Create article",
+					"name": "(public) like article",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/public/articles/1/like",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"public",
+								"articles",
+								"1",
+								"like"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(public) Get all articles by tag ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/public/articles/tags/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"public",
+								"articles",
+								"tags",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(public) Get all articles by author ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/public/articles/users/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"public",
+								"articles",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(public) Get all articles",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/v1/public/articles",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"public",
+								"articles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(public) Get article by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/public/articles/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"public",
+								"articles",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Create article",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
-								"key": "X-Current-User-Id",
-								"value": "1",
-								"type": "text"
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"body": {
@@ -263,18 +804,28 @@
 					"response": []
 				},
 				{
-					"name": "Publish Article",
+					"name": "(private) Publish article",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA3MjI2OSwiZXhwIjoxNzAxNjc3MDY5fQ.3_9GuYoCmowVbF-DWmaGledkCZjzv4H0Cv0Jx7trO8JxRRUbNsC5pL7oF8V-w0eh",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PATCH",
 						"header": [
 							{
 								"key": "X-Current-User-Id",
-								"value": "71",
+								"value": "1",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "localhost:8080/api/v1/private/articles/397/publish",
+							"raw": "localhost:8080/api/v1/private/articles/1/publish",
 							"host": [
 								"localhost"
 							],
@@ -284,7 +835,7 @@
 								"v1",
 								"private",
 								"articles",
-								"397",
+								"1",
 								"publish"
 							]
 						}
@@ -292,18 +843,164 @@
 					"response": []
 				},
 				{
-					"name": "Confirm publishing",
+					"name": "(private) Delete article",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/private/articles/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"articles",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Update article",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\":\"Was sagt Kengoroo....pam-para-bara\",\r\n    \"content\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis lectus nulla at volutpat diam ut venenatis tellus. Nunc vel risus commodo viverra maecenas accumsan lacus vel. Justo donec enim diam vulputate ut pharetra. Vel facilisis volutpat est velit egestas dui id ornare arcu. Enim blandit volutpat maecenas volutpat blandit aliquam. Sed sed risus pretium quam vulputate dignissim suspendisse in est. Dolor sed viverra ipsum nunc aliquet. Massa ultricies mi quis hendrerit dolor. Nunc eget lorem dolor sed viverra ipsum nunc aliquet bibendum. Eget nullam non nisi est sit. Odio morbi quis commodo odio aenean sed adipiscing diam. Sed arcu non odio euismod. Suspendisse ultrices gravida dictum fusce ut placerat. Ut aliquam purus sit amet luctus venenatis lectus magna.Ultrices dui sapien eget mi proin sed libero enim. Id interdum velit laoreet id donec ultrices. Neque vitae tempus quam pellentesque nec. Dignissim convallis aenean et tortor at risus viverra adipiscing. Neque ornare aenean euismod elementum nisi quis eleifend. Id volutpat lacus laoreet non curabitur gravida. Dolor sit amet consectetur adipiscing. Eu non diam phasellus vestibulum lorem sed risus ultricies tristique. Massa tempor nec feugiat nisl pretium fusce. Elit sed vulputate mi sit amet mauris commodo quis imperdiet. Nec feugiat in fermentum posuere urna nec. Viverra justo nec ultrices dui sapien. In est ante in nibh mauris. Tortor consequat id porta nibh venenatis cras sed felis. Suspendisse in est ante in nibh. Eget nullam non nisi est sit.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/private/articles/2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"articles",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Get article by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/private/articles/2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"articles",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Get own articles",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ1c2VyIiwiaWF0IjoxNzAxMTA5NDE4LCJleHAiOjE3MDE3MTQyMTh9.SAu0abdz-bis55pAO4A7nO0UFuCrOo7lMhHLwvkIASLYYf808DmCFZsvT6D6kMgq",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/private/articles",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"articles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(admin) Confirm publishing",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PATCH",
 						"header": [
 							{
 								"key": "X-Current-User-Id",
-								"value": "70",
+								"value": "1",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "localhost:8080/api/v1/admin/articles/1?publish=true",
+							"raw": "localhost:8080/api/v1/admin/articles/1/publish?publish=true",
 							"host": [
 								"localhost"
 							],
@@ -313,7 +1010,8 @@
 								"v1",
 								"admin",
 								"articles",
-								"1"
+								"1",
+								"publish"
 							],
 							"query": [
 								{
@@ -326,12 +1024,53 @@
 					"response": []
 				},
 				{
-					"name": "(PUBLIC) Get article by ID",
+					"name": "(admin) Get all articles by author ID",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/v1/public/articles/1",
+							"raw": "localhost:8080/api/v1/admin/articles/users/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"articles",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "comments",
+			"item": [
+				{
+					"name": "(public) Get all comments to article",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/public/comments/articles/1",
 							"host": [
 								"localhost"
 							],
@@ -340,6 +1079,7 @@
 								"api",
 								"v1",
 								"public",
+								"comments",
 								"articles",
 								"1"
 							]
@@ -348,12 +1088,15 @@
 					"response": []
 				},
 				{
-					"name": "(PUBLIC) Get all articles",
+					"name": "(public) Get comment by ID",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/v1/public/articles",
+							"raw": "localhost:8080/api/v1/public/comments/1",
 							"host": [
 								"localhost"
 							],
@@ -362,19 +1105,39 @@
 								"api",
 								"v1",
 								"public",
-								"articles"
+								"comments",
+								"1"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get all articles by author ID",
+					"name": "(private) Create comment",
 					"request": {
-						"method": "GET",
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA4OTQ2NSwiZXhwIjoxNzAxNjk0MjY1fQ.RTJnKLgPJkAqvIphOod-M_TnbUVpXWwv9BD4pAn2UDh_H8LpmTWF0ukXLQUNC4LH",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"comment\":\"Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "localhost:8080/api/v1/public/articles/users/71",
+							"raw": "localhost:8080/api/v1/private/comments/articles/1",
 							"host": [
 								"localhost"
 							],
@@ -382,22 +1145,152 @@
 							"path": [
 								"api",
 								"v1",
-								"public",
+								"private",
+								"comments",
 								"articles",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Update comment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA4OTQ2NSwiZXhwIjoxNzAxNjk0MjY1fQ.RTJnKLgPJkAqvIphOod-M_TnbUVpXWwv9BD4pAn2UDh_H8LpmTWF0ukXLQUNC4LH",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"comment\":\"Creator updated comment\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/private/comments/3",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"comments",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Delete comment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTA4OTQ2NSwiZXhwIjoxNzAxNjk0MjY1fQ.RTJnKLgPJkAqvIphOod-M_TnbUVpXWwv9BD4pAn2UDh_H8LpmTWF0ukXLQUNC4LH",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/private/comments/3",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"comments",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "messages",
+			"item": [
+				{
+					"name": "(private) Create message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ1c2VyIiwiaWF0IjoxNzAxMTA5NDE4LCJleHAiOjE3MDE3MTQyMTh9.SAu0abdz-bis55pAO4A7nO0UFuCrOo7lMhHLwvkIASLYYf808DmCFZsvT6D6kMgq",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"message\":\"Message 2 from User ID=2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/private/messages/users/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"messages",
 								"users",
-								"71"
+								"1"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get all articles by tag",
+					"name": "(private) Get all sent messages",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/api/v1/public/articles/tags/42",
+							"raw": "localhost:8080/api/v1/private/messages/sent",
 							"host": [
 								"localhost"
 							],
@@ -405,10 +1298,105 @@
 							"path": [
 								"api",
 								"v1",
-								"public",
-								"articles",
-								"tags",
-								"42"
+								"private",
+								"messages",
+								"sent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Get all received messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/private/messages/received",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"messages",
+								"received"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Get message by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/private/messages/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"messages",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(private) Delete message by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwMTEwODA1MSwiZXhwIjoxNzAxNzEyODUxfQ.Pl927WEWMLlDcrv6RS5ekuNtBWwRyMI6q8fyy1k4zRGr3TRBmCZPOMn2pw97ZgSP",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/private/messages/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"private",
+								"messages",
+								"1"
 							]
 						}
 					},
