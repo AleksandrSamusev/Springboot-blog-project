@@ -62,7 +62,7 @@ public class Validations {
         if (!article.getAuthor().getUserId().equals(userId)) {
             log.error("Article with id {} is not belongs to user with id {}", article.getArticleId(), userId);
             throw new ActionForbiddenException(String.format(
-                    "Article with id %d is not belongs to user with ide %s. Action is forbidden",
+                    "Article with id %d is not belongs to user with id %s. Action is forbidden",
                     article.getArticleId(), userId));
         }
     }

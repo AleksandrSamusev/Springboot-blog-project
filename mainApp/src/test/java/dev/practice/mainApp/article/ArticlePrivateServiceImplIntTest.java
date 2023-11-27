@@ -81,10 +81,14 @@ public class ArticlePrivateServiceImplIntTest {
 
 
     void setRoles() {
-        Role roleAdmin = new Role(null, "ROLE_ADMIN");
-        Role roleUser = new Role(null, "ROLE_USER");
-        roleRepository.saveAll(Set.of(roleUser, roleAdmin));
-
+        if(roleRepository.findByName("ROLE_ADMIN") == null) {
+            Role roleAdmin = new Role(null, "ROLE_ADMIN");
+            roleRepository.save(roleAdmin);
+        }
+        if (roleRepository.findByName("ROLE_USER") == null) {
+            Role roleUser = new Role(null, "ROLE_USER");
+            roleRepository.save(roleUser);
+        }
     }
 
     @Test
@@ -323,6 +327,8 @@ public class ArticlePrivateServiceImplIntTest {
                     LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L, new HashSet<>(),
                     new HashSet<>()));
         }
+        author.getArticles().addAll(articleRepository.findAll());
+        userRepository.save(author);
 
         List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 0, 10,
                 "ALL");
@@ -333,7 +339,7 @@ public class ArticlePrivateServiceImplIntTest {
     }
 
     @Test
-    void article_test_29_Given_userIdSize5from10_When_getAllArticlesByUserId_Then_return5ArticlesOfUser() {
+    void article_test_29_Given_userIdSize5from3_When_getAllArticlesByUserId_Then_return5ArticlesOfUser() {
         dropDB();
         User author = userRepository.save(user);
         for (int i = 0; i < 20; i++) {
@@ -341,6 +347,8 @@ public class ArticlePrivateServiceImplIntTest {
                     LocalDateTime.now(), null, ArticleStatus.CREATED, 0L, 0L, new HashSet<>(),
                     new HashSet<>()));
         }
+        author.getArticles().addAll(articleRepository.findAll());
+        userRepository.save(author);
 
         List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 10, 5,
                 "ALL");
@@ -348,8 +356,8 @@ public class ArticlePrivateServiceImplIntTest {
         assertThat(articleRepository.findAll().size()).isEqualTo(20);
         assertThat(result.size()).isEqualTo(5);
         assertThat(result.get(0).getAuthor().getUserId()).isEqualTo(author.getUserId());
-        assertThat(result.get(0).getTitle()).isEqualTo("10");
-        assertThat(result.get(4).getTitle()).isEqualTo("14");
+        assertThat(result.get(0).getTitle()).isEqualTo("4");
+        assertThat(result.get(4).getTitle()).isEqualTo("0");
     }
 
     @Test
@@ -366,6 +374,8 @@ public class ArticlePrivateServiceImplIntTest {
                     LocalDateTime.now(), LocalDateTime.now(), ArticleStatus.PUBLISHED, 0L, 0L, new HashSet<>(),
                     new HashSet<>()));
         }
+        author.getArticles().addAll(articleRepository.findAll());
+        userRepository.save(author);
 
         List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 0, 10,
                 "PUBLISHED");
@@ -393,6 +403,8 @@ public class ArticlePrivateServiceImplIntTest {
         articleRepository.save(new Article(null, "r", "some information", author,
                 LocalDateTime.now(), null, ArticleStatus.REJECTED, 0L, 0L, new HashSet<>(),
                 new HashSet<>()));
+        author.getArticles().addAll(articleRepository.findAll());
+        userRepository.save(author);
 
         List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 0, 10,
                 "REJECTED");
@@ -420,6 +432,8 @@ public class ArticlePrivateServiceImplIntTest {
         articleRepository.save(new Article(null, "r", "some information", author,
                 LocalDateTime.now(), null, ArticleStatus.MODERATING, 0L, 0L, new HashSet<>(),
                 new HashSet<>()));
+        author.getArticles().addAll(articleRepository.findAll());
+        userRepository.save(author);
 
         List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 0, 10,
                 "MODERATING");
@@ -447,6 +461,8 @@ public class ArticlePrivateServiceImplIntTest {
         articleRepository.save(new Article(null, "r", "some information", author,
                 LocalDateTime.now(), null, ArticleStatus.MODERATING, 0L, 0L, new HashSet<>(),
                 new HashSet<>()));
+        author.getArticles().addAll(articleRepository.findAll());
+        userRepository.save(author);
 
         List<ArticleFullDto> result = articleService.getAllArticlesByUserId(author.getUsername(), 0, 10,
                 "CREATED");

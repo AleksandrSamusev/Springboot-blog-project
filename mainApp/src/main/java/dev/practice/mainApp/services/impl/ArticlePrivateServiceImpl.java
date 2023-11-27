@@ -108,7 +108,8 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
                         .sorted(Comparator.comparing(Article::getPublished).reversed())
                         .toList();
                 yield ArticleMapper.toListArticleFull(articles.subList(
-                        from * size, size > articles.size() ? articles.size() : from * size + size));
+                        from * size > articles.size() ? articles.size() - size : from * size,
+                        Math.min(from * size + size, articles.size())));
             }
             case "MODERATING" -> {
                 List<Article> articles = user.getArticles()
@@ -117,7 +118,8 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
                         .sorted(Comparator.comparing(Article::getCreated).reversed())
                         .toList();
                 yield ArticleMapper.toListArticleFull(articles.subList(
-                        from * size, size > articles.size() ? articles.size() : from * size + size));
+                        from * size > articles.size() ? articles.size() - size : from * size,
+                        Math.min(from * size + size, articles.size())));
             }
             case "REJECTED" -> {
                 List<Article> articles = user.getArticles()
@@ -126,7 +128,8 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
                         .sorted(Comparator.comparing(Article::getCreated).reversed())
                         .toList();
                 yield ArticleMapper.toListArticleFull(articles.subList(
-                        from * size, size > articles.size() ? articles.size() : from * size + size));
+                        from * size > articles.size() ? articles.size() - size : from * size,
+                        Math.min(from * size + size, articles.size())));
             }
             case "CREATED" -> {
                 List<Article> articles = user.getArticles()
@@ -135,7 +138,8 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
                         .sorted(Comparator.comparing(Article::getCreated).reversed())
                         .toList();
                 yield ArticleMapper.toListArticleFull(articles.subList(
-                        from * size, size > articles.size() ? articles.size() : from * size + size));
+                        from * size > articles.size() ? articles.size() - size : from * size,
+                        Math.min(from * size + size, articles.size())));
             }
             case "ALL" -> {
                 List<Article> articles = user.getArticles()
@@ -143,7 +147,8 @@ public class ArticlePrivateServiceImpl implements ArticlePrivateService {
                         .sorted(Comparator.comparing(Article::getCreated).reversed())
                         .toList();
                 yield ArticleMapper.toListArticleFull(articles.subList(
-                        from * size, size > articles.size() ? articles.size() : from * size + size));
+                        from * size > articles.size() ? articles.size() - size : from * size,
+                        Math.min(from * size + size, articles.size())));
             }
             default -> {
                 log.info("Incorrect status: {}", status);

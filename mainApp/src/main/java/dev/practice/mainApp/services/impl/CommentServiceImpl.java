@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
     private final Validations validations;
 
     @Override

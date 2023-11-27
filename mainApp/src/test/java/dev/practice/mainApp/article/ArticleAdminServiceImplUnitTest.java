@@ -59,6 +59,12 @@ public class ArticleAdminServiceImplUnitTest {
     @Test
     void articleAd_test_1_Given_adminAndExistUser_When_getAllArticlesByUserId_Then_returnAllUserArticles() {
         Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.any()))
+                .thenReturn(admin);
+        Mockito
+                .when(validations.isAdmin(Mockito.any()))
+                .thenReturn(true);
+        Mockito
                 .when(validations.checkUserExist(Mockito.anyLong()))
                 .thenReturn(author);
         Mockito
@@ -67,7 +73,7 @@ public class ArticleAdminServiceImplUnitTest {
                 .thenReturn(List.of(fullArticle));
 
 
-        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(admin.getUsername(),
                 1L, 0, 0, "ALL");
 
         assertThat(result.get(0)).isInstanceOf(ArticleFullDto.class);
@@ -79,13 +85,19 @@ public class ArticleAdminServiceImplUnitTest {
         article.setPublished(null);
         article.setStatus(ArticleStatus.CREATED);
         Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.any()))
+                .thenReturn(admin);
+        Mockito
+                .when(validations.isAdmin(Mockito.any()))
+                .thenReturn(true);
+        Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(article);
         Mockito
                 .when(articleRepository.save(Mockito.any()))
                 .thenReturn(article);
 
-        ArticleFullDto result = articleService.publishArticle("author", 0L, true);
+        ArticleFullDto result = articleService.publishArticle(admin.getUsername(), 0L, true);
 
         assertThat(result.getPublished()).isNotNull();
         assertThat(result.getStatus()).isEqualTo(ArticleStatus.PUBLISHED);
@@ -96,13 +108,19 @@ public class ArticleAdminServiceImplUnitTest {
         article.setPublished(null);
         article.setStatus(ArticleStatus.CREATED);
         Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.any()))
+                .thenReturn(admin);
+        Mockito
+                .when(validations.isAdmin(Mockito.any()))
+                .thenReturn(true);
+        Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(article);
         Mockito
                 .when(articleRepository.save(Mockito.any()))
                 .thenReturn(article);
 
-        ArticleFullDto result = articleService.publishArticle("author", 0L, false);
+        ArticleFullDto result = articleService.publishArticle(admin.getUsername(), 0L, false);
 
         assertThat(result.getPublished()).isNull();
         assertThat(result.getStatus()).isEqualTo(ArticleStatus.REJECTED);

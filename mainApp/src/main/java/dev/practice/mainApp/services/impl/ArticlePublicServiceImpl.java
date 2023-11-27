@@ -69,7 +69,8 @@ public class ArticlePublicServiceImpl implements ArticlePublicService {
                 .toList();
 
         List<Article> articlesPageable = articles.subList(
-                from * size, size > articles.size() ?  articles.size() : from * size + size);
+                from * size > articles.size() ? articles.size() - size : from * size,
+                Math.min(from * size + size, articles.size()));
 
         List<String> uris = createListOfUris(articlesPageable);
         List<StatisticRecord> responses = sendRequestToStatistic(statsClient, uris);

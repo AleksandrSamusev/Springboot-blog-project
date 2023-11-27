@@ -92,31 +92,16 @@ public class ValidationsTest {
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
 
-/*    @Test
-    public void val_test_5_Given_userIsAdmin_When_checkUserIsAdmin_Then_doNothing() {
-        user.setRole(Role.ADMIN);
-        validations.checkUserIsAdmin(user);
-    }*/
-
-/*    @Test
-    public void val_test_6_Given_userIsNotAdmin_When_checkUserIsAdmin_Then_throwException() {
-        final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
-                () -> validations.checkUserIsAdmin(user));
-        assertEquals("User with id 0 is not ADMIN. Access is forbidden", exception.getMessage(),
-                "Incorrect message");
-        assertThat(exception).isInstanceOf(ActionForbiddenException.class);
-    }*/
-
     @Test
     public void val_test_6_Given_userIsAuthor_When_checkUserIsAuthor_Then_doNothing() {
-        validations.checkUserIsAuthor(savedArticle, user.getUsername());
+        validations.checkUserIsAuthor(savedArticle, user.getUserId());
     }
 
     @Test
     public void val_test_7_Given_userIsNotAuthor_When_checkUserIsAuthor_Then_throwException() {
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
-                () -> validations.checkUserIsAuthor(savedArticle, "abc"));
-        assertEquals("Article with id 0 is not belongs to user with username abc. Action is forbidden",
+                () -> validations.checkUserIsAuthor(savedArticle, 123L));
+        assertEquals("Article with id 0 is not belongs to user with id 123. Action is forbidden",
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }

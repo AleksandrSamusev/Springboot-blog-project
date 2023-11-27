@@ -57,7 +57,7 @@ public class MessageServiceTest {
     @Test
     public void message_test1_Given_ValidIdsAndDto_When_CreateMessage_Then_MessageCreated() {
         when(validations.checkUserExist(2L)).thenReturn(user2);
-        when(userRepository.findByUsername(anyString())).thenReturn(user1);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user1);
         when(messageRepositoryMock.save(any())).thenReturn(fromUser1toUser2);
 
         MessageFullDto messageFullDto = messageService.createMessage(2L, "johnDoe", newMessage);
@@ -92,7 +92,7 @@ public class MessageServiceTest {
     @Test
     public void message_test4_Given_SenderIdEqualsRecipientId_When_CreateMessage_Then_ActionForbiddenException() {
         when(validations.checkUserExist(anyLong())).thenReturn(user1);
-        when(userRepository.findByUsername(anyString())).thenReturn(user1);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user1);
         doThrow(new ActionForbiddenException(
                 "Action forbidden for current user")).when(validations).checkSenderIsNotRecipient(anyLong(), anyLong());
 

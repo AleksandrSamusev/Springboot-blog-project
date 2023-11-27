@@ -63,7 +63,8 @@ public class ArticleAdminControllerTest {
     void article_test_3_Given_adminUserExist_When_getAllArticlesByUserId_Then_returnArticlesStatusOK()
             throws Exception {
         Mockito
-                .when(articleService.getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
+                .when(articleService.getAllArticlesByUserId(
+                        Mockito.any(), Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenReturn(List.of(articleFull));
 
         mvc.perform(get("/api/v1/admin/articles/users/{authorId}", 1L)
@@ -77,7 +78,7 @@ public class ArticleAdminControllerTest {
                 .andExpect(jsonPath("$[0].articleId").value(1));
 
         Mockito.verify(articleService, Mockito.times(1))
-                .getAllArticlesByUserId(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString());
+                .getAllArticlesByUserId(Mockito.any(), Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString());
     }
 
     @WithMockUser(roles = "ADMIN")
@@ -86,7 +87,7 @@ public class ArticleAdminControllerTest {
             throws Exception {
         Mockito
                 .when(articleService.getAllArticlesByUserId(
-                        Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
+                        Mockito.any(), Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenThrow(ActionForbiddenException.class);
 
         mvc.perform(get("/api/v1/admin/articles/users/{authorId}", 1L)

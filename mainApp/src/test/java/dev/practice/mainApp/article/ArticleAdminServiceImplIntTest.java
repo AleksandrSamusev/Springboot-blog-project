@@ -70,9 +70,11 @@ public class ArticleAdminServiceImplIntTest {
         User author = userRepository.save(user);
         userRepository.save(user2);
 
-        articleRepository.save(article);
+        Article savedArticle = articleRepository.save(article);
+        author.getArticles().add(savedArticle);
+        userRepository.save(author);
 
-        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(
+        List<ArticleFullDto> result = articleService.getAllArticlesByUserId(user2.getUsername(),
                 author.getUserId(), 0, 10, "ALL");
 
         assertThat(result.get(0)).isInstanceOf(ArticleFullDto.class);
