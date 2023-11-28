@@ -1,0 +1,73 @@
+{
+	"info": {
+		"_postman_id": "af9f6a4e-c7df-4600-98f7-1785421a4b50",
+		"name": "BLOG_BACKEND_STATSAPP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21140447"
+	},
+	"item": [
+		{
+			"name": "get stats",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:9090/api/v1/stats?start=1923-11-28T07:24:53.312977200&end=2023-11-28T07:27:53.312977200&uris= /api/v1/public/articles/2, /api/v1/public/articles/1",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"api",
+						"v1",
+						"stats"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "1923-11-28T07:24:53.312977200"
+						},
+						{
+							"key": "end",
+							"value": "2023-11-28T07:27:53.312977200"
+						},
+						{
+							"key": "uris",
+							"value": " /api/v1/public/articles/2, /api/v1/public/articles/1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post stats",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"statisticRecordId\":null,\r\n    \"serviceName\":\"test\",\r\n    \"ip\":\"192.168.0.1\",\r\n    \"uri\":\"/api/v1/testURI/\",\r\n    \"timestamp\":\"2023-11-28T07:24:53.114152\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:9090/api/v1/stats",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"api",
+						"v1",
+						"stats"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
