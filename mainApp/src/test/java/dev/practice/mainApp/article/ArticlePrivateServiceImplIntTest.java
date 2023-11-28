@@ -81,11 +81,11 @@ public class ArticlePrivateServiceImplIntTest {
 
 
     void setRoles() {
-        if(roleRepository.findByName("ROLE_ADMIN") == null) {
+        if(roleRepository.findByName("ROLE_ADMIN").isEmpty()) {
             Role roleAdmin = new Role(null, "ROLE_ADMIN");
             roleRepository.save(roleAdmin);
         }
-        if (roleRepository.findByName("ROLE_USER") == null) {
+        if (roleRepository.findByName("ROLE_USER").isEmpty()) {
             Role roleUser = new Role(null, "ROLE_USER");
             roleRepository.save(roleUser);
         }

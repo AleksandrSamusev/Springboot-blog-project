@@ -7,10 +7,12 @@ import dev.practice.mainApp.exceptions.ActionForbiddenException;
 import dev.practice.mainApp.exceptions.InvalidParameterException;
 import dev.practice.mainApp.exceptions.ResourceNotFoundException;
 import dev.practice.mainApp.mappers.UserMapper;
+import dev.practice.mainApp.models.Article;
 import dev.practice.mainApp.models.Role;
 import dev.practice.mainApp.models.User;
 import dev.practice.mainApp.repositories.RoleRepository;
 import dev.practice.mainApp.repositories.UserRepository;
+import dev.practice.mainApp.services.ArticlePrivateService;
 import dev.practice.mainApp.services.UserService;
 import dev.practice.mainApp.utils.Validations;
 import lombok.AllArgsConstructor;
@@ -18,8 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +32,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final ArticlePrivateService articleService;
     private final Validations validations;
     private final BCryptPasswordEncoder encoder;
 
@@ -64,13 +69,16 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-
     @Override
     public void deleteUser(Long userId, String login) {
         User requester = validations.checkUserExistsByUsernameOrEmail(login);
-        validations.checkUserExist(userId);
+        User user = validations.checkUserExist(userId);
         if (userId.equals(requester.getUserId()) || validations.isAdmin(login)) {
-            userRepository.deleteById(userId);
+            user.getArticles().forEach(article ->
+                    articleService.deleteArticle(login, article.getArticleId()));
+            user.setRoles(new HashSet<>());
+            User savedUser = userRepository.save(user);
+            userRepository.deleteById(savedUser.getUserId());
             log.info("User with ID = " + userId + " was successfully deleted.");
         } else {
             throw new ActionForbiddenException("Action forbidden for current user");
@@ -147,10 +155,10 @@ public class UserServiceImpl implements UserService {
     public UserFullDto changeRole(Long userId, String roleName) {
         User user = validations.checkUserExist(userId);
         Optional<Role> role = roleRepository.findByName(roleName);
-        if(role.isPresent()) {
+        if (role.isPresent()) {
             user.getRoles().add(role.get());
         } else {
-            throw new ResourceNotFoundException("Role with given name: '" + roleName +"' not found");
+            throw new ResourceNotFoundException("Role with given name: '" + roleName + "' not found");
         }
         User savedUser = userRepository.save(user);
         log.info("Set new role: {} to user with ID: {}", roleName, userId);

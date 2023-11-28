@@ -271,6 +271,7 @@ public class UserServiceTest {
 
         when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user);
         when(validations.checkUserExist(anyLong())).thenReturn(user);
+        when(userRepositoryMock.save(any())).thenReturn(user);
 
         Mockito.doNothing().when(userRepositoryMock).deleteById(1L);
 
