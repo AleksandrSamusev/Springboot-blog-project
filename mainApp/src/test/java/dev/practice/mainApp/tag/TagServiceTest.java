@@ -157,11 +157,11 @@ public class TagServiceTest {
         when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(admin);
         when(validations.isAdmin(anyString())).thenReturn(true);
         when(validations.isTagExists(anyLong())).thenReturn(tag);
-        doNothing().when(tagRepositoryMock).deleteById(1L);
+        doNothing().when(tagRepositoryMock).delete(tag);
 
         tagService.deleteTag(1L, admin.getUsername());
 
-        verify(tagRepositoryMock, times(1)).deleteById(1L);
+        verify(tagRepositoryMock, times(1)).delete(tag);
     }
 
     @Test
