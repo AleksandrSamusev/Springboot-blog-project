@@ -81,12 +81,12 @@ public class CommentPrivateControllerTest {
 
     private final CommentNewDto dtoForUpdate = new CommentNewDto("Updated!");
 
-    @WithMockUser
+
     @Test
+    @WithMockUser
     public void comment_test28_CreateCommentTest() throws Exception {
         when(commentService.createComment(anyLong(), any(), anyString())).thenReturn(fullComment);
-        mockMvc.perform(post("/api/v1/private/comments/article/1")
-                        .header("X-Current-User-Id", 1)
+        mockMvc.perform(post("/api/v1/private/comments/articles/1")
                         .content(mapper.writeValueAsString(newDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +103,6 @@ public class CommentPrivateControllerTest {
     public void comment_test29_UpdateCommentTest() throws Exception {
         when(commentService.updateComment(any(), anyLong(), anyString())).thenReturn(fullUpdatedComment);
         mockMvc.perform(patch("/api/v1/private/comments/1")
-                        .header("X-Current-User-Id", 1)
                         .content(mapper.writeValueAsString(dtoForUpdate))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -130,8 +129,7 @@ public class CommentPrivateControllerTest {
 
         CommentNewDto dto = new CommentNewDto(null);
         when(commentService.createComment(anyLong(), any(), anyString())).thenReturn(fullComment);
-        mockMvc.perform(post("/api/v1/private/comments/article/1")
-                        .header("X-Current-User-Id", 1)
+        mockMvc.perform(post("/api/v1/private/comments/articles/1")
                         .content(mapper.writeValueAsString(dto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -152,8 +150,7 @@ public class CommentPrivateControllerTest {
                 "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
 
         when(commentService.createComment(anyLong(), any(), anyString())).thenReturn(fullComment);
-        mockMvc.perform(post("/api/v1/private/comments/article/1")
-                        .header("X-Current-User-Id", 1)
+        mockMvc.perform(post("/api/v1/private/comments/articles/1")
                         .content(mapper.writeValueAsString(dto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

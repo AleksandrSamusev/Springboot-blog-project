@@ -52,10 +52,10 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void deleteTag(Long tagId, String username) {
-        User user = validations.checkUserExistsByUsernameOrEmail(username);
-        if (!validations.isAdmin(username)) {
-            log.error("Only admin can delete tag. User with username {} is not admin", username);
+    public void deleteTag(Long tagId, String login) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
+        if (!validations.isAdmin(login)) {
+            log.error("Only admin can delete tag. User with id {} is not admin", user.getUserId());
             throw new ActionForbiddenException("Action forbidden for current user. Only admin can delete tag");
         }
 
@@ -82,9 +82,10 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public ArticleFullDto addTagsToArticle(String username, Long articleId, List<TagNewDto> tags) {
+    public ArticleFullDto addTagsToArticle(String login, Long articleId, List<TagNewDto> tags) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
         Article article = validations.checkArticleExist(articleId);
-        validations.checkUserIsAuthor(article, username);
+        validations.checkUserIsAuthor(article, user.getUserId());
 
         if (tags.isEmpty()) {
             log.info("Tags connected to article with id {} wasn't changed. New tags list was empty", articleId);
@@ -113,9 +114,10 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public ArticleFullDto removeTagsFromArticle(String username, Long articleId, List<Long> tags) {
+    public ArticleFullDto removeTagsFromArticle(String login, Long articleId, List<Long> tags) {
+        User user = validations.checkUserExistsByUsernameOrEmail(login);
         Article article = validations.checkArticleExist(articleId);
-        validations.checkUserIsAuthor(article, String.valueOf(username));
+        validations.checkUserIsAuthor(article, user.getUserId());
 
         if (tags.isEmpty()) {
             log.info("Tags connected to article with id {} wasn't changed. Tags list was empty", articleId);

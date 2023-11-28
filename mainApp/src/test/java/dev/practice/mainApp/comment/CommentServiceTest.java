@@ -117,7 +117,7 @@ public class CommentServiceTest {
 
     @Test
     public void comment_test2_Given_UserNotExists_When_CreateComment_Then_ResourceNotFoundException() {
-        when(userRepositoryMock.findByUsername(any()))
+        when(validations.checkUserExistsByUsernameOrEmail(any()))
                 .thenThrow(new ResourceNotFoundException("User with id 2 wasn't found"));
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
                 commentService.createComment(1L, newComment, "johnDoe"));
@@ -161,7 +161,7 @@ public class CommentServiceTest {
                 "I found this article very interesting!!!", LocalDateTime.now(),
                 article, commentAuthor);
         when(validations.isCommentExists(anyLong())).thenReturn(comment);
-        when(userRepositoryMock.findByUsername(anyString())).thenThrow(new ResourceNotFoundException(
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenThrow(new ResourceNotFoundException(
                 "User with id 2 wasn't found"));
 
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
@@ -181,6 +181,7 @@ public class CommentServiceTest {
 
     @Test
     public void comment_test14_Given_ValidParameters_When_DeleteComment_Then_CommentDeleted() {
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(commentAuthor);
         when(validations.isCommentExists(anyLong())).thenReturn(comment);
         doNothing().when(commentRepositoryMock).deleteById(1L);
 
@@ -206,6 +207,7 @@ public class CommentServiceTest {
                 "I found this article very interesting!!!", LocalDateTime.now(),
                 article, commentAuthor);
 
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(admin);
         when(validations.isCommentExists(anyLong())).thenReturn(comment);
         when(validations.isAdmin(anyString())).thenReturn(true);
         doNothing().when(commentRepositoryMock).deleteById(1L);
@@ -216,6 +218,7 @@ public class CommentServiceTest {
 
     @Test
     public void comment_test16_Given_UserNotCommentAuthor_When_DeleteComment_Then_ActionForbiddenException() {
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(notAnAuthor);
         when(validations.isCommentExists(anyLong())).thenReturn(comment);
         ActionForbiddenException ex = assertThrows(ActionForbiddenException.class, () ->
                 commentService.deleteComment(1L, notAnAuthor.getUsername()));

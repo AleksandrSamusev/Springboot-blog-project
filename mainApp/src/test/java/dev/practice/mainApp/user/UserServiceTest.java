@@ -137,7 +137,7 @@ public class UserServiceTest {
     public void user_test_4_Given_ValidUserIdAndCurrentUserId_When_getUserById_Then_returnValidUser() {
         when(validations.checkUserExist(1L)).thenReturn(user1);
 
-        when(userRepositoryMock.findByUsername(anyString())).thenReturn(user1);
+        when(validations.checkUserExistsByUsernameOrEmail(anyString())).thenReturn(user1);
 
 
         assertEquals(userService.getUserById(1L, "johnDoe").getClass(), UserFullDto.class);
@@ -147,9 +147,6 @@ public class UserServiceTest {
     @Test
     public void user_test_5_Given_UserWithRoleAsUser_When_getUserById_Then_ActionForbiddenException() {
         when(validations.checkUserExist(1L)).thenReturn(user1);
-
-        when(userRepositoryMock.findByUsername(anyString())).thenReturn(user3);
-
 
         ActionForbiddenException thrown = assertThrows(ActionForbiddenException.class, () ->
                 userService.getUserById(1L, user3.getUsername()));

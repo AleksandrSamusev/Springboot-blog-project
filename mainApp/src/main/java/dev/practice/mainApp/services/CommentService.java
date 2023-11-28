@@ -6,11 +6,11 @@ import dev.practice.mainApp.dtos.comment.CommentNewDto;
 import java.util.List;
 
 public interface CommentService {
-    CommentFullDto createComment(Long articleId, CommentNewDto dto, String username);
+    CommentFullDto createComment(Long articleId, CommentNewDto dto, String login);
 
-    CommentFullDto updateComment(CommentNewDto dto, Long commentId, String username);
+    CommentFullDto updateComment(CommentNewDto dto, Long commentId, String login);
 
-    void deleteComment(Long commentId, String username);
+    void deleteComment(Long commentId, String login);
 
     CommentFullDto getCommentById(Long commentId);
 

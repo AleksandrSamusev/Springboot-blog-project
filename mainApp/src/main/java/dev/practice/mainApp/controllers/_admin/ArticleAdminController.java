@@ -19,17 +19,19 @@ public class ArticleAdminController {
     private final ArticleAdminService articleService;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("users/{authorId}")
+    @GetMapping("/users/{authorId}")
     public ResponseEntity<List<ArticleFullDto>> getAllArticlesByUserId(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("authorId") Long authorId,
             @RequestParam(defaultValue = "0") Integer from,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "ALL", required = false) String status) {
-        return new ResponseEntity<>(articleService.getAllArticlesByUserId(authorId, from, size, status), HttpStatus.OK);
+        return new ResponseEntity<>(articleService.getAllArticlesByUserId(
+                userDetails.getUsername(), authorId, from, size, status), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("{articleId}/publish")
+    @PatchMapping("/{articleId}/publish")
     public ResponseEntity<ArticleFullDto> publishArticle(@AuthenticationPrincipal UserDetails userDetails,
                                                          @PathVariable("articleId") Long articleId,
                                                          @RequestParam boolean publish) {

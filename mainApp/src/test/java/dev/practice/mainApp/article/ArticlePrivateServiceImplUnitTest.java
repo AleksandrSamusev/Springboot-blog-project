@@ -63,7 +63,7 @@ public class ArticlePrivateServiceImplUnitTest {
     @Test
     void articlePr_test_1_Given_validArticleWithoutTagsAndUser_When_createArticle_Then_articleSaved() {
         Mockito
-                .when(userRepository.findByUsername(Mockito.any()))
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.anyString()))
                 .thenReturn(author);
         Mockito
                 .when(articleRepository.save(Mockito.any(Article.class)))
@@ -85,7 +85,7 @@ public class ArticlePrivateServiceImplUnitTest {
     void articlePr_test_2_Given_bannedUser_When_createArticle_Then_throwException() {
         author.setIsBanned(true);
         Mockito
-                .when(userRepository.findByUsername(Mockito.any()))
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.any()))
                 .thenReturn(author);
         Mockito
                 .doCallRealMethod()
@@ -116,6 +116,9 @@ public class ArticlePrivateServiceImplUnitTest {
     @Test
     void articlePr_test_4_Given_userIsNotAuthor_When_updateArticle_Then_throwException() {
         Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.anyString()))
+                .thenReturn(author2);
+        Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
         Mockito
@@ -124,7 +127,7 @@ public class ArticlePrivateServiceImplUnitTest {
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
                 () -> articleService.updateArticle(author2.getUsername(), 0L, Mockito.any()));
-        assertEquals("Article with id 0 is not belongs to user with username RW. Action is forbidden",
+        assertEquals("Article with id 0 is not belongs to user with id 1. Action is forbidden",
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
         Mockito.verify(articleRepository, Mockito.times(0)).save(Mockito.any(Article.class));
@@ -134,6 +137,9 @@ public class ArticlePrivateServiceImplUnitTest {
     void articlePr_test_5_Given_authorisedUserNotAuthor_When_getArticleById_Then_returnedArticleShortDto() {
         savedArticle.setStatus(ArticleStatus.PUBLISHED);
         savedArticle.setPublished(LocalDateTime.now());
+        Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.anyString()))
+                .thenReturn(author2);
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
@@ -151,6 +157,9 @@ public class ArticlePrivateServiceImplUnitTest {
         savedArticle.setStatus(ArticleStatus.PUBLISHED);
         savedArticle.setPublished(LocalDateTime.now());
         Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.anyString()))
+                .thenReturn(author);
+        Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
 
@@ -167,6 +176,9 @@ public class ArticlePrivateServiceImplUnitTest {
         savedArticle.setStatus(ArticleStatus.PUBLISHED);
         savedArticle.setPublished(LocalDateTime.now());
         author2.setRoles(Set.of(roleAdmin));
+        Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.anyString()))
+                .thenReturn(author2);
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
@@ -186,6 +198,9 @@ public class ArticlePrivateServiceImplUnitTest {
     void articlePr_test_8_Given_adminArticleRejected_When_getArticleById_Then_returnedArticleFullDto() {
         savedArticle.setStatus(ArticleStatus.REJECTED);
         author2.setRoles(Set.of(roleAdmin));
+        Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.anyString()))
+                .thenReturn(author2);
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
@@ -207,6 +222,9 @@ public class ArticlePrivateServiceImplUnitTest {
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
+        Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.anyString()))
+                .thenReturn(author);
 
         ArticleFullDto result = (ArticleFullDto) articleService.getArticleById(author.getUsername(), 0L).get();
 
@@ -219,6 +237,9 @@ public class ArticlePrivateServiceImplUnitTest {
     @Test
     void articlePr_test_10_Given_authorizedUserArticleNotPublished_When_getArticleById_Then_throwException() {
         savedArticle.setStatus(ArticleStatus.MODERATING);
+        Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.anyString()))
+                .thenReturn(author2);
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
@@ -234,6 +255,9 @@ public class ArticlePrivateServiceImplUnitTest {
     @Test
     void articlePr_test_11_Given_userNotAuthor_When_deleteArticle_Then_throwException() {
         Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.anyString()))
+                .thenReturn(author2);
+        Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
         Mockito
@@ -242,13 +266,16 @@ public class ArticlePrivateServiceImplUnitTest {
 
         final ActionForbiddenException exception = Assertions.assertThrows(ActionForbiddenException.class,
                 () -> articleService.deleteArticle(author2.getUsername(), 0L));
-        assertEquals("Article with id 0 is not belongs to user with username RW. Action is forbidden",
+        assertEquals("Article with id 0 is not belongs to user with id 1. Action is forbidden",
                 exception.getMessage(), "Incorrect message");
         assertThat(exception).isInstanceOf(ActionForbiddenException.class);
     }
 
     @Test
     void articlePr_test_12_Given_articleCreated_When_publishArticle_Then_returnArticle() {
+        Mockito
+                .when(validations.checkUserExistsByUsernameOrEmail(Mockito.anyString()))
+                .thenReturn(author);
         Mockito
                 .when(validations.checkArticleExist(Mockito.anyLong()))
                 .thenReturn(savedArticle);
