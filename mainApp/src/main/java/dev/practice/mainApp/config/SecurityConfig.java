@@ -1,7 +1,7 @@
 package dev.practice.mainApp.config;
 
 import dev.practice.mainApp.security.JWTAuthenticationEntryPoint;
-import dev.practice.mainApp.security.JWTAuthenticationFilter;
+import dev.practice.mainApp.security.filters.JWTAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

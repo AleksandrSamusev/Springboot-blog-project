@@ -1,5 +1,6 @@
-package dev.practice.mainApp.security;
+package dev.practice.mainApp.security.filters;
 
+import dev.practice.mainApp.security.JWTTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
