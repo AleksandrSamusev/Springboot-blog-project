@@ -50,6 +50,9 @@ To do this, you need to go to the editor's website and import the contents of th
 ![IDEA-fragment](mainApp/src/main/resources/static/images/openapi.jpeg)
 
 
+## Components diagram
+![components-diagram](mainApp/src/main/resources/static/images/Components.jpg)
+
 ## Blog Database ER-diagram
 
 ![er-diagram](mainApp/src/main/resources/static/images/erDiagram.jpeg)
