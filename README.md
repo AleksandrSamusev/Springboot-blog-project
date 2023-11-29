@@ -51,7 +51,7 @@ To do this, you need to go to the editor's website and import the contents of th
 
 
 ## Components diagram
-![components-diagram](mainApp/src/main/resources/static/images/Components.jpg)
+![components-diagram](mainApp/src/main/resources/static/images/components.jpg)
 
 ## Blog Database ER-diagram
 
